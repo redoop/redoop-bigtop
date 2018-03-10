@@ -1,0 +1,126 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+hive_pkg_name=hive
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	mkdir -p /tmp/debian-hive/.ivy
+	bash debian/do-component-build
+	touch $@
+
+.PHONY: server2
+.PHONY: metastore
+.PHONY: hcatalog-server
+.PHONY: webhcat-server
+
+server2 metastore hcatalog-server webhcat-server:
+	bash debian/init.d.tmpl debian/hive-$@.svc deb debian/${hive_pkg_name}${CRH_VERSION_AS_NAME}-$@.init
+
+override_dh_auto_install: server2 metastore hcatalog-server webhcat-server
+	cp debian/hive-site.xml .
+	cp debian/hive.1 .
+	cp debian/hive-hcatalog.1 .
+	env CRH_DIR=${crh_dir} bash debian/install_hive.sh \
+	  --prefix=debian/tmp \
+	  --build-dir=build/dist \
+	  --doc-dir=debian/tmp/usr/share/doc/${hive_pkg_name}
+	# We need to get rid of jars that happen to be shipped in other CDH packages
+	rm -f debian/tmp/${crh_dir}/hive/lib/hbase-*.jar debian/tmp/${crh_dir}/hive/lib/zookeeper-*.jar
+	ln -s ${crh_dir}/hbase/hbase-common.jar ${crh_dir}/hbase/hbase-client.jar debian/tmp/${crh_dir}/hive/lib
+	ln -s  ${crh_dir}/zookeeper/zookeeper.jar debian/tmp/${crh_dir}/hive/lib
+
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hive.install.include
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hive-webhcat.postinst
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hive-webhcat-server.svc
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hive-webhcat-server.default
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hive-server2.svc
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hive-metastore.svc
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hive-hcatalog-server.svc
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hive-hcatalog-server.default
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hive-site.xml
+
+	mkdir -p debian/hive${CRH_VERSION_AS_NAME}-server2/etc/init.d
+	mkdir -p debian/hive${CRH_VERSION_AS_NAME}-metastore/etc/init.d
+	mkdir -p debian/hive${CRH_VERSION_AS_NAME}-hcatalog-server/etc/init.d
+	mkdir -p debian/hive${CRH_VERSION_AS_NAME}-webhcat-server/etc/init.d
+	
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/${hive_pkg_name}${CRH_VERSION_AS_NAME}-server2.init
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/${hive_pkg_name}${CRH_VERSION_AS_NAME}-metastore.init
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/${hive_pkg_name}${CRH_VERSION_AS_NAME}-hcatalog-server.init
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/${hive_pkg_name}${CRH_VERSION_AS_NAME}-webhcat-server.init
+	
+	mv debian/${hive_pkg_name}${CRH_VERSION_AS_NAME}-server2.init debian/hive${CRH_VERSION_AS_NAME}-server2/etc/init.d/hive-server2
+	mv debian/${hive_pkg_name}${CRH_VERSION_AS_NAME}-metastore.init debian/hive${CRH_VERSION_AS_NAME}-metastore/etc/init.d/hive-metastore
+	mv debian/${hive_pkg_name}${CRH_VERSION_AS_NAME}-hcatalog-server.init debian/hive${CRH_VERSION_AS_NAME}-hcatalog-server/etc/init.d/hive-hcatalog-server
+	mv debian/${hive_pkg_name}${CRH_VERSION_AS_NAME}-webhcat-server.init debian/hive${CRH_VERSION_AS_NAME}-webhcat-server/etc/init.d/hive-webhcat-server
+	
+	# Workaround for BIGTOP-583
+	rm -f debian/tmp/${crh_dir}/hive/lib/slf4j-log4j12-*.jar
+	env crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN} bash debian/build-hive-install-file.sh >> debian/hive.install
+	cat debian/hive-hcatalog.dirs >> debian/hive-hcatalog.install
+	
+	mkdir -p debian/hive${CRH_VERSION_AS_NAME}/${crh_dir}/hive
+	cp debian/tmp/${crh_dir}/hive/hive.tar.gz debian/hive${CRH_VERSION_AS_NAME}/${crh_dir}/hive
+
+	# Hive source contains a directory docs/changes that is interpreted a special way in Debian 7+ packaging
+	mv docs/changes docs/changes_
+	
+	# Rename file to add CRH version as name, first define file list
+deb_file=server2 metastore hbase jdbc hcatalog hcatalog-server webhcat webhcat-server 
+override_dh_install:
+	CRH_DIR=${crh_dir}
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/hive.dirs ] || mv debian/hive.dirs debian/hive${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/hive.install ] || mv debian/hive.install debian/hive${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/hive.lintian-overrides ] || mv debian/hive.lintian-overrides debian/hive${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/hive.manpages ] || mv debian/hive.manpages debian/hive${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/hive.postinst ] || mv debian/hive.postinst debian/hive${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/hive.preinst ] || mv debian/hive.preinst debian/hive${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/hive.prerm ] || mv debian/hive.prerm debian/hive${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/hive-$$file.dirs ] || mv debian/hive-$$file.dirs debian/hive${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/hive-$$file.install ] || mv debian/hive-$$file.install debian/hive${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/hive-$$file.lintian-overrides ] || mv debian/hive-$$file.lintian-overrides debian/hive${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/hive-$$file.manpages ] || mv debian/hive-$$file.manpages debian/hive${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/hive-$$file.postinst ] || mv debian/hive-$$file.postinst debian/hive${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/hive-$$file.preinst ] || mv debian/hive-$$file.preinst debian/hive${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/hive-$$file.prerm ] || mv debian/hive-$$file.prerm debian/hive${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install
+		

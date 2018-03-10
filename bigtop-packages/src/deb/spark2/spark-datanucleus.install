@@ -1,0 +1,2 @@
+${crh_dir}/spark2/jars/datanucleus-*.jar
+${crh_dir}/spark2/yarn/lib/datanucleus-*.jar

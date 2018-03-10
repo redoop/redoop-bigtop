@@ -1,0 +1,91 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# 
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+zookeeper_pkg_name=zookeeper${CRH_VERSION_AS_NAME}
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	bash debian/do-component-build -Divy.home=${HOME}/.ivy2
+	mkdir -p debian/tmp
+	tar cf - --exclude=debian/\* . | (cd debian/tmp && tar xf -)
+
+override_dh_auto_install:
+	cp debian/zookeeper.1 debian/zoo.cfg debian/zookeeper.default .
+	env CRH_DIR=${crh_dir} bash -x debian/install_zookeeper.sh \
+	  --build-dir=build/zookeeper-${ZOOKEEPER_BASE_VERSION} \
+	  --prefix=debian/$(zookeeper_pkg_name)
+	   # Move native files to a dedicated package
+	   mkdir -p debian/zookeeper${CRH_VERSION_AS_NAME}-native/usr/bin
+	   mkdir -p debian/zookeeper${CRH_VERSION_AS_NAME}-native/usr/lib
+	   mkdir -p debian/zookeeper${CRH_VERSION_AS_NAME}-native/${crh_dir}
+	   mkdir -p debian/zookeeper${CRH_VERSION_AS_NAME}-rest/etc/init.d
+	   mkdir -p debian/zookeeper${CRH_VERSION_AS_NAME}-server/etc/init.d
+	   mv debian/zookeeper${CRH_VERSION_AS_NAME}/usr/bin/cli_* debian/zookeeper${CRH_VERSION_AS_NAME}/usr/bin/load_gen debian/zookeeper${CRH_VERSION_AS_NAME}-native/usr/bin/
+	   mv debian/zookeeper${CRH_VERSION_AS_NAME}/usr/lib/libzookeeper* debian/zookeeper${CRH_VERSION_AS_NAME}-native/usr/lib
+	   mv debian/zookeeper${CRH_VERSION_AS_NAME}/${crh_dir}/zookeeper-native debian/zookeeper${CRH_VERSION_AS_NAME}-native/${crh_dir}
+	   mv debian/zookeeper${CRH_VERSION_AS_NAME}/usr/include debian/zookeeper${CRH_VERSION_AS_NAME}-native/usr/include
+	   sed -i -e "s,{CRH_DIR},${crh_dir}," debian/zookeeper-rest.svc
+	   sed -i -e "s,{CRH_VERSION},${CRH_VERSION_WITH_BN}," debian/zookeeper.postinst
+	   cp debian/zookeeper-server.init debian/zookeeper${CRH_VERSION_AS_NAME}-server/etc/init.d/zookeeper-server
+	   bash debian/init.d.tmpl debian/zookeeper-rest.svc deb debian/zookeeper-rest.init
+	   cp debian/zookeeper-rest.init debian/zookeeper${CRH_VERSION_AS_NAME}-rest/etc/init.d/zookeeper-rest
+	
+	
+	# Rename file to add CRH version as name, first define file list
+deb_file=server rest native
+
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/zookeeper.dirs ] || mv debian/zookeeper.dirs debian/zookeeper${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/zookeeper.install ] || mv debian/zookeeper.install debian/zookeeper${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/zookeeper.lintian-overrides ] || mv debian/zookeeper.lintian-overrides debian/zookeeper${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/zookeeper.manpages ] || mv debian/zookeeper.manpages debian/zookeeper${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/zookeeper.postinst ] || mv debian/zookeeper.postinst debian/zookeeper${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/zookeeper.preinst ] || mv debian/zookeeper.preinst debian/zookeeper${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/zookeeper.prerm ] || mv debian/zookeeper.prerm debian/zookeeper${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/zookeeper-$$file.dirs ] || mv debian/zookeeper-$$file.dirs debian/zookeeper${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/zookeeper-$$file.install ] || mv debian/zookeeper-$$file.install debian/zookeeper${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/zookeeper-$$file.lintian-overrides ] || mv debian/zookeeper-$$file.lintian-overrides debian/zookeeper${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/zookeeper-$$file.manpages ] || mv debian/zookeeper-$$file.manpages debian/zookeeper${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/zookeeper-$$file.postinst ] || mv debian/zookeeper-$$file.postinst debian/zookeeper${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/zookeeper-$$file.preinst ] || mv debian/zookeeper-$$file.preinst debian/zookeeper${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/zookeeper-$$file.prerm ] || mv debian/zookeeper-$$file.prerm debian/zookeeper${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install
+	   

@@ -1,0 +1,9 @@
+${crh_dir}/hive/lib/commons-logging-*.jar
+${crh_dir}/hive/lib/hive-exec*.jar
+${crh_dir}/hive/lib/hive-jdbc*.jar
+${crh_dir}/hive/lib/hive-metastore*.jar
+${crh_dir}/hive/lib/hive-serde*.jar
+${crh_dir}/hive/lib/hive-service*.jar
+${crh_dir}/hive/lib/libfb303-*.jar
+${crh_dir}/hive/lib/libthrift-*.jar
+${crh_dir}/hive/lib/log4j-*.jar

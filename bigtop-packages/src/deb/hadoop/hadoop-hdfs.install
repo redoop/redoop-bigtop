@@ -1,0 +1,11 @@
+/etc/security/limits.d/hdfs.conf
+/etc/hadoop/conf.empty/hdfs-site.xml
+${crh_dir}/hadoop-hdfs
+${crh_dir}/hadoop/libexec/hdfs-config.sh
+${crh_dir}/hadoop/libexec/init-hdfs.sh
+${crh_dir}/hadoop/libexec/init-hcfs.json
+${crh_dir}/hadoop/libexec/init-hcfs.groovy
+/usr/bin/hdfs
+/var/lib/hadoop-hdfs
+/var/log/hadoop-hdfs
+/var/run/hadoop-hdfs

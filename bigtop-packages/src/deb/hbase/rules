@@ -1,0 +1,124 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# 
+# -*- makefile -*-
+SHELL=/bin/bash
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+zookeeper_home=${crh_dir}/zookeeper
+hadoop_home=${crh_dir}/hadoop
+hbase_pkg_name=hbase
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	bash debian/do-component-build -Dmaven.repo.local=${HOME}/.m2/repository  
+
+	
+override_dh_auto_install:
+	mkdir -p debian/tmp/etc/default/
+	cp debian/hbase.default debian/tmp/etc/default/${hbase_pkg_name}
+	env CRH_DIR=${crh_dir} CRH_VERSION=${CRH_VERSION_WITH_BN} bash -x debian/install_hbase.sh \
+		--build-dir=build \
+		--conf-dir=/etc/hbase/conf.dist \
+		--doc-dir=usr/share/doc/${hbase_pkg_name}-doc \
+		--prefix=debian/tmp
+	mkdir -p debian/tmp/etc/security/limits.d
+	cp debian/hbase.nofiles.conf debian/tmp/etc/security/limits.d/${hbase_pkg_name}.nofiles.conf
+	
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hbase.default
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hbase.svc
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/regionserver-init.d.tpl
+	
+	# Symlink in the dependency jars from their packages. Both of these packages
+	# provide an unversioned symlink foo.jar -> foo-0.1.2.jar.
+	rm -f debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/{hadoop,zookeeper,slf4j-log4j12-}*.jar
+	ln -f -s ${zookeeper_home}/zookeeper.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-annotations.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-auth.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-common.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-hdfs.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-mapreduce-client-app.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-mapreduce-client-common.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-mapreduce-client-core.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-mapreduce-client-jobclient.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-mapreduce-client-shuffle.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-yarn-api.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-yarn-client.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-yarn-common.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -f -s ${hadoop_home}/client/hadoop-yarn-server-common.jar debian/tmp/${crh_dir}/${hbase_pkg_name}/lib/
+	ln -s /var/log/${hbase_pkg_name} debian/tmp/${crh_dir}/${hbase_pkg_name}/logs
+	ln -s /var/run/${hbase_pkg_name} debian/tmp/${crh_dir}/${hbase_pkg_name}/pids
+	# Wage war on "executable-not-elf-or-script" warnings:
+	### ruby scripts should not be executable - they require
+	### hbase org.jruby.Main <script>
+	find debian/tmp/${crh_dir}/${hbase_pkg_name}/bin debian/tmp/${crh_dir}/${hbase_pkg_name}/lib -name \*.rb -exec chmod 644 {} \;
+	### webapps should not be executable either
+	find debian/tmp/${crh_dir}/${hbase_pkg_name}/hbase-webapps -type f -exec chmod 644 {} \;
+	bash debian/install_init_scripts.sh
+	
+		# Rename file to add CRH version as name, first define file list
+deb_file=doc master regionserver rest thrift
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/hbase.dirs ] || mv debian/hbase.dirs debian/hbase${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/hbase.install ] || mv debian/hbase.install debian/hbase${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/hbase.lintian-overrides ] || mv debian/hbase.lintian-overrides debian/hbase${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/hbase.manpages ] || mv debian/hbase.manpages debian/hbase${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/hbase.postinst ] || mv debian/hbase.postinst debian/hbase${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/hbase.preinst ] || mv debian/hbase.preinst debian/hbase${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/hbase.prerm ] || mv debian/hbase.prerm debian/hbase${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/hbase-$$file.dirs ] || mv debian/hbase-$$file.dirs debian/hbase${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/hbase-$$file.install ] || mv debian/hbase-$$file.install debian/hbase${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/hbase-$$file.lintian-overrides ] || mv debian/hbase-$$file.lintian-overrides debian/hbase${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/hbase-$$file.manpages ] || mv debian/hbase-$$file.manpages debian/hbase${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/hbase-$$file.postinst ] || mv debian/hbase-$$file.postinst debian/hbase${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/hbase-$$file.preinst ] || mv debian/hbase-$$file.preinst debian/hbase${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/hbase-$$file.prerm ] || mv debian/hbase-$$file.prerm debian/hbase${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install
+	
+	mkdir -p debian/hbase${CRH_VERSION_AS_NAME}-regionserver/etc/init.d/
+	mkdir -p debian/hbase${CRH_VERSION_AS_NAME}-rest/etc/init.d/
+	mkdir -p debian/hbase${CRH_VERSION_AS_NAME}-master/etc/init.d/
+	mkdir -p debian/hbase${CRH_VERSION_AS_NAME}-thrift/etc/init.d/
+	cp debian/regionserver-init.d.tpl debian/hbase${CRH_VERSION_AS_NAME}-regionserver/etc/init.d/hbase-regionserver
+	#bash debian/init.d.tmpl debian/hbase.svc deb debian/hbase-rest.init
+	cp debian/hbase-rest.init debian/hbase${CRH_VERSION_AS_NAME}-rest/etc/init.d/hbase-rest
+	#bash debian/init.d.tmpl debian/hbase.svc deb debian/hbase-thrift.init
+	cp debian/hbase-thrift.init debian/hbase${CRH_VERSION_AS_NAME}-thrift/etc/init.d/hbase-thrift
+	#bash debian/init.d.tmpl debian/hbase.svc deb debian/hbase-master.init
+	cp debian/hbase-master.init debian/hbase${CRH_VERSION_AS_NAME}-master/etc/init.d/hbase-master

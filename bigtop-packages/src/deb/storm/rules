@@ -1,0 +1,66 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+build_version=${STORM_VERSION}
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+crh_version_with_bn=${CRH_VERSION_WITH_BN}
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# No easy way to disable the default RAT run which fails the build because of some fails in the debian/ directory
+	# I could not find a way to add debian/ to RAT exclude list through cmd line
+	# or to unbind rat:check goal
+	# So I am redirecting its attention with a decoy
+	env STORM_VERSION=$(build_version) \
+		sh debian/do-component-build
+
+override_dh_auto_install:
+	env CRH_DIR=${crh_dir} CRH_VERSION=${crh_version_with_bn} sh debian/install_storm.sh \
+	  --build-dir=build \
+	  --prefix=debian/storm${CRH_VERSION_AS_NAME}
+	
+	# Rename file to add CRH version as name, first define file list
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/storm.dirs ] || mv debian/storm.dirs debian/storm${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/storm.install ] || mv debian/storm.install debian/storm${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/storm.lintian-overrides ] || mv debian/storm.lintian-overrides debian/storm${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/storm.manpages ] || mv debian/storm.manpages debian/storm${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/storm.postinst ] || mv debian/storm.postinst debian/storm${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/storm.preinst ] || mv debian/storm.preinst debian/storm${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/storm.prerm ] || mv debian/storm.prerm debian/storm${CRH_VERSION_AS_NAME}.prerm
+	
+	
+	dh_install
+

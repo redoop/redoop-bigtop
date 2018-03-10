@@ -1,0 +1,4 @@
+/etc/hive-webhcat
+${crh_dir}/hive-hcatalog/etc/webhcat
+${crh_dir}/hive-hcatalog/share/webhcat
+${crh_dir}/hive-hcatalog/sbin/webhcat*
