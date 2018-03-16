@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-%define ambari_name ambari 
+%define ambari_name ambari
+%define ambari_stack CRH
 %define _binaries_in_noarch_packages_terminate_build   0
 %define _unpackaged_files_terminate_build 0
 
@@ -37,10 +38,14 @@ Group: Development
 BuildArch: noarch
 Buildroot: %(mktemp -ud %{_tmppath}/apache-%{ambari_name}-%{version}-%{release}-XXXXXX)
 License: ASL 2.0 
-Source0: apache-%{ambari_name}-%{ambari_version}-src.tar.gz
+Source0: apache-%{ambari_name}-%{ambari_base_version}-src.tar.gz
 Source1: do-component-build 
 Source2: install_%{ambari_name}.sh
 Source3: bigtop.bom
+Source4: stacks
+
+Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
+
 # FIXME
 AutoProv: no
 AutoReqProv: no
@@ -50,9 +55,15 @@ Ambari
 
 %prep
 %setup -n apache-%{ambari_name}-%{ambari_base_version}-src
+# Apply patch
+%patch0 -p1
+
 
 %build
-bash $RPM_SOURCE_DIR/do-component-build
+# build source
+DISTRO_DIR=$RPM_SOURCE_DIR AMBARI_STACK=%{ambari_stack} PREFIX=$RPM_BUILD_ROOT bash $RPM_SOURCE_DIR/do-component-build
+
+
 
 %install
 %__rm -rf $RPM_BUILD_ROOT
@@ -62,8 +73,10 @@ AMBARI_VERSION=%{ambari_version} bash $RPM_SOURCE_DIR/install_ambari.sh \
           --source-dir=`pwd` \
           --prefix=$RPM_BUILD_ROOT
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{initd_dir}
-%__mv ${RPM_BUILD_ROOT}/etc/init.d/ambari-server ${RPM_BUILD_ROOT}/%{initd_dir} || :
- 
+%__cp ${RPM_BUILD_ROOT}/etc/init.d/ambari-server ${RPM_BUILD_ROOT}/%{initd_dir} || :
+%__cp ${RPM_BUILD_ROOT}/etc/init.d/ambari-agent ${RPM_BUILD_ROOT}/%{initd_dir} || :
+
+
 %package server
 Summary: Ambari Server
 Group: Development/Libraries
@@ -89,28 +102,102 @@ Ambari Server
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+
 STACKS_FOLDER="/var/lib/ambari-server/resources/stacks"
-STACKS_FOLDER_OLD=/var/lib/ambari-server/resources/stacks_$(date '+%d_%m_%y_%H_%M').old
+STACKS_FOLDER_OLD="/var/lib/ambari-server/resources/stacks_$(date '+%d_%m_%y_%H_%M').old"
 
 COMMON_SERVICES_FOLDER="/var/lib/ambari-server/resources/common-services"
-COMMON_SERVICES_FOLDER_OLD=/var/lib/ambari-server/resources/common-services_$(date '+%d_%m_%y_%H_%M').old
+COMMON_SERVICES_FOLDER_OLD="/var/lib/ambari-server/resources/common-services_$(date '+%d_%m_%y_%H_%M').old"
+
+MPACKS_FOLDER="/var/lib/ambari-server/resources/mpacks"
+MPACKS_FOLDER_OLD="/var/lib/ambari-server/resources/mpacks_$(date '+%d_%m_%y_%H_%M').old"
+
+AMBARI_PROPERTIES="/etc/ambari-server/conf/ambari.properties"
+AMBARI_PROPERTIES_OLD="$AMBARI_PROPERTIES.rpmsave"
+
+AMBARI_ENV="/var/lib/ambari-server/ambari-env.sh"
+AMBARI_ENV_OLD="$AMBARI_ENV.rpmsave"
+
+AMBARI_KRB_JAAS_LOGIN_FILE="/etc/ambari-server/conf/krb5JAASLogin.conf"
+AMBARI_KRB_JAAS_LOGIN_FILE_OLD="$AMBARI_KRB_JAAS_LOGIN_FILE.rpmsave"
 
 AMBARI_VIEWS_FOLDER="/var/lib/ambari-server/resources/views"
 AMBARI_VIEWS_BACKUP_FOLDER="$AMBARI_VIEWS_FOLDER/backups"
 
-if [ -d "/etc/ambari-server/conf.save" ]
+AMBARI_SERVER_JAR_FILES="/usr/lib/ambari-server/ambari-server-*.jar"
+AMBARI_SERVER_JAR_FILES_BACKUP_FOLDER="/usr/lib/ambari-server-backups"
+SERVER_CONF_SAVE="/etc/ambari-server/conf.save"
+SERVER_CONF_SAVE_BACKUP="/etc/ambari-server/conf_$(date '+%d_%m_%y_%H_%M').save"
+
+if [ -d "$SERVER_CONF_SAVE" ]
 then
-    mv /etc/ambari-server/conf.save /etc/ambari-server/conf_$(date '+%d_%m_%y_%H_%M').save
+    echo "Backing up configs $SERVER_CONF_SAVE -> $SERVER_CONF_SAVE_BACKUP"
+    mv "$SERVER_CONF_SAVE" "$SERVER_CONF_SAVE_BACKUP"
+fi
+
+if [ -f "$AMBARI_PROPERTIES" ]
+then
+    echo "Backing up Ambari properties $AMBARI_PROPERTIES -> $AMBARI_PROPERTIES_OLD"
+    cp -n "$AMBARI_PROPERTIES" "$AMBARI_PROPERTIES_OLD"
+fi
+
+if [ -f "$AMBARI_ENV" ]
+then
+    echo "Backing up Ambari properties $AMBARI_ENV -> $AMBARI_ENV_OLD"
+    cp -n "$AMBARI_ENV" "$AMBARI_ENV_OLD"
+fi
+
+if [ -f "$AMBARI_KRB_JAAS_LOGIN_FILE" ]
+then
+    echo "Backing up JAAS login file $AMBARI_KRB_JAAS_LOGIN_FILE -> $AMBARI_KRB_JAAS_LOGIN_FILE_OLD"
+    cp -n "$AMBARI_KRB_JAAS_LOGIN_FILE" "$AMBARI_KRB_JAAS_LOGIN_FILE_OLD"
 fi
 
 if [ -d "$STACKS_FOLDER" ]
 then
+    echo "Backing up stacks directory $STACKS_FOLDER -> $STACKS_FOLDER_OLD"
     mv -f "$STACKS_FOLDER" "$STACKS_FOLDER_OLD"
 fi
 
-if [ -d "$COMMON_SERVICES_FOLDER_OLD" ]
+if [ -d "$COMMON_SERVICES_FOLDER" ]
 then
+    echo "Backing up common-services directory $COMMON_SERVICES_FOLDER -> $COMMON_SERVICES_FOLDER_OLD"
     mv -f "$COMMON_SERVICES_FOLDER" "$COMMON_SERVICES_FOLDER_OLD"
+fi
+
+if [ -d "$MPACKS_FOLDER" ]
+then
+    # Make a copy of mpacks folder
+    if [ ! -d "$MPACKS_FOLDER_OLD" ]; then
+        echo "Backing up mpacks directory $MPACKS_FOLDER -> $MPACKS_FOLDER_OLD"
+        cp -R "$MPACKS_FOLDER" "$MPACKS_FOLDER_OLD"
+    fi
+
+    # Update symlinks in $STACKS_FOLDER_OLD to point to $MPACKS_FOLDER_OLD
+    if [ -d "$STACKS_FOLDER_OLD" ]; then
+        for link in $(find "$STACKS_FOLDER_OLD" -type l)
+        do
+            target=`readlink $link`
+            if grep -q "$MPACKS_FOLDER/"<<<$target; then
+                new_target="${target/$MPACKS_FOLDER/$MPACKS_FOLDER_OLD}"
+                echo "Updating symlink $link -> $new_target"
+                ln -snf $new_target $link
+            fi
+        done
+    fi
+
+    # Update symlinks in $COMMON_SERVICES_FOLDER_OLD to point to $MPACKS_FOLDER_OLD
+    if [ -d "$COMMON_SERVICES_FOLDER_OLD" ]; then
+    for link in $(find "$COMMON_SERVICES_FOLDER_OLD" -type l)
+        do
+            target=`readlink $link`
+            if grep -q "$MPACKS_FOLDER/"<<<$target; then
+                new_target="${target/$MPACKS_FOLDER/$MPACKS_FOLDER_OLD}"
+                echo "Updating symlink $link -> $new_target"
+                ln -snf $new_target $link
+            fi
+        done
+    fi
 fi
 
 if [ ! -d "$AMBARI_VIEWS_BACKUP_FOLDER" ] && [ -d "$AMBARI_VIEWS_FOLDER" ]
@@ -120,10 +207,26 @@ fi
 
 if [ -d "$AMBARI_VIEWS_FOLDER" ] && [ -d "$AMBARI_VIEWS_BACKUP_FOLDER" ]
 then
+    echo "Backing up Ambari view jars $AMBARI_VIEWS_FOLDER/*.jar -> $AMBARI_VIEWS_BACKUP_FOLDER/"
     cp -u $AMBARI_VIEWS_FOLDER/*.jar $AMBARI_VIEWS_BACKUP_FOLDER/
 fi
 
+for f in $AMBARI_SERVER_JAR_FILES;
+do
+    if [ -f "$f" ]
+    then
+        if [ ! -d "$AMBARI_SERVER_JAR_FILES_BACKUP_FOLDER" ]
+        then
+            mkdir -p "$AMBARI_SERVER_JAR_FILES_BACKUP_FOLDER"
+        fi
+        echo "Backing up Ambari server jar $f -> $AMBARI_SERVER_JAR_FILES_BACKUP_FOLDER/"
+        mv -f $f $AMBARI_SERVER_JAR_FILES_BACKUP_FOLDER/
+    fi
+done
+
 exit 0
+
+
 
 %post server
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -141,28 +244,44 @@ exit 0
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-if [ -e "/usr/sbin/ambari-server" ]; then # Check is needed for upgrade
-    # Remove link created by previous package version
-    rm -f /usr/sbin/ambari-server
-fi
+# Warning: don't add changes to this script directly, please add changes to install-helper.sh.
 
-ln -s /etc/init.d/ambari-server /usr/sbin/ambari-server
+INSTALL_HELPER="/var/lib/ambari-server/install-helper.sh"
+
+AMBARI_SERVER_KEYS_FOLDER="/var/lib/ambari-server/keys"
+AMBARI_SERVER_KEYS_DB_FOLDER="/var/lib/ambari-server/keys/db"
+AMBARI_SERVER_NEWCERTS_FOLDER="/var/lib/ambari-server/keys/db/newcerts"
 
 case "$1" in
   1) # Action install
-    if [ -f "/var/lib/ambari-server/install-helper.sh" ]; then
-        /var/lib/ambari-server/install-helper.sh install
+    if [ -f "$INSTALL_HELPER" ]; then
+        $INSTALL_HELPER install
     fi
-    chkconfig --add ambari-server
   ;;
   2) # Action upgrade
-    if [ -f "/var/lib/ambari-server/install-helper.sh" ]; then
-        /var/lib/ambari-server/install-helper.sh upgrade
+    if [ -f "$INSTALL_HELPER" ]; then
+        $INSTALL_HELPER upgrade
     fi
   ;;
 esac
 
+if [ -d "$AMBARI_SERVER_KEYS_FOLDER" ]
+then
+    chmod 700 "$AMBARI_SERVER_KEYS_FOLDER"
+    if [ -d "$AMBARI_SERVER_KEYS_DB_FOLDER" ]
+    then
+        chmod 700 "$AMBARI_SERVER_KEYS_DB_FOLDER"
+        if [ -d "$AMBARI_SERVER_NEWCERTS_FOLDER" ]
+        then
+            chmod 700 "$AMBARI_SERVER_NEWCERTS_FOLDER"
+
+        fi
+    fi
+fi
+
 exit 0
+
+
 
 %preun server
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -205,6 +324,8 @@ if [ "$1" -eq 0 ]; then  # Action is uninstall
 fi
 
 exit 0
+
+
 
 %posttrans server
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -253,6 +374,8 @@ fi
 
 exit 0
 
+
+
 %package agent
 Summary: Ambari Agent
 Group: Development/Libraries
@@ -261,6 +384,7 @@ AutoProv: no
 AutoReqProv: no
 %description agent
 Ambari Agent
+
 
 %pre agent
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -303,12 +427,14 @@ then
     mv -f "$STACKS_FOLDER" "$STACKS_FOLDER_OLD"
 fi
 
-if [ -d "$COMMON_SERVICES_FOLDER_OLD" ]
+if [ -d "$COMMON_SERVICES_FOLDER" ]
 then
     mv -f "$COMMON_SERVICES_FOLDER" "$COMMON_SERVICES_FOLDER_OLD"
 fi
 
 exit 0
+
+
 
 %post agent
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -326,39 +452,24 @@ exit 0
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+# Warning: don't add changes to this script directly, please add changes to install-helper.sh.
 
 case "$1" in
   1) # Action install
     if [ -f "/var/lib/ambari-agent/install-helper.sh" ]; then
         /var/lib/ambari-agent/install-helper.sh install
     fi
-  chkconfig --add ambari-agent
   ;;
   2) # Action upgrade
-    if [ -d "/etc/ambari-agent/conf.save" ]; then
-        cp -f /etc/ambari-agent/conf.save/* /etc/ambari-agent/conf
-        mv /etc/ambari-agent/conf.save /etc/ambari-agent/conf_$(date '+%d_%m_%y_%H_%M').save
-    fi
-
     if [ -f "/var/lib/ambari-agent/install-helper.sh" ]; then
         /var/lib/ambari-agent/install-helper.sh upgrade
     fi
   ;;
 esac
 
-
-BAK=/etc/ambari-agent/conf/ambari-agent.ini.old
-ORIG=/etc/ambari-agent/conf/ambari-agent.ini
-
-if [ -f $BAK ]; then
-  if [ -f "/var/lib/ambari-agent/upgrade_agent_configs.py" ]; then
-    /var/lib/ambari-agent/upgrade_agent_configs.py
-  fi
-  mv $BAK ${BAK}_$(date '+%d_%m_%y_%H_%M').save
-fi
-
-
 exit 0
+
+
 
 %preun agent
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -397,6 +508,8 @@ fi
 
 exit 0
 
+
+
 %posttrans agent
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -418,6 +531,8 @@ RESOURCE_MANAGEMENT_DIR="/usr/lib/python2.6/site-packages/resource_management"
 RESOURCE_MANAGEMENT_DIR_AGENT="/usr/lib/ambari-agent/lib/resource_management"
 JINJA_DIR="/usr/lib/python2.6/site-packages/ambari_jinja2"
 JINJA_AGENT_DIR="/usr/lib/ambari-agent/lib/ambari_jinja2"
+AMBARI_AGENT_BINARY="/etc/init.d/ambari-agent"
+AMBARI_AGENT_BINARY_SYMLINK="/usr/sbin/ambari-agent"
 
 # remove RESOURCE_MANAGEMENT_DIR if it's a directory
 if [ -d "$RESOURCE_MANAGEMENT_DIR" ]; then  # resource_management dir exists
@@ -435,72 +550,49 @@ if [ ! -d "$JINJA_DIR" ]; then
   ln -s "$JINJA_AGENT_DIR" "$JINJA_DIR"
 fi
 
+# setting ambari-agent binary symlink
+if [ ! -f "$AMBARI_AGENT_BINARY_SYMLINK" ]; then
+  ln -s "$AMBARI_AGENT_BINARY" "$AMBARI_AGENT_BINARY_SYMLINK"
+fi
+
 exit 0
 
-%package client
-Summary: Ambari Client
-Group: Development/Libraries
-Requires: bigtop-utils >= 0.7
-%description client
-Ambari Client
+
+
 
 %files server
+%config  /etc/ambari-server/conf
 %attr(644,root,root) /etc/init/ambari-server.conf
-%defattr(644,root,root,755)
-/usr/lib/ambari-server
+%attr(755,root,root) /etc/init.d/ambari-server
+%attr(755,root,root) /etc/rc.d/init.d/ambari-server
 %attr(755,root,root) /usr/sbin/ambari-server.py
 %attr(755,root,root) /usr/sbin/ambari_server_main.py
-%attr(755,root,root) %{initd_dir}/ambari-server
-/var/lib/ambari-server
-%attr(755,root,root) /var/lib/ambari-server/ambari-python-wrap
-%config  /etc/ambari-server/conf
-%config %attr(700,root,root) /var/lib/ambari-server//ambari-env.sh
-%attr(700,root,root) /var/lib/ambari-server//ambari-sudo.sh
-%attr(700,root,root) /var/lib/ambari-server//install-helper.sh
-%attr(700,root,root) /var/lib/ambari-server/keys/db
-%attr(755,root,root) /var/lib/ambari-server/resources/stacks/stack_advisor.py
+/usr/lib/ambari-server
+%dir  /var/lib/ambari-server/resources/upgrade
 %dir %attr(755,root,root) /var/lib/ambari-server/data/tmp
 %dir %attr(700,root,root) /var/lib/ambari-server/data/cache
-%attr(755,root,root) /var/lib/ambari-server/resources/apps
-%attr(755,root,root) /var/lib/ambari-server/resources/scripts
-%attr(755,root,root) /var/lib/ambari-server/resources/views
-%attr(755,root,root) /var/lib/ambari-server/resources/custom_actions
-%attr(755,root,root) /var/lib/ambari-server/resources/host_scripts
-%dir  /var/lib/ambari-server/resources/upgrade
+/var/lib/ambari-server
+%attr(755,root,root) /usr/lib/python2.6/site-packages/ambari_server
+%dir  /var/log/ambari-server
 %dir  /var/run/ambari-server
 %dir  /var/run/ambari-server/bootstrap
 %dir  /var/run/ambari-server/stack-recommendations
-%dir  /var/log/ambari-server
-%attr(755,root,root) /usr/lib/python2.6/site-packages/ambari_server
+
+
 
 %files agent
-%attr(644,root,root) /etc/init/ambari-agent.conf
-%attr(-,root,root) /usr/lib/python2.6/site-packages/ambari_agent
-%attr(755,root,root) /var/lib/ambari-agent/ambari-python-wrap
-%attr(755,root,root) /var/lib/ambari-agent/ambari-sudo.sh
-%attr(-,root,root) /usr/lib/ambari-agent/lib/ambari_commons
-%attr(-,root,root) /usr/lib/ambari-agent/lib/resource_management
-%attr(755,root,root) /usr/lib/ambari-agent/lib/ambari_jinja2
-%attr(755,root,root) /usr/lib/ambari-agent/lib/ambari_simplejson
-%attr(755,root,root) /usr/lib/ambari-agent/lib/examples
 %attr(755,root,root) /etc/ambari-agent/conf/ambari-agent.ini
 %attr(755,root,root) /etc/ambari-agent/conf/logging.conf.sample
-%attr(755,root,root) /usr/sbin/ambari-agent
-%config %attr(700,root,root) /var/lib/ambari-agent/ambari-env.sh
-%attr(700,root,root) /var/lib/ambari-agent/install-helper.sh
-%attr(700,root,root) /var/lib/ambari-agent/upgrade_agent_configs.py
-%dir %attr(755,root,root) /var/run/ambari-agent
-%dir %attr(755,root,root) /var/lib/ambari-agent/data
-%dir %attr(777,root,root) /var/lib/ambari-agent/tmp
-%dir %attr(755,root,root) /var/lib/ambari-agent/keys
-%dir %attr(755,root,root) /var/log/ambari-agent
+%attr(644,root,root) /etc/init/ambari-agent.conf
 %attr(755,root,root) /etc/init.d/ambari-agent
-%attr(755,root,root) /var/lib/ambari-agent/data
-%attr(755,root,root) /var/lib/ambari-agent/cache
-%attr(755,root,root) /var/lib/ambari-agent/cred
-%attr(755,root,root) /var/lib/ambari-agent/tools
-
-%files client
-%defattr(644,root,root,755)
-/usr/lib/ambari-client
-%attr(755,root,root) /usr/bin/ambari-shell
+%attr(755,root,root) /etc/rc.d/init.d/ambari-agent
+/usr/lib/ambari-agent
+%attr(755,root,root) /usr/lib/python2.6/site-packages
+/var/lib/ambari-agent
+%attr(644,root,root) /var/lib/ambari-agent/cred/lib/*.jar
+%attr(644,root,root) /var/lib/ambari-agent/tools/*.jar
+%attr(644,root,root) /var/lib/ambari-agent/cache
+%dir %attr(755,root,root) /var/lib/ambari-agent/data
+%dir %attr(755,root,root) /var/lib/ambari-agent/tmp
+%dir %attr(755,root,root) /var/log/ambari-agent
+%dir %attr(755,root,root) /var/run/ambari-agent
