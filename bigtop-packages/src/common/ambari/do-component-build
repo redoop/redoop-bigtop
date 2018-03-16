@@ -27,7 +27,7 @@ cp -ra ${DISTRO_DIR}/stacks/${AMBARI_STACK} ambari-server/src/main/resources/sta
 
 
 # Build source
-mvn clean package -Dstack.distribution=${AMBARI_STACK} -DskipTests -Drat.skip
+mvn clean install -Dstack.distribution=${AMBARI_STACK} -DskipTests -Drat.skip
 
 
 # (cd contrib/management-packs/odpi-ambari-mpack ; mvn clean package -DskipTests -Drat.skip)
