@@ -44,6 +44,7 @@ Source1: do-component-build
 Source2: install_%{ambari_name}.sh
 Source3: bigtop.bom
 Source4: stacks
+Source5: selector
 
 Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
 
@@ -559,12 +560,12 @@ fi
 exit 0
 
 
-%package -n ${distro_select}
+%package -n %{distro_select}
 Summary: Distro Select
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description -n ${distro_select}
+%description -n %{distro_select}
 Distro Select
 
 
@@ -607,7 +608,7 @@ Distro Select
 %dir %attr(755,root,root) /var/run/ambari-agent
 
 
-%files -n ${distro_select}
+%files -n %{distro_select}
 %attr(755,root,root) /usr/bin/${distro_select}
 %attr(755,root,root) /usr/bin/conf-select
 
