@@ -609,6 +609,6 @@ Distro Select
 
 
 %files -n %{distro_select}
-%attr(755,root,root) /usr/bin/${distro_select}
+%attr(755,root,root) /usr/bin/%{distro_select}
 %attr(755,root,root) /usr/bin/conf-select
 
