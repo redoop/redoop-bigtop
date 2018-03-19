@@ -45,6 +45,7 @@ Source2: install_%{ambari_name}.sh
 Source3: bigtop.bom
 Source4: stacks
 Source5: selector
+Source6: custom-style
 
 Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
 
@@ -59,6 +60,10 @@ Ambari
 %setup -n apache-%{ambari_name}-%{ambari_base_version}-src
 # Apply patch
 %patch0 -p1
+
+
+# apply custom style
+DISTRO_DIR=$RPM_SOURCE_DIR bash $RPM_SOURCE_DIR/custom-style/copy-custom-style.sh %{ambari_stack}
 
 
 %build
