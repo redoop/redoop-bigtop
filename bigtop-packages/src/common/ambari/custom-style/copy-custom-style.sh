@@ -43,17 +43,19 @@ then
   echo cp $stack_style_dir/ambari-web/messages.js ambari-web/app/messages.js
   cp $stack_style_dir/ambari-web/messages.js ambari-web/app/messages.js
 fi
-fi
+
 if [ -f "$stack_style_dir/ambari-web/login.hbs" ]
 then
   echo cp $stack_style_dir/ambari-web/login.hbs ambari-web/app/templates/login.hbs
   cp $stack_style_dir/ambari-web/login.hbs ambari-web/app/templates/login.hbs
 fi
+
 if [ -f "$stack_style_dir/ambari-web/index.html" ]
 then
   echo cp $stack_style_dir/ambari-web/index.html ambari-web/app/assets/index.html
   cp $stack_style_dir/ambari-web/index.html ambari-web/app/assets/index.html
 fi
+
 if [ -d "$stack_style_dir/ambari-web/img" ]
 then
   echo cp -rf $stack_style_dir/ambari-web/img ambari-web/app/assets/
