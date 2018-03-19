@@ -15,6 +15,7 @@
 
 %define ambari_name ambari
 %define ambari_stack CRH
+%define distro_select crh-select
 %define _binaries_in_noarch_packages_terminate_build   0
 %define _unpackaged_files_terminate_build 0
 
@@ -558,6 +559,14 @@ fi
 exit 0
 
 
+%package -n ${distro_select}
+Summary: Distro Select
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description -n ${distro_select}
+Distro Select
+
 
 
 %files server
@@ -596,3 +605,9 @@ exit 0
 %dir %attr(755,root,root) /var/lib/ambari-agent/tmp
 %dir %attr(755,root,root) /var/log/ambari-agent
 %dir %attr(755,root,root) /var/run/ambari-agent
+
+
+%files -n ${distro_select}
+%attr(755,root,root) /usr/bin/${distro_select}
+%attr(755,root,root) /usr/bin/conf-select
+
