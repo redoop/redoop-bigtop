@@ -46,7 +46,7 @@ Source3: bigtop.bom
 Source4: stacks
 Source5: selector
 Source6: custom-style
-Source7: licensetools
+Source7: licenseutils
 
 Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
 Patch1: patch1-REDOOP-AMBARI-LICENSE.diff
