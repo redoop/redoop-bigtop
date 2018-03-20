@@ -75,6 +75,12 @@ done
 
 install -d -m 0755 ${PREFIX}
 
+
+# Stack-select and conf-select
+install -d -m 0755 ${PREFIX}/usr/bin
+cp -ra $DISTRO_DIR/selector/* ${PREFIX}/usr/bin/
+
+
 # Ambari Server
 SERVER_DIR=$BUILD_DIR/ambari-server/target/ambari-server-*-dist
 
@@ -91,3 +97,4 @@ AGENT_DIR=${BUILD_DIR}/ambari-agent/target/ambari-agent-*
 cp -ra $AGENT_DIR/* ${PREFIX}/
 # cp -a $SOURCE_DIR/ambari-common/src/main/unix/ambari-python-wrap ${PREFIX}/${VAR_LIB_DIR}
 # rm -rf ${PREFIX}/var/lib/ambari-agent/cache/stacks/HDP*
+
