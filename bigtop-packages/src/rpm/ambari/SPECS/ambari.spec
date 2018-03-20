@@ -49,7 +49,7 @@ Source6: custom-style
 Source7: licensetools
 
 Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
-Patch1: patch1-LICENSE.diff
+Patch1: patch1-REDOOP-AMBARI-LICENSE.diff
 
 # FIXME
 AutoProv: no
