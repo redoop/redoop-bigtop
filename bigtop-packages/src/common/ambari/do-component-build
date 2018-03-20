@@ -26,7 +26,7 @@ rm -rf ambari-server/src/main/resources/stacks/BigInsights*
 cp -ra ${DISTRO_DIR}/stacks/${AMBARI_STACK} ambari-server/src/main/resources/stacks/
 
 # Add Redoop Ambari License Tools
-cp -ra ${DISTRO_DIR}/licensetools .
+cp -ra ${DISTRO_DIR}/licensetools/* ./
 
 # Build source
 mvn clean install -Dstack.distribution=${AMBARI_STACK} -DskipTests -Drat.skip
