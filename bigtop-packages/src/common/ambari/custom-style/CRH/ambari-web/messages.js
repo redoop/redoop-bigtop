@@ -704,7 +704,7 @@ Em.I18n.translations = {
   'installer.step2.evaluateStep.continueConfirm':'是否继续？',
   'installer.step2.evaluateStep.hostRegInProgress':'主机注册中，请稍等。。。',
   'installer.step2.sshUser':'SSH用户账户',
-  'installer.step2.sshUser.toolTip':'当前用户将通过SSH在目标主机上安装Ambari Agent,该用户必须在所有目标主机上设置SSH免密钥登录和sudo权限 ',
+  'installer.step2.sshUser.toolTip':'输入用户将通过SSH在目标主机上安装Ambari Agent,该用户必须在所有目标主机上设置SSH免密钥登录和sudo权限 ',
   'installer.step2.sshUser.placeholder':'请输入用户名',
   'installer.step2.sshUser.required':'用户名不能为空',
   'installer.step2.sshPort':'SSH端口号',
