@@ -69,13 +69,13 @@ public class HandleLicenseInfoImpl implements HandleLicenseInfo {
         // 更新有效期
         FileReader fileReader = new FileReader(licenseLocalFile);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
-        String[] strs = new String(Base64.decode(bufferedReader.readLine())).split(",");
-        int remainValidTime = Integer.valueOf(strs[0]);
+        String strs = new String(Base64.decode(bufferedReader.readLine()));
+        int remainValidTime = Integer.valueOf(strs);
         remainValidTime--;
         int remainValidDay = remainValidTime/24 + 1;
         FileWriter fileWriter = new FileWriter(licenseLocalFile);
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        bufferedWriter.write(Base64.encode((String.valueOf(remainValidTime)+",xwd").getBytes()));
+        bufferedWriter.write(Base64.encode((String.valueOf(remainValidTime)).getBytes()));
         bufferedWriter.close();
         fileWriter.close();
 
@@ -109,7 +109,7 @@ public class HandleLicenseInfoImpl implements HandleLicenseInfo {
         // 初始化剩余有效期
         FileWriter fileWriter = new FileWriter(licenseLocalFile);
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        bufferedWriter.write(Base64.encode((LicenseInfo.getInstance().getVaildTime()+",xwd").getBytes()));
+        bufferedWriter.write(Base64.encode((LicenseInfo.getInstance().getVaildTime()).getBytes()));
         bufferedWriter.close();
         fileWriter.close();
 
