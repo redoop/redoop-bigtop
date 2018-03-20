@@ -583,6 +583,7 @@ Distro Select
 %attr(644,root,root) /etc/init/ambari-server.conf
 %attr(755,root,root) /etc/init.d/ambari-server
 %attr(755,root,root) /etc/rc.d/init.d/ambari-server
+/etc/redoop
 %attr(755,root,root) /usr/sbin/ambari-server.py
 %attr(755,root,root) /usr/sbin/ambari_server_main.py
 /usr/lib/ambari-server
