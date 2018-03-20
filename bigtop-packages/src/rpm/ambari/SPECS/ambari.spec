@@ -46,8 +46,10 @@ Source3: bigtop.bom
 Source4: stacks
 Source5: selector
 Source6: custom-style
+Source7: licensetools
 
 Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
+Patch1: patch1-LICENSE.diff
 
 # FIXME
 AutoProv: no
@@ -60,6 +62,7 @@ Ambari
 %setup -n apache-%{ambari_name}-%{ambari_base_version}-src
 # Apply patch
 %patch0 -p1
+%patch1 -p1
 
 
 # apply custom style
