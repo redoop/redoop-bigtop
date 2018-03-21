@@ -106,12 +106,12 @@ public class HandleLicenseInfoImpl implements HandleLicenseInfo {
             }
         }
         // 添加license uuid
-        FileWriter fileWriter = new FileWriter(licenseIdLocalFile,true);
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        bufferedWriter.newline();
-        bufferedWriter.write((LicenseInfo.getInstance().getLicenseId()));
-        bufferedWriter.close();
-        fileWriter.close();
+        FileWriter fw = new FileWriter(licenseIdLocalFile,true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.newline();
+        bw.write((LicenseInfo.getInstance().getLicenseId()));
+        bw.close();
+        fw.close();
 
 
         // 将license有效期信息写到本地文件
