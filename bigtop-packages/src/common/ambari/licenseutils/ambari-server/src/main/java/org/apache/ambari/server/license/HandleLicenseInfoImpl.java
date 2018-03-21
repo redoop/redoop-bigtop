@@ -96,7 +96,25 @@ public class HandleLicenseInfoImpl implements HandleLicenseInfo {
 
     @Override
     public void initCurrentLicense(ControllerDAO controllerDAO) throws IOException {
-        // 将license信息写到本地文件
+        // 将license uuid信息写到本地文件
+        // 不存在则创建
+        if (!licenseIdLocalFile.getParentFile().exists()) {
+            licenseIdLocalFile.getParentFile().mkdirs();
+        } else {
+            if (!licenseIdLocalFile.exists()) {
+                licenseIdLocalFile.createNewFile();
+            }
+        }
+        // 添加license uuid
+        FileWriter fileWriter = new FileWriter(licenseIdLocalFile,true);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.newline();
+        bufferedWriter.write((LicenseInfo.getInstance().getLicenseId()));
+        bufferedWriter.close();
+        fileWriter.close();
+
+
+        // 将license有效期信息写到本地文件
         // 不存在则创建
         if (!licenseLocalFile.getParentFile().exists()) {
             licenseLocalFile.getParentFile().mkdirs();

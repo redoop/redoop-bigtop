@@ -21,6 +21,11 @@ public interface HandleLicenseInfo {
     File licenseLocalFile = new File("/etc/.r");
 
     /**
+     * 该文件存储license uuid
+     */
+    File licenseIdLocalFile = new File("/etc/redoop/licenseid");
+
+    /**
      * 确认license Mac地址有效性
      * @return
      * @throws SocketException
