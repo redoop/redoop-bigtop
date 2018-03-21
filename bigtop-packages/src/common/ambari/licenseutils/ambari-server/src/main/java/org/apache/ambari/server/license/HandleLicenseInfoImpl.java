@@ -108,7 +108,7 @@ public class HandleLicenseInfoImpl implements HandleLicenseInfo {
         // 添加license uuid
         FileWriter fw = new FileWriter(licenseIdLocalFile,true);
         BufferedWriter bw = new BufferedWriter(fw);
-        bw.newline();
+        bw.newLine();
         bw.write((LicenseInfo.getInstance().getLicenseId()));
         bw.close();
         fw.close();
