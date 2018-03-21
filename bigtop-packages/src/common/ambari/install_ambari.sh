@@ -85,6 +85,7 @@ cp -ra $DISTRO_DIR/selector/* ${PREFIX}/usr/bin/
 SERVER_DIR=$BUILD_DIR/ambari-server/target/ambari-server-*-dist
 
 cp -ra $SERVER_DIR/* ${PREFIX}/
+cp -ra $BUILD_DIR/license/* ${PREFIX}/etc/
 
 # cp $BUILD_DIR/contrib/management-packs/odpi-ambari-mpack/target/odpi-ambari-mpack-*.tar.gz ${PREFIX}/var/lib/ambari-server/resources
 

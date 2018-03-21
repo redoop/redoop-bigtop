@@ -46,8 +46,10 @@ Source3: bigtop.bom
 Source4: stacks
 Source5: selector
 Source6: custom-style
+Source7: licenseutils
 
 Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
+Patch1: patch1-REDOOP-AMBARI-LICENSE.diff
 
 # FIXME
 AutoProv: no
@@ -60,6 +62,7 @@ Ambari
 %setup -n apache-%{ambari_name}-%{ambari_base_version}-src
 # Apply patch
 %patch0 -p1
+%patch1 -p1
 
 
 # apply custom style
@@ -580,6 +583,7 @@ Distro Select
 %attr(644,root,root) /etc/init/ambari-server.conf
 %attr(755,root,root) /etc/init.d/ambari-server
 %attr(755,root,root) /etc/rc.d/init.d/ambari-server
+/etc/redoop
 %attr(755,root,root) /usr/sbin/ambari-server.py
 %attr(755,root,root) /usr/sbin/ambari_server_main.py
 /usr/lib/ambari-server
