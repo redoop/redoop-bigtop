@@ -714,7 +714,7 @@ Em.I18n.translations = {
   'installer.step2.agentUser':'Ambari Agent 用户账户',
   'installer.step2.agentUser.toolTip':'这个用户账号用来在目标主机行运行ambari agent进程，这个用户必须设置无密码登陆所有目标主机。',
   'installer.step2.bootStrap.error':'Ambari Agent初始化失败',
-  'installer.step2.bootStrap.inProgress':'Ambari Agent正在主机上设置，根据主机的数量可能需要几分钟时间，请等待。。。',
+  'installer.step2.bootStrap.inProgress':'Ambari Agent正在主机上设置，根据主机的数量可能需要几分钟时间，请等待',
   'installer.step2.bootStrap.header':'正在配置Ambari Agent',
 
   'installer.step3.header':'确认',
@@ -750,7 +750,7 @@ Em.I18n.translations = {
   '<div class="alert alert-warn"><b>Note</b>: 清理防火墙和 Transparent Huge Page不支持HostCleanup脚本.</div>' +
   '<div class="alert alert-warn"><b>Note</b>: 要在交互模式下清理，移除 <b>--silent</b> 选项. 如要清理所有资源，包括 <i>users</i>, 移除 <b>--skip=users</b> 选项. 用 <b>--help</b> 来获取可用的选项列表.</div>',
   'installer.step3.hostWarningsPopup.summary':'{0} on {1}',
-  'installer.step3.hostWarningsPopup.jdk':'JDK Issues',
+  'installer.step3.hostWarningsPopup.jdk':'JDK问题',
   'installer.step3.hostWarningsPopup.jdk.name':'JDK 没有发现 <i>{0}</i>',
   'installer.step3.hostWarningsPopup.jdk.context':'{0}',
   'installer.step3.hostWarningsPopup.jdk.message':'以下注册主机有些问题关联jdk',
@@ -961,7 +961,7 @@ Em.I18n.translations = {
   'assign.master.popup.cancel.body':'不选择{0}主机将禁用交互式查询.',
 
    'installer.step8.header': '核查',
-  'installer.step8.body': '在安装前，请核查配置',
+  'installer.step8.body': '在安装前，请您核查配置信息',
   'installer.step8.kerberors.warning': '<strong>因为Kerberos已经手动安装在集群 当完成这个操作，你需要创建/分配principals和keytab.</strong>',
   'installer.step8.deployPopup.message':'正在准备部署: 共{1}个任务，已完成{0}个任务.',
   'installer.step8.hosts':'主机上',
@@ -973,7 +973,7 @@ Em.I18n.translations = {
   'installer.step8.repoInfo.displayName':'仓库',
   'installer.step8.services.restart.required': '{0} {1} 在安装过程中重新启动.',
   'installer.step9.header':'安装，启动并测试',
-  'installer.step9.body':'服务安装和启动中，请等待.',
+  'installer.step9.body':'正在进行服务的安装和启动，请等待',
   'installer.step9.status.success':'成功的安装并启动服务.',
   'installer.step9.status.skipStartSuccess':'成功安装服务.',
   'installer.step9.status.warning':'安装或者启动服务中出现了部分警告.',
