@@ -680,7 +680,7 @@ angular.module('ambariAdminConsole')
     },
 
     'main': {
-      'title': 'Welcome to Apache Ambari',
+      'title': '欢迎来到 Ambari',
       'noClusterDescription': '提供一个集群, 管理集群的访问者, 并为 Ambari 用户自定义视图.',
       'hasClusterDescription': '监控你的集群资源, 管理集群的访问者, 并为 Ambari 用户自定义视图.',
       'autoLogOut': '自动注销',
