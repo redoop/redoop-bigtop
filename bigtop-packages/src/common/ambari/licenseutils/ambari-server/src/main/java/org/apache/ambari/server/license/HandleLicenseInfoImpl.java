@@ -72,7 +72,7 @@ public class HandleLicenseInfoImpl implements HandleLicenseInfo {
         String strs = new String(Base64.decode(bufferedReader.readLine()));
         int remainValidTime = Integer.valueOf(strs);
         remainValidTime--;
-        int remainValidDay = remainValidTime/24 + 1;
+        int remainValidDay = remainValidTime/24;
         FileWriter fileWriter = new FileWriter(licenseLocalFile);
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
         bufferedWriter.write(Base64.encode((String.valueOf(remainValidTime)).getBytes()));
