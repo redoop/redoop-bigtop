@@ -577,7 +577,7 @@ AutoReqProv: no
 Distro Select
 
 
-%package -n crh-db-mpack
+%package crh-db-mpack
 Summary: CRH DB Mpack
 Group: Development/Libraries
 AutoProv: no
@@ -586,7 +586,7 @@ AutoReqProv: no
 CRH DB Mpack
 
 
-%package -n crh-dw-mpack
+%package crh-dw-mpack
 Summary: CRH DW Mpack
 Group: Development/Libraries
 AutoProv: no
@@ -650,5 +650,5 @@ CRH DW Mpack
 ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1*.tar.gz --verbose \
 ambari-server restart
 
-%service_macro -n crh-db-mpack
-%service_macro -n crh-dw-mpack
+%service_macro crh-db-mpack
+%service_macro crh-dw-mpack
