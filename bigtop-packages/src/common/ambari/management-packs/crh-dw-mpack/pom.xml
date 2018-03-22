@@ -86,7 +86,7 @@
         <configuration>
           <tarLongFileMode>gnu</tarLongFileMode>
           <descriptors>
-            <descriptor>src/main/assemblies/crh-dwset-mpack.xml</descriptor>
+            <descriptor>src/main/assemblies/crh-dw-mpack.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
