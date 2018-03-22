@@ -577,6 +577,25 @@ AutoReqProv: no
 Distro Select
 
 
+%package -n crh-db-mpack
+Summary: CRH DB Mpack
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description -n crh-db-mpack
+CRH DB Mpack
+
+
+%package -n crh-dw-mpack
+Summary: CRH DW Mpack
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description -n crh-dw-mpack
+CRH DW Mpack
+
+
+
 
 %files server
 %config  /etc/ambari-server/conf
@@ -621,3 +640,15 @@ Distro Select
 %attr(755,root,root) /usr/bin/%{distro_select}
 %attr(755,root,root) /usr/bin/conf-select
 
+
+
+# Service file management RPMs
+%define service_macro() \
+%files -n %1 \
+%attr(644,root,root) /var/lib/ambari-mapcks/%1 \
+%post -n %1 \
+ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1*.tar.gz --verbose \
+ambari-server restart
+
+%service_macro -n crh-db-mpack
+%service_macro -n crh-dw-mpack
