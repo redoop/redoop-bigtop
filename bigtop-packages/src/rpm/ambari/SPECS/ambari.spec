@@ -582,7 +582,7 @@ Summary: CRH DB Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description -n crh-db-mpack
+%description crh-db-mpack
 CRH DB Mpack
 
 
@@ -591,7 +591,7 @@ Summary: CRH DW Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description -n crh-dw-mpack
+%description crh-dw-mpack
 CRH DW Mpack
 
 
