@@ -645,9 +645,9 @@ CRH DW Mpack
 # Service file management RPMs
 %define service_macro() \
 %files %1 \
-%attr(644,root,root) /var/lib/ambari-mapcks/%1 \
+%attr(644,root,root) /var/lib/ambari-mapcks/%1-*.tar.gz \
 %post %1 \
-ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1*.tar.gz --verbose \
+ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-*.tar.gz --verbose \
 ambari-server restart
 
 %service_macro crh-db-mpack
