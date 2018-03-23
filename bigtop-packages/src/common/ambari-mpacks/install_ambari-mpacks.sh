@@ -74,15 +74,9 @@ for var in PREFIX BUILD_DIR SOURCE_DIR ; do
 done
 
 
-# Management packs
-MPACKS_DIR=${PREFIX}/var/lib/ambari-mpacks/
-install -d -m 0755 ${MPACKS_DIR}
-
 # Copy mpacks tar to mpacks dir
-for mpack in $SERVICES
-do 
-  cp -ra $BUILD_DIR/${mpack}/target/${mpack}-*.tar.gz ${MPACKS_DIR}
-done
+cp -ra $BUILD_DIR/${MPACK}/target/${MPACK}-*.tar.gz ${PREFIX}/var/lib/ambari-mpacks/
+
 
 
 

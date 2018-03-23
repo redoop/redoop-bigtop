@@ -16,7 +16,7 @@
 %define ambari_mpacks_name ambari-mpacks
 %define _binaries_in_noarch_packages_terminate_build   0
 %define _unpackaged_files_terminate_build 0
-%define services crh-ts-mpack crh-dw-mpack
+%define mpacks crh-ts-mpack crh-dw-mpack
 
 
 # disable repacking jars
@@ -46,17 +46,30 @@ Redoop Ambari Management Packs
 
 %build
 # build source
-DISTRO_DIR=$RPM_SOURCE_DIR AMBARI_STACK=%{ambari_stack} PREFIX=$RPM_BUILD_ROOT SERVICES=${services} bash $RPM_SOURCE_DIR/do-component-build
+
+# Get our own mapcks and build them
+cp -ra ${RPM_SOURCE_DIR}/management-packs/* ./
+
+for mpack in ${mpacks}
+do
+	DISTRO_DIR=$RPM_SOURCE_DIR AMBARI_STACK=%{ambari_stack} PREFIX=$RPM_BUILD_ROOT MPACK=${mpack} bash $RPM_SOURCE_DIR/do-component-build
+done
 
 
 
 %install
 %__rm -rf $RPM_BUILD_ROOT
-AMBARI_VERSION=%{ambari_version} SERVICES=${services} bash $RPM_SOURCE_DIR/install_ambari-mpacks.sh \
+
+MPACKS_DIR=
+install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
+for mpack in ${mpacks}
+do
+	AMBARI_VERSION=%{ambari_version} MPACK=${mpack} bash $RPM_SOURCE_DIR/install_ambari-mpacks.sh \
           --build-dir=`pwd` \
           --distro-dir=$RPM_SOURCE_DIR \
           --source-dir=`pwd` \
           --prefix=$RPM_BUILD_ROOT
+done
 
 
 
