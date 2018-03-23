@@ -23,7 +23,7 @@
   <version>2.0.0.0-SNAPSHOT</version>
   <name>Ambari Contrib Management Packs</name>
   <modules>
-    <module>crh-db-mpack</module>
+    <module>crh-ts-mpack</module>
     <module>crh-dw-mpack</module>
   </modules>
   <build>
@@ -92,7 +92,7 @@
         </os>
       </activation>
       <modules>
-        <module>crh-db-mpack</module>
+        <module>crh-ts-mpack</module>
         <module>crh-dw-mpack</module>
       </modules>
     </profile>
