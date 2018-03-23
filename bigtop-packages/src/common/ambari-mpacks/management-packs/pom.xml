@@ -81,6 +81,7 @@
           </excludes>
         </configuration>
       </plugin>
+    </plugins>
   </build>
   <profiles>
     <profile>
@@ -96,9 +97,4 @@
       </modules>
     </profile>
   </profiles>
-  <dependencyManagement>
-    <dependencies>
-    </dependencies>
-  </dependencyManagement>
-
 </project>
