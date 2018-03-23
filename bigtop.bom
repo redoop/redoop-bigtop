@@ -587,7 +587,7 @@ bigtop {
     'ambari-mpacks' {
       name    = "ambari-mpacks"
       relNotes = "Redoop Ambari Mpacks"
-      version { base = 2.6.1; pkg = base; release = 1 }
+      version { base = ambari.version.base; pkg = base; release = 1 }
       //tarball { destination = "ambari-mpacks-${version.base}.tar.gz" }
     }
   }
