@@ -19,14 +19,11 @@ set -ex
 
 export _JAVA_OPTIONS="-Xmx2048m -XX:MaxPermSize=512m -Djava.awt.headless=true"
 
-# Remove default stacks before we get our own stack
-rm -rf ambari-server/src/main/resources/stacks/HDP*
-rm -rf ambari-server/src/main/resources/stacks/BigInsights*
-# Get our own stack
-cp -ra ${DISTRO_DIR}/stacks/${AMBARI_STACK} ambari-server/src/main/resources/stacks/
 
-# Add Redoop Ambari License Tools
-cp -ra ${DISTRO_DIR}/licenseutils/* ./
+# Get our own mapcks
+cp -ra ${RPM_SOURCE_DIR}/management-packs/* ./
 
-# Build source
-mvn clean install -Dstack.distribution=${AMBARI_STACK} -DskipTests -Drat.skip
+# Build our own mapcks
+mvn clean package -DskipTests -Drat.skip
+
+
