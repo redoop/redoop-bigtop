@@ -31,7 +31,7 @@ BuildArch: noarch
 Buildroot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 License: ASL 2.0 
 Source1: do-component-build 
-Source2: install_%{name}.sh
+Source2: install_%{ambari_mpacks_name}.sh
 Source3: bigtop.bom
 
 
