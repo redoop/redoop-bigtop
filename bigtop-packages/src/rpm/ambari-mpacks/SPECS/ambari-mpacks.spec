@@ -46,14 +46,7 @@ Redoop Ambari Management Packs
 
 %build
 # build source
-
-# Get our own mapcks and build them
-cp -ra ${RPM_SOURCE_DIR}/management-packs/* ./
-
-for mpack in ${mpacks}
-do
-	MPACK=${mpack} bash $RPM_SOURCE_DIR/do-component-build
-done
+bash $RPM_SOURCE_DIR/do-component-build
 
 
 

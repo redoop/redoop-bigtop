@@ -20,8 +20,10 @@ set -ex
 export _JAVA_OPTIONS="-Xmx2048m -XX:MaxPermSize=512m -Djava.awt.headless=true"
 
 
+# Get our own mapcks
+cp -ra ${RPM_SOURCE_DIR}/management-packs/* ./
+
 # Build our own mapcks
-pushd $mpack
 mvn clean package -DskipTests -Drat.skip
-popd
+
 
