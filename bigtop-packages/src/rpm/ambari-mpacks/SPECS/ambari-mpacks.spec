@@ -54,8 +54,8 @@ bash $RPM_SOURCE_DIR/do-component-build
 
 install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
 
-%__cp -ra ./crh-ts-mpack/target/${MPACK}-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra ./crh-ts-mpack/target/${MPACK}-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-ts-mpack/target/crh-ts-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-dw-mpack/target/crh-dw-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 
 
 
