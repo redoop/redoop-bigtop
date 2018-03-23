@@ -588,7 +588,11 @@ bigtop {
       name    = "ambari-mpacks"
       relNotes = "Redoop Ambari Mpacks"
       version { base = ambari.version.base; pkg = base; release = 1 }
-      //tarball { destination = "ambari-mpacks-${version.base}.tar.gz" }
+      tarball { destination = "apache-${ambari.name}-${version.base}-src.tar.gz"
+                source      = destination }
+      url     { download_path = "/${ambari.name}/${ambari.name}-${version.base}/"
+                site = "${apache.APACHE_MIRROR}/${download_path}"
+                archive = "${apache.APACHE_ARCHIVE}/${download_path}" }
     }
   }
 }
