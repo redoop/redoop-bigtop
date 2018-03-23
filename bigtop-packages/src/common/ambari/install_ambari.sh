@@ -95,15 +95,8 @@ AGENT_DIR=${BUILD_DIR}/ambari-agent/target/ambari-agent-*
 
 cp -ra $AGENT_DIR/* ${PREFIX}/
 # cp -a $SOURCE_DIR/ambari-common/src/main/unix/ambari-python-wrap ${PREFIX}/${VAR_LIB_DIR}
-# rm -rf ${PREFIX}/var/lib/ambari-agent/cache/stacks/HDP*
 
 
-# Management packs
-MPACKS_DIR=${PREFIX}/var/lib/ambari-mpacks/
-install -d -m 0755 ${MPACKS_DIR}
-# CRH DB mpack
-cp $BUILD_DIR/contrib/management-packs/crh-db-mpack/target/crh-db-mpack-*.tar.gz ${MPACKS_DIR}
-# CRH DW mapck
-cp $BUILD_DIR/contrib/management-packs/crh-dw-mpack/target/crh-dw-mpack-*.tar.gz ${MPACKS_DIR}
+
 
 

@@ -16,6 +16,7 @@
 %define ambari_mpacks_name ambari-mpacks
 %define _binaries_in_noarch_packages_terminate_build   0
 %define _unpackaged_files_terminate_build 0
+%define services crh-ts-mpack crh-dw-mpack
 
 
 # disable repacking jars
@@ -45,13 +46,13 @@ Redoop Ambari Management Packs
 
 %build
 # build source
-DISTRO_DIR=$RPM_SOURCE_DIR AMBARI_STACK=%{ambari_stack} PREFIX=$RPM_BUILD_ROOT bash $RPM_SOURCE_DIR/do-component-build
+DISTRO_DIR=$RPM_SOURCE_DIR AMBARI_STACK=%{ambari_stack} PREFIX=$RPM_BUILD_ROOT SERVICES=${services} bash $RPM_SOURCE_DIR/do-component-build
 
 
 
 %install
 %__rm -rf $RPM_BUILD_ROOT
-AMBARI_VERSION=%{ambari_version} bash $RPM_SOURCE_DIR/install_ambari-mpacks.sh \
+AMBARI_VERSION=%{ambari_version} SERVICES=${services} bash $RPM_SOURCE_DIR/install_ambari-mpacks.sh \
           --build-dir=`pwd` \
           --distro-dir=$RPM_SOURCE_DIR \
           --source-dir=`pwd` \
@@ -59,22 +60,22 @@ AMBARI_VERSION=%{ambari_version} bash $RPM_SOURCE_DIR/install_ambari-mpacks.sh \
 
 
 
-%package crh-db
-Summary: CRH DB Mpack
+%package crh-ts
+Summary: CRH Time Series Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description crh-db
-Redoop Ambari CRH DB Mpack
+%description crh-ts
+Redoop Ambari CRH Time Series Mpack
 
 
 %package crh-dw
-Summary: CRH DW Mpack
+Summary: CRH Data Warehouse Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
 %description crh-dw
-Redoop Ambari CRH DW Mpack
+Redoop Ambari CRH Data Warehouse Mpack
 
 
 
@@ -86,5 +87,5 @@ Redoop Ambari CRH DW Mpack
 ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz --verbose \
 ambari-server restart
 
-%service_macro crh-db
+%service_macro crh-ts
 %service_macro crh-dw

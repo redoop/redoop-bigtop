@@ -30,7 +30,3 @@ cp -ra ${DISTRO_DIR}/licenseutils/* ./
 
 # Build source
 mvn clean install -Dstack.distribution=${AMBARI_STACK} -DskipTests -Drat.skip
-
-# Get our own mapcks and build them
-cp -ra ${DISTRO_DIR}/management-packs/* contrib/management-packs/
-(cd contrib/management-packs ; mvn clean package -DskipTests -Drat.skip)

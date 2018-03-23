@@ -79,7 +79,7 @@ MPACKS_DIR=${PREFIX}/var/lib/ambari-mpacks/
 install -d -m 0755 ${MPACKS_DIR}
 
 # Copy mpacks tar to mpacks dir
-for mpack in crh-db-mpack crh-dw-mpack
+for mpack in $SERVICES
 do 
   cp -ra $BUILD_DIR/${mpack}/target/${mpack}-*.tar.gz ${MPACKS_DIR}
 done
