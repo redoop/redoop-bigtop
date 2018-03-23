@@ -1,10 +1,10 @@
 {
   "type" : "full-release",
-  "name" : "crh-db-mpack",
+  "name" : "crh-ts-mpack",
   "version": "${project.version}",
   "hash": "${buildNumber}",
   "branch": "${scmBranch}",
-  "description" : "CRH DB Management Pack",
+  "description" : "CRH Time Series Management Pack",
   "prerequisites": {
     "min-ambari-version" : "${minAmbariVersion}",
     "max-ambari-version" : "${maxAmbariVersion}"
