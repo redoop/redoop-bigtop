@@ -77,9 +77,12 @@ done
 # Management packs
 MPACKS_DIR=${PREFIX}/var/lib/ambari-mpacks/
 install -d -m 0755 ${MPACKS_DIR}
-# CRH DB mpack
-cp $BUILD_DIR/contrib/management-packs/crh-db-mpack/target/crh-db-mpack-*.tar.gz ${MPACKS_DIR}
-# CRH DW mapck
-cp $BUILD_DIR/contrib/management-packs/crh-dw-mpack/target/crh-dw-mpack-*.tar.gz ${MPACKS_DIR}
+
+# Copy mpacks tar to mpacks dir
+for mpack in crh-db-mpack crh-dw-mpack
+do 
+  cp -ra $BUILD_DIR/contrib/management-packs/${mpack}/target/${mpack}-*.tar.gz ${MPACKS_DIR}
+done
+
 
 
