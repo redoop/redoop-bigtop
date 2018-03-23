@@ -31,9 +31,9 @@ Group: Development
 BuildArch: noarch
 Buildroot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 License: ASL 2.0 
-Source1: do-component-build 
-Source2: install_%{ambari_mpacks_name}.sh
-Source3: bigtop.bom
+Source0: do-component-build 
+Source1: install_%{ambari_mpacks_name}.sh
+Source2: bigtop.bom
 
 
 # FIXME
@@ -52,7 +52,7 @@ cp -ra ${RPM_SOURCE_DIR}/management-packs/* ./
 
 for mpack in ${mpacks}
 do
-	DISTRO_DIR=$RPM_SOURCE_DIR AMBARI_STACK=%{ambari_stack} PREFIX=$RPM_BUILD_ROOT MPACK=${mpack} bash $RPM_SOURCE_DIR/do-component-build
+	MPACK=${mpack} bash $RPM_SOURCE_DIR/do-component-build
 done
 
 
@@ -60,7 +60,6 @@ done
 %install
 %__rm -rf $RPM_BUILD_ROOT
 
-MPACKS_DIR=
 install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
 for mpack in ${mpacks}
 do
