@@ -584,5 +584,11 @@ bigtop {
       //          token = "crh@redoop.org"
       //        }
     }
+    'ambari-mpacks' {
+      name    = "ambari-mpacks"
+      relNotes = "Redoop Ambari Mpacks"
+      version { base = 6.1.2.6; pkg = base; release = 1 }
+      tarball { destination = "ambari-mpacks-${version.base}.tar.gz" }
+    }
   }
 }
