@@ -21,7 +21,7 @@
 # disable repacking jars
 %define __os_install_post %{nil}
 
-Name: ambari-mpacks
+Name: ambari-mpacks%{crh_version_as_name}
 Version: %{ambari_mpacks_version}
 Release: %{ambari_mpacks_release}
 Summary: Redoop Ambari Mpacks
