@@ -63,8 +63,8 @@ Summary: CRH DB Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description redoop ambari managements mpack crh-db
-CRH DB Mpack
+%description crh-db
+Redoop Ambari CRH DB Mpack
 
 
 %package crh-dw
@@ -72,8 +72,8 @@ Summary: CRH DW Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description redoop ambari managements mpack crh-dw
-CRH DW Mpack
+%description crh-dw
+Redoop Ambari CRH DW Mpack
 
 
 
