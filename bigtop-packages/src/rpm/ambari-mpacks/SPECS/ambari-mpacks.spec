@@ -43,6 +43,7 @@ AutoReqProv: no
 Redoop Ambari Management Packs
 
 
+%build
 # build source
 DISTRO_DIR=$RPM_SOURCE_DIR AMBARI_STACK=%{ambari_stack} PREFIX=$RPM_BUILD_ROOT bash $RPM_SOURCE_DIR/do-component-build
 
