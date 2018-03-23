@@ -539,5 +539,525 @@ angular.module('ambariAdminConsole')
     }
   });
 
-  $translateProvider.preferredLanguage('en');
+  $translateProvider.translations('zh',{
+    'CLUSTER.ADMINISTRATOR': '操作员',
+    'CLUSTER.USER': '只读',
+    'VIEW.USER': '使用',
+
+    'common': {
+      'ambari': 'Ambari',
+      'apacheAmbari': 'Apache Ambari',
+      'about': '关于',
+      'version': '版本',
+      'signOut': '签出',
+      'register':'注册',
+      'clusters': '集群',
+      'views': '视图',
+      'viewUrls': '视图 URLs',
+      'roles': '角色',
+      'users': '用户',
+      'groups': '组',
+      'versions': '版本',
+      'stack': 'Stack',
+      'details': '细节',
+      'goToDashboard': '前往仪表盘',
+      'noClusters': '无集群',
+      'noViews': '无视图',
+      'view': '视图',
+      'displayLabel': '显示标签',
+      'search': '搜索',
+      'name': '名称',
+      'any': '任何',
+      'none': 'None',
+      'type': 'Type',
+      'add': '添加 {{term}}',
+      'delete': '删除 {{term}}',
+      'deregisterCluster': '撤销注册集群',
+      'cannotDelete': '不能删除 {{term}}',
+      'privileges': '特权',
+      'cluster': '集群',
+      'remoteClusters': '远程集群',
+      'services':'服务',
+      'clusterRole': '集群角色',
+      'viewPermissions': '视图权限',
+      'getInvolved': '成功参与!',
+      'license': 'Apache License, Version 2.0 许可',
+      'tableFilterMessage': '{{showed}} of {{total}} {{term}} showing',
+      'yes': 'Yes',
+      'no': 'No',
+      'renameCluster': '重命名集群',
+      'renameClusterTip': '只允许输入字母数字字符类型，最多80个字符',
+      'clusterCreationInProgress': '集群创建中...',
+      'userGroupManagement': '用户 + 组 管理',
+      'all': '所有',
+      'group': '组',
+      'user': '用户',
+      'settings': '设置',
+      'authentication': '认证',
+      'deleteConfirmation': '你确信要删除 {{instanceType}} {{instanceName}}?',
+      'remoteClusterDelConfirmation':'你确信要删除 {{instanceType}} {{instanceName}}? 该操作不可撤销.',
+      'messageInstanceAffected':'以下视图正在用于配置这个远程集群, 并且将需要被重新配置: {{viewInstance}}',
+      'local': 'Local',
+      'pam': 'PAM',
+      'ldap': 'LDAP',
+      'jwt': 'JWT',
+      'warning': '警告',
+      'filterInfo': '{{showed}} of {{total}} {{term}} showing',
+      'usersGroups': '用户/组',
+      'enabled': 'Enabled',
+      'disabled': 'Disabled',
+      'NA': 'n/a',
+      'blockViewLabel': 'BLOCK',
+      'listViewLabel': 'LIST',
+      'rbac': 'Role Based Access Control',
+      'important': '重要',
+      'undo': '撤销',
+      'fromGroupMark': '(from group)',
+      'hidden' : '隐藏',
+
+      'clusterNameChangeConfirmation': {
+        'title': '确认更改集群名称',
+        'message': '你确信要更改集群名称为 {{clusterName}}?'
+      },
+
+      'loginActivities': {
+        'loginActivities':'Login Activities',
+        'loginMessage': '登录信息',
+        'loginMessage.placeholder': '请输入登录信息',
+        'buttonText.placeholder': 'Please enter button text',
+        'homeDirectory': 'Home Directory',
+        'notEmpty': '这些区域不能为空',
+        'saveError': '保存错误',
+        'message': '信息',
+        'buttonText': '按钮',
+        'status': '状态',
+        'status.disabled': 'Disabled',
+        'homeDirectory.alert': 'Many Ambari Views store user preferences in the logged in user\'s / user directory in HDFS. Optionally, Ambari can auto-create these directories for users on login.',
+        'homeDirectory.autoCreate': '自动创建 HDFS 用户目录',
+        'homeDirectory.header': '用户目录创建选项',
+        'homeDirectory.template': '用户目录创建模版',
+        'homeDirectory.group': '默认组',
+        'homeDirectory.permissions': '权限'
+      },
+
+      'controls': {
+        'cancel': '取消',
+        'close': '关闭',
+        'ok': 'OK',
+        'save': '保存',
+        'clearFilters': '清除过滤',
+        'confirmChange': '确认改变',
+        'discard': '放弃',
+        'remove': '移除',
+        'update':'更新',
+        'checkAll': '检查所有',
+        'clearAll': '清除所有'
+      },
+
+      'alerts': {
+        'fieldRequired': 'Field required!',
+        'fieldIsRequired': 'This field is required.',
+        'noSpecialChars': '不能包含特殊字符!',
+        'nothingToDisplay': '无 {{term}} 可展示.',
+        'noRemoteClusterDisplay':'无远程集群可展示.',
+        'noPrivileges': '无 {{term}} 特权',
+        'noPrivilegesDescription': '该 {{term}} 没有任何特权.',
+        'timeOut': '由于不活跃，你将在 <b>{{time}}</b> 秒后自动注销.',
+        'isInvalid': '{{term}} 无效.',
+        'cannotSavePermissions': '不能保存权限',
+        'cannotLoadPrivileges': '不能加载特权',
+        'cannotLoadClusterStatus': '不能加载集群状态',
+        'clusterRenamed': '集群已经重命名为 {{clusterName}}.',
+        'remoteClusterRegistered': '集群已经注册为 {{clusterName}}.',
+        'cannotRenameCluster': '不能重命名集群为 {{clusterName}}',
+        'minimumTwoChars': '最小长度是 2 字符.',
+        'maxTwentyFiveChars': '最大长度是 25 字符.',
+        'onlyText': '只允许小写的数字字母字符.',
+        'onlyAnScore': '无效输入，只允许输入字母数字，例如: My_default_view',
+        'passwordRequired':'密码是必须的',
+        'unsavedChanges': '你还没有保存改变. 保存改变或取消?'
+      }
+    },
+
+    'main': {
+      'title': '欢迎来到 Ambari',
+      'noClusterDescription': '提供一个集群, 管理集群的访问者, 并为 Ambari 用户自定义视图.',
+      'hasClusterDescription': '监控你的集群资源, 管理集群的访问者, 并为 Ambari 用户自定义视图.',
+      'autoLogOut': '自动注销',
+
+      'operateCluster': {
+        'title': '操作你的集群',
+        'description': '管理你的集群配置并监控你的服务健康',
+        'manageRoles': '管理角色'
+      },
+
+      'createCluster': {
+        'title': '创建一个集群',
+        'description': '使用安装向导选择服务并配置你的集群',
+        'launchInstallWizard': '启动安装向导'
+      },
+
+      'manageUsersAndGroups': {
+        'title': '管理 用户 + 组',
+        'description': '管理能访问 Ambari 的用户和组'
+      },
+
+      'deployViews': {
+        'title': '部署视图',
+        'description': '创建视图实例并授权'
+      },
+
+      'controls': {
+        'remainLoggedIn': '保持登录',
+        'logOut': '现在注销'
+      }
+    },
+
+    'views': {
+      'instance': '实例',
+      'viewInstance': '视图实例',
+      'create': '创建实例',
+      'createViewInstance': '创建视图实例',
+      'edit': '编辑',
+      'viewName': '视图名称',
+      'instances': '实例',
+      'instanceName': '实例名称',
+      'instanceId': '实例 ID',
+      'displayName': '显示名称',
+      'settings': '设置',
+      'advanced': '高级',
+      'visible': '可见',
+      'description': '描述',
+      'shortUrl':'Short URL',
+      'instanceDescription': '实例描述',
+      'clusterConfiguration': '集群配置',
+      'localCluster': '本地集群',
+      'remoteCluster': '远程集群',
+      'registerRemoteCluster' : '注册远程集群',
+      'clusterName': '集群名称',
+      'custom': '自定义',
+      'icon': 'Icon',
+      'icon64': 'Icon64',
+      'permissions': '权限',
+      'permission': '权限',
+      'grantUsers': '授权给这些用户',
+      'grantGroups': '授权给这些组',
+      'configuration': '配置',
+      'goToInstance': '前往实例',
+      'pending': '等待中...',
+      'deploying': '部署中...',
+      'properties': '属性',
+      'urlDelete':'删除 URL',
+
+      'clusterPermissions': {
+        'label': '本地集群权限',
+        'clusteradministrator': '集群管理员',
+        'clusteroperator': '集群操作员',
+        'clusteruser': '集群用户',
+        'serviceadministrator': '服务管理员',
+        'serviceoperator': '服务操作员',
+        'infoMessage': '授权 <strong>Use</strong> 权限给以下 <strong>{{cluster}}</strong> 角色:',
+        'nonLocalClusterMessage': 'The ability to inherit view <strong>Use</strong> permission based on Cluster Roles is only available when using a Local Cluster configuration.'
+      },
+
+      'alerts': {
+        'noSpecialChars': '不能包含任何特殊字符.',
+        'noSpecialCharsOrSpaces': '不能包含任何特殊字符或者空格.',
+        'instanceExists': '这个名称的实例已经存在了.',
+        'notDefined': '这个视图没有定义的 {{term}}.',
+        'cannotEditInstance': '不能编辑静态实例',
+        'cannotDeleteStaticInstance': '不能删除静态实例',
+        'deployError': '错误部署. 检查 Ambari Server 日志.',
+        'unableToCreate': '不能创建视图实例',
+        'cannotUseOption': '该视图不能使用这个选项',
+        'unableToResetErrorMessage': 'Unable to reset error message for prop: {{key}}',
+        'instanceCreated': '创建视图实例 {{instanceName}}',
+        'unableToParseError': '无法解析错误信息: {{message}}',
+        'cannotCreateInstance': '不能创建实例',
+        'cannotLoadInstanceInfo': '不能加载实例信息',
+        'cannotLoadPermissions': '不能加载权限',
+        'cannotSaveSettings': '不能保存设置',
+        'cannotSaveProperties': '不能保存属性',
+        'cannotDeleteInstance': '不能删除实例',
+        'cannotLoadViews': '不能加载视图',
+        'cannotLoadViewUrls': '不能加载视图 URLs',
+        'cannotLoadViewUrl': '不能加载视图 URL',
+        'savedRemoteClusterInformation':'远程集群信息被保存.',
+        'credentialsUpdated':'Credentials Updated.'
+      }
+    },
+
+    'urls':{
+      'name':'名称',
+      'url':'URL',
+      'viewUrls':'视图 URLs',
+      'createNewUrl':'创建新的 URL',
+      'create':'创建',
+      'edit':'编辑',
+      'view':'视图',
+      'viewInstance':'实例',
+      'step1':'创建 URL',
+      'step2':'选择实例',
+      'step3':'分配 URL',
+      'noUrlsToDisplay':'无 URLs 可展示.',
+      'noViewInstances':'无视图实例',
+      'none':'None',
+      'change':'更改',
+      'urlCreated':'创建 short URL <a href="{{siteRoot}}#/main/view/{{viewName}}/{{shortUrl}}">{{urlName}}</a>',
+      'urlUpdated':'更新 short URL <a href="{{siteRoot}}#/main/view/{{viewName}}/{{shortUrl}}">{{urlName}}</a>'
+    },
+
+    'clusters': {
+      'switchToList': 'Switch&nbsp;to&nbsp;list&nbsp;view',
+      'switchToBlock': 'Switch&nbsp;to&nbsp;block&nbsp;view',
+      'role': 'Role',
+      'assignRoles': '分配角色到这些 {{term}}',
+
+      'alerts': {
+        'cannotLoadClusterData': '不能加载集群数据'
+      }
+    },
+
+    'groups': {
+      'createLocal': '创建本地组',
+      'name': '组名称',
+      'members': '成员',
+      'membersPlural': '{{n}} member{{n == 1 ? "" : "s"}}',
+
+      'alerts': {
+        'onlySimpleChars': 'Must contain only simple characters.',
+        'groupCreated': 'Created group <a href="#/groups/{{groupName}}/edit">{{groupName}}</a>',
+        'groupCreationError': '组创建错误',
+        'cannotUpdateGroupMembers': '不能更新组成员',
+        'getGroupsListError': '获取组列表错误'
+      }
+    },
+
+    'users': {
+      'username': '用户名',
+      'userName': 'User name',
+      'admin': 'Admin',
+      'ambariAdmin': 'Ambari Admin',
+      'ambariClusterURL':'Ambari Cluster URL',
+      'changePassword': '更改密码',
+      'updateCredentials':'Update Credentials',
+      'changePasswordFor': '为 {{userName}} 更改密码',
+      'yourPassword': '你的密码',
+      'newPassword': '新的用户密码',
+      'newPasswordConfirmation': '新的用户密码确认',
+      'create': '创建本地用户',
+      'active': 'Active',
+      'inactive': 'Inactive',
+      'status': '状态',
+      'password': '密码',
+      'passwordConfirmation': '密码确认',
+      'userIsAdmin': '这个用户是一个 Ambari Admin 并且有所有特权.',
+      'showAll': '展示所有用户',
+      'showAdmin': '只展示 admin 用户',
+      'groupMembership': 'Group Membership',
+      'userNameTip': '最大长度是 80 字符. \\, &, |, <, >, ` 不被允许.',
+
+      'changeStatusConfirmation': {
+        'title': '改变状态',
+        'message': '你确信要为用户 "{{userName}}" 更改状态到 {{status}}?'
+      },
+
+      'changePrivilegeConfirmation': {
+        'title': '更改 Admin 特权',
+        'message': '你确信要 {{action}} Admin 特权给用户 "{{userName}}"?'
+      },
+
+      'roles': {
+        'clusterUser': '集群用户',
+        'clusterAdministrator': '集群管理员',
+        'clusterOperator': '集群操作员',
+        'serviceAdministrator': '服务管理员',
+        'serviceOperator': '服务操作员',
+        'ambariAdmin': 'Ambari 管理员',
+        'viewUser': '视图用户',
+        'none': 'None',
+        'oneRolePerUserOrGroup': 'Only 1 role allowed per user or group',
+        'permissionLevel': '{{level}}-level Permissions'
+      },
+
+      'alerts': {
+        'passwordRequired': '密码是必须的',
+        'wrongPassword': '密码必须一致!',
+        'usernameRequired':'用户名是必须的',
+        'cannotChange': '不能改变 {{term}}',
+        'userCreated': '创建用户 <a href="#/users/{{encUserName}}">{{userName}}</a>',
+        'userCreationError': '用户创建错误',
+        'removeUserError': 'Removing from group error',
+        'cannotAddUser': '不能添加用户到组',
+        'passwordChanged': '密码更改.',
+        'cannotChangePassword': '不能更改密码',
+        'roleChanged': '{{name}} 改变为 {{role}}',
+        'roleChangedToNone': '{{user_name}}\'s explicit privilege has been changed to \'NONE\'. Any privilege now seen for this user comes through its Group(s).',
+        'usersEffectivePrivilege': '{{user_name}}\'s effective privilege through its Group(s) is higher than your selected privilege.'
+      }
+    },
+
+    'versions': {
+      'current': 'Current',
+      'addVersion': '添加版本',
+      'defaultVersion': '(Default Version Definition)',
+      'inUse': 'In Use',
+      'installed': 'Installed',
+      'usePublic': "Use Public Repository",
+      'networkIssues': {
+        'networkLost': "Why is this disabled?",
+        'publicDisabledHeader': "Public Repository Option Disabled",
+        'publicRepoDisabledMsg': 'Ambari does not have access to the Internet and cannot use the Public Repository for installing the software. Your Options:',
+        'publicRepoDisabledMsg1': 'Configure your hosts for access to the Internet.',
+        'publicRepoDisabledMsg2': 'If you are using an Internet Proxy, refer to the Ambari Documentation on how to configure Ambari to use the Internet Proxy.',
+        'publicRepoDisabledMsg3': 'Use the Local Repositoy option.'
+      },
+      'selectVersion': "选择版本",
+      'selectVersionEmpty': "No other repositories",
+      'useLocal': "Use Local Repository",
+      'uploadFile': '上载版本定义文件',
+      'enterURL': '版本定义文件 URL',
+      'defaultURL': 'https://',
+      'readInfo': '读取版本信息',
+      'browse': 'Browse',
+      'installOn': 'Install on...',
+      'register': {
+        'title': '注册版本',
+        'error': {
+          'header': '不能注册',
+          'body': 'You are attempting to register a version with a Base URL that is already in use with an existing registered version. You *must* review your Base URLs and confirm they are unique for the version you are trying to register.'
+        }
+      },
+      'deregister': '撤销注册版本',
+      'deregisterConfirmation': '你确信要撤销注册版本 <strong>{{versionName}}</strong> ?',
+      'placeholder': '版本号 (0.0)',
+      'repos': 'Repositories',
+      'os': 'OS',
+      'baseURL': 'Base URL',
+      'skipValidation': 'Skip Repository Base URL validation (Advanced)',
+      'noVersions': '选择版本显示细节.',
+      'patch': 'Patch',
+      'maint': 'Maint',
+      'introduction': 'To register a new version in Ambari, provide a Version Definition File, confirm the software repository information and save the version.',
+      'contents': {
+        'title': 'Contents',
+        'empty': 'No contents to display'
+      },
+      'details': {
+        'stackName': 'Stack Name',
+        'displayName': 'Display Name',
+        'version': 'Version',
+        'actualVersion': 'Actual Version',
+        'releaseNotes': 'Release Notes'
+      },
+      'repository': {
+        'placeholder': 'Enter Base URL or remove this OS'
+      },
+      'useRedhatSatellite': {
+        'title': 'Use RedHat Satellite/Spacewalk',
+        'warning': 'By selecting to <b>"Use RedHat Satellite/Spacewalk"</b> for the software repositories, ' +
+        'you are responsible for configuring the repository channel in Satellite/Spacewalk and confirming the repositories for the selected <b>stack version</b> are available on the hosts in the cluster. ' +
+        'Refer to the Ambari documentation for more information.',
+        'disabledMsg': 'Use of RedHat Satellite/Spacewalk is not available when using Public Repositories'
+      },
+      'changeBaseURLConfirmation': {
+        'title': 'Confirm Base URL Change',
+        'message': 'You are about to change repository Base URLs that are already in use. Please confirm that you intend to make this change and that the new Base URLs point to the same exact Stack version and build'
+      },
+
+      'alerts': {
+        'baseURLs': 'Provide Base URLs for the Operating Systems you are configuring.',
+        'validationFailed': 'Some of the repositories failed validation. Make changes to the base url or skip validation if you are sure that urls are correct',
+        'skipValidationWarning': '<b>Warning:</b> This is for advanced users only. Use this option if you want to skip validation for Repository Base URLs.',
+        'useRedhatSatelliteWarning': 'Disable distributed repositories and use RedHat Satellite/Spacewalk channels instead',
+        'filterListError': 'Fetch stack version filter list error',
+        'versionCreated': 'Created version <a href="#/stackVersions/{{stackName}}/{{versionName}}/edit">{{stackName}}-{{versionName}}</a>',
+        'versionCreationError': 'Version creation error',
+        'allOsAdded': 'All Operating Systems have been added',
+        'osListError': 'getSupportedOSList error',
+        'readVersionInfoError': 'Version Definition read error',
+        'versionEdited': 'Edited version <a href="#/stackVersions/{{stackName}}/{{versionName}}/edit">{{displayName}}</a>',
+        'versionUpdateError': 'Version update error',
+        'versionDeleteError': 'Version delete error'
+      }
+    },
+
+    'authentication': {
+      'description': 'Ambari supports authenticating against local Ambari users created and stored in the Ambari Database, or authenticating against a LDAP server:',
+      'ldap': 'LDAP Authentication',
+      'on': 'On',
+      'off': 'Off',
+
+      'connectivity': {
+        'title': 'LDAP Connectivity Configuration',
+        'host': 'LDAP Server Host',
+        'port': 'LDAP Server Port',
+        'ssl': 'Use SSL?',
+        'trustStore': {
+          'label': 'Trust Store',
+          'options': {
+            'default': 'JDK Default',
+            'custom': 'Custom'
+          }
+        },
+        'trustStorePath': 'Trust Store Path',
+        'trustStoreType': {
+          'label': 'Trust Store Type',
+          'options': {
+            'jks': 'JKS',
+            'jceks': 'JCEKS',
+            'pkcs12': 'PKCS12'
+          }
+        },
+        'trustStorePassword': 'Trust Store Password',
+        'dn': 'Bind DN',
+        'bindPassword': 'Bind Password',
+
+        'controls': {
+          'testConnection': 'Test Connection'
+        }
+      },
+
+      'attributes': {
+        'title': 'LDAP Attribute Configuration',
+        'detection': {
+          'label': 'Identifying the proper attributes to be used when authenticating and looking up users and groups can be specified manually, or automatically detected. Please choose:',
+          'options': {
+            'manual': 'Define Attributes Manually',
+            'auto': 'Auto-Detect Attributes'
+          }
+        },
+        'userSearch': 'User Search Base',
+        'groupSearch': 'Group Search Base',
+        'detected': 'The following attributes were detected, please review and Test Attributes to ensure their accuracy.',
+        'userObjClass': 'User Object Class',
+        'userNameAttr': 'User Name Attribute',
+        'groupObjClass': 'Group Object Class',
+        'groupNameAttr': 'Group Name Attribute',
+        'groupMemberAttr': 'Group Member Attribute',
+        'distinguishedNameAttr': 'Distinguished Name Attribute',
+        'test': {
+          'description': 'To quickly test the chosen attributes click the button below. During this process you can specify a test user name and password and Ambari will attempt to authenticate and retrieve group membership information',
+          'username': 'Test Username',
+          'password': 'Test Password'
+        },
+        'groupsList': '组列表',
+
+        'controls': {
+          'autoDetect': 'Perform Auto-Detection',
+          'testAttrs': 'Test Attributes'
+        },
+
+        'alerts': {
+          'successfulAuth': 'Successful Authentication'
+        }
+      },
+
+      'controls': {
+        'test': 'Test'
+      }
+    }
+  });
+
+  $translateProvider.preferredLanguage('zh');
 }]);

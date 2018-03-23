@@ -46,8 +46,10 @@ Source3: bigtop.bom
 Source4: stacks
 Source5: selector
 Source6: custom-style
+Source7: licenseutils
 
 Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
+Patch1: patch1-REDOOP-AMBARI-LICENSE.diff
 
 # FIXME
 AutoProv: no
@@ -60,6 +62,7 @@ Ambari
 %setup -n apache-%{ambari_name}-%{ambari_base_version}-src
 # Apply patch
 %patch0 -p1
+%patch1 -p1
 
 
 # apply custom style
@@ -574,12 +577,32 @@ AutoReqProv: no
 Distro Select
 
 
+%package crh-db-mpack
+Summary: CRH DB Mpack
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description crh-db-mpack
+CRH DB Mpack
+
+
+%package crh-dw-mpack
+Summary: CRH DW Mpack
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description crh-dw-mpack
+CRH DW Mpack
+
+
+
 
 %files server
 %config  /etc/ambari-server/conf
 %attr(644,root,root) /etc/init/ambari-server.conf
 %attr(755,root,root) /etc/init.d/ambari-server
 %attr(755,root,root) /etc/rc.d/init.d/ambari-server
+/etc/redoop
 %attr(755,root,root) /usr/sbin/ambari-server.py
 %attr(755,root,root) /usr/sbin/ambari_server_main.py
 /usr/lib/ambari-server
@@ -617,3 +640,15 @@ Distro Select
 %attr(755,root,root) /usr/bin/%{distro_select}
 %attr(755,root,root) /usr/bin/conf-select
 
+
+
+# Service file management RPMs
+%define service_macro() \
+%files %1 \
+%attr(644,root,root) /var/lib/ambari-mpacks/%1-1.0.0.0-SNAPSHOT.tar.gz \
+%post %1 \
+ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-1.0.0.0-SNAPSHOT.tar.gz --verbose \
+ambari-server restart
+
+%service_macro crh-db-mpack
+%service_macro crh-dw-mpack
