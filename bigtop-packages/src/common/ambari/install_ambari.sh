@@ -76,11 +76,6 @@ done
 install -d -m 0755 ${PREFIX}
 
 
-# Stack-select and conf-select
-install -d -m 0755 ${PREFIX}/usr/bin
-cp -ra $DISTRO_DIR/selector/* ${PREFIX}/usr/bin/
-
-
 # Ambari Server
 SERVER_DIR=$BUILD_DIR/ambari-server/target/ambari-server-*-dist
 

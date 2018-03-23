@@ -15,7 +15,6 @@
 
 %define ambari_name ambari
 %define ambari_stack CRH
-%define distro_select crh-select
 %define _binaries_in_noarch_packages_terminate_build   0
 %define _unpackaged_files_terminate_build 0
 
@@ -44,9 +43,8 @@ Source1: do-component-build
 Source2: install_%{ambari_name}.sh
 Source3: bigtop.bom
 Source4: stacks
-Source5: selector
-Source6: custom-style
-Source7: licenseutils
+Source5: custom-style
+Source6: licenseutils
 
 Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
 Patch1: patch1-REDOOP-AMBARI-LICENSE.diff
@@ -568,15 +566,6 @@ fi
 exit 0
 
 
-%package -n %{distro_select}
-Summary: Distro Select
-Group: Development/Libraries
-AutoProv: no
-AutoReqProv: no
-%description -n %{distro_select}
-Distro Select
-
-
 
 %files server
 %config  /etc/ambari-server/conf
@@ -615,10 +604,5 @@ Distro Select
 %dir %attr(755,root,root) /var/lib/ambari-agent/tmp
 %dir %attr(755,root,root) /var/log/ambari-agent
 %dir %attr(755,root,root) /var/run/ambari-agent
-
-
-%files -n %{distro_select}
-%attr(755,root,root) /usr/bin/%{distro_select}
-%attr(755,root,root) /usr/bin/conf-select
 
 

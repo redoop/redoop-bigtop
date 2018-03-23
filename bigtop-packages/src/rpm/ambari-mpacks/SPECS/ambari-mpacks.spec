@@ -14,6 +14,7 @@
 # limitations under the License.
 
 %define ambari_mpacks_name ambari-mpacks
+%define distro_select crh-select
 %define _binaries_in_noarch_packages_terminate_build   0
 %define _unpackaged_files_terminate_build 0
 
@@ -33,6 +34,7 @@ Buildroot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 License: ASL 2.0 
 Source0: do-component-build 
 Source1: bigtop.bom
+Source2: selector
 
 
 # FIXME
@@ -52,11 +54,24 @@ bash $RPM_SOURCE_DIR/do-component-build
 %install
 %__rm -rf $RPM_BUILD_ROOT
 
-install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
+# Stack-select and conf-select
+install -d -m 0755 ${RPM_BUILD_ROOT}/usr/bin
+cp -ra $RPM_SOURCE_DIR/selector/* ${RPM_BUILD_ROOT}/usr/bin/
 
+# Redoop Management Packs
+install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
 %__cp -ra crh-ts-mpack/target/crh-ts-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-dw-mpack/target/crh-dw-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 
+
+
+%package -n %{distro_select}
+Summary: Distro Select
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description -n %{distro_select}
+Distro Select
 
 
 %package crh-ts
@@ -76,6 +91,10 @@ AutoReqProv: no
 %description crh-dw
 Redoop Ambari CRH Data Warehouse Mpack
 
+
+%files -n %{distro_select}
+%attr(755,root,root) /usr/bin/%{distro_select}
+%attr(755,root,root) /usr/bin/conf-select
 
 
 # Service file management RPMs
