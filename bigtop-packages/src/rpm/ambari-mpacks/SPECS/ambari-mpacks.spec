@@ -16,7 +16,7 @@
 %define ambari_mpacks_name ambari-mpacks
 %define _binaries_in_noarch_packages_terminate_build   0
 %define _unpackaged_files_terminate_build 0
-%define mpacks crh-ts-mpack crh-dw-mpack
+
 
 
 # disable repacking jars
@@ -32,8 +32,7 @@ BuildArch: noarch
 Buildroot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 License: ASL 2.0 
 Source0: do-component-build 
-Source1: install_%{ambari_mpacks_name}.sh
-Source2: bigtop.bom
+Source1: bigtop.bom
 
 
 # FIXME
@@ -54,14 +53,9 @@ bash $RPM_SOURCE_DIR/do-component-build
 %__rm -rf $RPM_BUILD_ROOT
 
 install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
-for mpack in ${mpacks}
-do
-	AMBARI_VERSION=%{ambari_version} MPACK=${mpack} bash $RPM_SOURCE_DIR/install_ambari-mpacks.sh \
-          --build-dir=`pwd` \
-          --distro-dir=$RPM_SOURCE_DIR \
-          --source-dir=`pwd` \
-          --prefix=$RPM_BUILD_ROOT
-done
+
+%__cp -ra crh-ts-mpack/target/${MPACK}-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-ts-mpack/target/${MPACK}-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 
 
 
