@@ -21,7 +21,7 @@ export _JAVA_OPTIONS="-Xmx2048m -XX:MaxPermSize=512m -Djava.awt.headless=true"
 
 
 # Get our own mapcks and build them
-cp -ra ${DISTRO_DIR}/management-packs ./
+cp -ra ${DISTRO_DIR}/management-packs/* ./
 for mpack in crh-db-mpack crh-dw-mpack
 do
 	pushd $mpack
