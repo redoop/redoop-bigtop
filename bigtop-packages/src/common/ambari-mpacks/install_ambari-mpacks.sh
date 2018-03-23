@@ -81,7 +81,7 @@ install -d -m 0755 ${MPACKS_DIR}
 # Copy mpacks tar to mpacks dir
 for mpack in crh-db-mpack crh-dw-mpack
 do 
-  cp -ra $BUILD_DIR/contrib/management-packs/${mpack}/target/${mpack}-*.tar.gz ${MPACKS_DIR}
+  cp -ra $BUILD_DIR/${mpack}/target/${mpack}-*.tar.gz ${MPACKS_DIR}
 done
 
 
