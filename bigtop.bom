@@ -383,7 +383,7 @@ bigtop {
        * to the base HBase version. Update as needed whenever changing the
        * HBase version in the BOM.
        */
-      phoenix.hbase ='HBase-1.1'
+      phoenix.hbase ='HBase-1.2'
       version { base = "4.13.1-${phoenix.hbase}"; pkg = '4.7.0'; release = 1 }
       tarball { destination = "$name-${version.base}-src.tar.gz"
                 source      = "$name-${version.base}-src.tar.gz" }
