@@ -95,7 +95,7 @@ Source6: hbase.nofiles.conf
 Source7: regionserver-init.d.tpl
 BuildArch: noarch
 Requires: coreutils, /usr/sbin/useradd, /sbin/chkconfig, /sbin/service
-Requires: hadoop%{crh_version_as_name}-client, zookeeper%{crh_version_as_name} >= 3.3.1, bigtop-utils >= 0.7
+Requires: hadoop%{crh_version_as_name}-client, zookeeper%{crh_version_as_name} >= 3.3.1, bigtop-utils >= 0.7,ambari-mpacks%{crh_version_as_name}-crh-ts
 
 %if  0%{?mgaversion}
 Requires: bsh-utils
@@ -334,7 +334,7 @@ ln -f -s %{hadoop_home}/client/hadoop-yarn-server-common.jar $RPM_BUILD_ROOT/%{l
 
 %pre
 getent group hbase 2>/dev/null >/dev/null || /usr/sbin/groupadd -r hbase
-getent passwd hbase 2>&1 > /dev/null || /usr/sbin/useradd -c "HBase" -s /sbin/nologin -g hbase -r -d /var/lib/hbase hbase 2> /dev/null || :
+getent passwd hbase 2>&1 > /dev/null || /usr/sbin/useradd -c "HBase" -s /sbin/bash -g hbase -r -d /var/lib/hbase hbase 2> /dev/null || :
 
 %post
 
