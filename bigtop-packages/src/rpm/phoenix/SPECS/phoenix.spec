@@ -90,7 +90,7 @@ Source4: bigtop.bom
 Source5: %{phoenix_name}-queryserver.svc
 Source6: %{phoenix_name}-queryserver.default
 BuildArch: noarch
-Requires: hadoop%{crh_version_as_name}, hadoop%{crh_version_as_name}-mapreduce, hadoop%{crh_version_as_name}-yarn, hbase%{crh_version_as_name}, zookeeper%{crh_version_as_name}
+Requires: hadoop%{crh_version_as_name}, hadoop%{crh_version_as_name}-mapreduce, hadoop%{crh_version_as_name}-yarn, hbase%{crh_version_as_name}, zookeeper%{crh_version_as_name},ambari-mpacks%{crh_version_as_name}-crh-ts
 
 %if  0%{?mgaversion}
 Requires: bsh-utils
@@ -143,7 +143,7 @@ bash $RPM_SOURCE_DIR/init.d.tmpl $RPM_SOURCE_DIR/%{phoenix_name}-queryserver.svc
 
 %pre
 getent group phoenix >/dev/null || groupadd -r phoenix
-getent passwd phoenix >/dev/null || useradd -c "Phoenix" -s /sbin/nologin -g phoenix -r -d %{var_lib_phoenix} phoenix 2> /dev/null || :
+getent passwd phoenix >/dev/null || useradd -c "Phoenix" -s /sbin/bash -g phoenix -r -d %{var_lib_phoenix} phoenix 2> /dev/null || :
     
 %post
 
