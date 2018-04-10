@@ -25,6 +25,7 @@
   <modules>
     <module>crh-ts-mpack</module>
     <module>crh-dw-mpack</module>
+    <module>crh-stream-mpack</module>
   </modules>
   <build>
     <pluginManagement>
@@ -94,6 +95,7 @@
       <modules>
         <module>crh-ts-mpack</module>
         <module>crh-dw-mpack</module>
+        <module>crh-stream-mpack</module>
       </modules>
     </profile>
   </profiles>

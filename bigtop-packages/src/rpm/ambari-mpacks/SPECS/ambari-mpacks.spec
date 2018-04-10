@@ -62,7 +62,7 @@ cp -ra $RPM_SOURCE_DIR/selector/* ${RPM_BUILD_ROOT}/usr/bin/
 install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
 %__cp -ra crh-ts-mpack/target/crh-ts-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-dw-mpack/target/crh-dw-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-
+%__cp -ra crh-dw-mpack/target/crh-stream-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 
 
 %package -n %{distro_select}
@@ -91,6 +91,13 @@ AutoReqProv: no
 %description crh-dw
 Redoop Ambari CRH Data Warehouse Mpack
 
+%package crh-stream
+Summary: CRH stream  Mpack
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description crh-stream
+Redoop Ambari CRH stream Mpack
 
 %files -n %{distro_select}
 %attr(755,root,root) /usr/bin/%{distro_select}
@@ -107,3 +114,4 @@ ambari-server restart
 
 %service_macro crh-ts
 %service_macro crh-dw
+%service_macro crh-stream
