@@ -63,7 +63,8 @@ install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
 %__cp -ra crh-ts-mpack/target/crh-ts-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-dw-mpack/target/crh-dw-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-stream-mpack/target/crh-stream-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-
+%__cp -ra crh-BI-mpack/target/crh-BI-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-spark-mpack/target/crh-spark-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 
 %package -n %{distro_select}
 Summary: Distro Select
@@ -99,6 +100,22 @@ AutoReqProv: no
 %description crh-stream
 Redoop Ambari CRH stream Mpack
 
+%package crh-BI
+Summary: CRH BI  Mpack
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description crh-BI
+Redoop Ambari CRH BI Mpack
+
+%package crh-spark
+Summary: CRH spark  Mpack
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description crh-spark
+Redoop Ambari CRH spark Mpack
+
 %files -n %{distro_select}
 %attr(755,root,root) /usr/bin/%{distro_select}
 %attr(755,root,root) /usr/bin/conf-select
@@ -115,3 +132,5 @@ ambari-server restart
 %service_macro crh-ts
 %service_macro crh-dw
 %service_macro crh-stream
+%service_macro crh-spark
+%service_macro crh-BI
