@@ -39,13 +39,13 @@ limitations under the License.
             <timeout>10000</timeout>
           </commandScript>
           <dependencies>
-            <dependency>
+            <!--<dependency>
               <name>SPARK/SPARK_CLIENT</name>
               <scope>host</scope>
               <auto-deploy>
                 <enabled>true</enabled>
               </auto-deploy>
-            </dependency>
+            </dependency> -->
             <dependency>
               <name>YARN/YARN_CLIENT</name>
               <scope>host</scope>
