@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export SPARK_HOME=${SPARK_HOME:-{CRH_DIR}/spark2}
-export SPARK_LOG_DIR=${SPARK_LOG_DIR:-/var/log/spark2}
+export SPARK_HOME=${SPARK_HOME:-{CRH_DIR}/spark}
+export SPARK_LOG_DIR=${SPARK_LOG_DIR:-/var/log/spark}
 
 export HADOOP_HOME=${HADOOP_HOME:-{CRH_DIR}/hadoop}
 export HADOOP_HDFS_HOME=${HADOOP_HDFS_HOME:-${HADOOP_HOME}/../hadoop-hdfs}
@@ -36,8 +36,8 @@ export STANDALONE_SPARK_MASTER_HOST=`hostname -f`
 export SPARK_MASTER_PORT=7077
 export SPARK_MASTER_WEBUI_PORT=18080
 
-export SPARK_WORKER_DIR=${SPARK_WORKER_DIR:-/var/run/spark2/work}
+export SPARK_WORKER_DIR=${SPARK_WORKER_DIR:-/var/run/spark/work}
 export SPARK_WORKER_PORT=7078
 export SPARK_WORKER_WEBUI_PORT=18081
 
-export SPARK_HISTORY_OPTS="$SPARK_HISTORY_OPTS -Dspark.history.fs.logDirectory=hdfs:///var/log/spark2/apps -Dspark.history.ui.port=18082"
+export SPARK_HISTORY_OPTS="$SPARK_HISTORY_OPTS -Dspark.history.fs.logDirectory=hdfs:///var/log/spark/apps -Dspark.history.ui.port=18082"

@@ -340,7 +340,7 @@ bigtop {
                 site = "${apache.APACHE_MIRROR}/${download_path}"
                 archive = "${apache.APACHE_ARCHIVE}/${download_path}" }
     }
-    'spark' {
+    'spark1' {
       name    = 'spark'
       pkg     = 'spark'
       relNotes = 'Apache Spark'
@@ -351,9 +351,9 @@ bigtop {
                 site = "${apache.APACHE_MIRROR}/${download_path}"
                 archive = "${apache.APACHE_ARCHIVE}/${download_path}" }
     }
-    'spark2' {
-      name    = 'spark2'
-      pkg     = 'spark2'
+    'spark' {
+      name    = 'spark'
+      pkg     = 'spark'
       relNotes = 'Apache Spark'
       version { base = '2.2.0'; pkg = base; release = 1 }
       tarball { destination = "spark-${version.base}.tar.gz"

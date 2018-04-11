@@ -52,7 +52,7 @@ Source3: init.d.tmpl
 Source4: install_zeppelin.sh
 Source5: zeppelin-env.sh
 Source6: zeppelin.svc
-Requires: bigtop-utils >= 0.7, hadoop%{crh_version_as_name}-client, spark%{crh_version_as_name} >= 1.5, spark%{crh_version_as_name}-python >= 1.5
+Requires: bigtop-utils >= 0.7, hadoop%{crh_version_as_name}-client, spark%{crh_version_as_name} >= 1.5, spark%{crh_version_as_name}-python >= 1.5,ambari-mpacks%{crh_version_as_name}-crh-BI
 Requires(preun): /sbin/service
 AutoReq: no
 
