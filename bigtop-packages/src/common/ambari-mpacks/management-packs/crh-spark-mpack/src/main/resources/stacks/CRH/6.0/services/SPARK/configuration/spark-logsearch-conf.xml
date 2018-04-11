@@ -24,7 +24,7 @@
     <name>service_name</name>
     <display-name>Service name</display-name>
     <description>Service name for Logsearch Portal (label)</description>
-    <value>Spark</value>
+    <value>Spark2</value>
     <on-ambari-upgrade add="true"/>
   </property>
   <property>
@@ -58,7 +58,7 @@
      }
    ],
    "filter":[
-       {
+      {
           "filter":"grok",
           "conditions":{
             "fields":{

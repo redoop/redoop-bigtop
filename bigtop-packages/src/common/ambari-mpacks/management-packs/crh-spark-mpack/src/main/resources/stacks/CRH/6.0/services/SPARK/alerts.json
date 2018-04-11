@@ -5,13 +5,13 @@
       {
         "name": "SPARK_JOBHISTORYSERVER_PROCESS",
         "label": "Spark History Server",
-        "description": "This host-level alert is triggered if the Spark History Server cannot be determined to be up.",
+        "description": "This host-level alert is triggered if the Spark2 History Server cannot be determined to be up.",
         "interval": 1,
         "scope": "HOST",
         "source": {
           "type": "PORT",
           "uri": "{{spark-defaults/spark.history.ui.port}}",
-          "default_port": 18080,
+          "default_port": 18081,
           "reporting": {
             "ok": {
               "text": "TCP OK - {0:.3f}s response on port {1}"
@@ -32,12 +32,12 @@
       {
         "name": "livy_server_status",
         "label": "Spark Livy Server",
-        "description": "This host-level alert is triggered if the Livy Server cannot be determined to be up.",
+        "description": "This host-level alert is triggered if the Livy2 Server cannot be determined to be up.",
         "interval": 1,
         "scope": "HOST",
         "source": {
           "type": "SCRIPT",
-          "path": "SPARK/1.2.1/package/scripts/alerts/alert_spark_livy_port.py",
+          "path": "SPARK/package/scripts/alerts/alert_spark_livy_port.py",
           "parameters": [
             {
               "name": "check.command.timeout",
@@ -61,7 +61,7 @@
         "scope": "HOST",
         "source": {
           "type": "SCRIPT",
-          "path": "SPARK/1.2.1/package/scripts/alerts/alert_spark_thrift_port.py",
+          "path": "SPARK/package/scripts/alerts/alert_spark_thrift_port.py",
           "parameters": [
             {
               "name": "check.command.timeout",

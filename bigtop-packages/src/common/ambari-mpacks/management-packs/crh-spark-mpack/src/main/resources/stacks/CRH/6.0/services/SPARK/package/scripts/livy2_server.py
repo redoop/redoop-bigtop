@@ -33,8 +33,8 @@ from resource_management.core.logger import Logger
 from resource_management.libraries.functions.format import format
 from resource_management.libraries.functions import conf_select, stack_select
 
-from livy_service import livy_service
-from setup_livy import setup_livy
+from livy2_service import livy2_service
+from setup_livy2 import setup_livy
 
 class LivyServer(Script):
 
@@ -44,7 +44,7 @@ class LivyServer(Script):
 
     self.install_packages(env)
 
-  def configure(self, env, upgrade_type=None):
+  def configure(self, env, upgrade_type=None, config_dir=None):
     import params
     env.set_params(params)
 
@@ -59,19 +59,19 @@ class LivyServer(Script):
       self.wait_for_dfs_directories_created([params.entity_groupfs_store_dir, params.entity_groupfs_active_dir])
 
     self.configure(env)
-    livy_service('server', upgrade_type=upgrade_type, action='start')
+    livy2_service('server', upgrade_type=upgrade_type, action='start')
 
   def stop(self, env, upgrade_type=None):
     import params
     env.set_params(params)
 
-    livy_service('server', upgrade_type=upgrade_type, action='stop')
+    livy2_service('server', upgrade_type=upgrade_type, action='stop')
 
   def status(self, env):
     import status_params
     env.set_params(status_params)
 
-    check_process_status(status_params.livy_server_pid_file)
+    check_process_status(status_params.livy2_server_pid_file)
 
   #  TODO move out and compose with similar method in resourcemanager.py
   def wait_for_dfs_directories_created(self, dirs):
@@ -80,21 +80,24 @@ class LivyServer(Script):
     ignored_dfs_dirs = HdfsResourceProvider.get_ignored_resources_list(params.hdfs_resource_ignore_file)
 
     if params.security_enabled:
-      Execute(format("{kinit_path_local} -kt {livy_kerberos_keytab} {livy_principal}"),
-              user=params.livy_user
+      Execute(format("{kinit_path_local} -kt {livy_kerberos_keytab} {livy2_principal}"),
+              user=params.livy2_user
               )
       Execute(format("{kinit_path_local} -kt {hdfs_user_keytab} {hdfs_principal_name}"),
               user=params.hdfs_user
               )
 
     for dir_path in dirs:
-      self.wait_for_dfs_directory_created(dir_path, ignored_dfs_dirs)
+        self.wait_for_dfs_directory_created(dir_path, ignored_dfs_dirs)
+
+  def get_pid_files(self):
+    import status_params
+    return [status_params.livy2_server_pid_file]
 
 
   @retry(times=8, sleep_time=20, backoff_factor=1, err_class=Fail)
   def wait_for_dfs_directory_created(self, dir_path, ignored_dfs_dirs):
     import params
-
 
     if not is_empty(dir_path):
       dir_path = HdfsResourceProvider.parse_path(dir_path)
@@ -114,7 +117,7 @@ class LivyServer(Script):
         dir_exists = ('FileStatus' in list_status)
       else:
         # have to do time expensive hdfs dfs -d check.
-        dfs_ret_code = shell.call(format("hdfs --config {hadoop_conf_dir} dfs -test -d " + dir_path), user=params.livy_user)[0]
+        dfs_ret_code = shell.call(format("hdfs --config {hadoop_conf_dir} dfs -test -d " + dir_path), user=params.livy2_user)[0]
         dir_exists = not dfs_ret_code #dfs -test -d returns 0 in case the dir exists
 
       if not dir_exists:
@@ -123,23 +126,24 @@ class LivyServer(Script):
         Logger.info("DFS directory '" + dir_path + "' exists.")
 
   def get_component_name(self):
-    return "livy-server"
+    return "livy2-server"
 
   def pre_upgrade_restart(self, env, upgrade_type=None):
     import params
 
     env.set_params(params)
     if params.version and check_stack_feature(StackFeature.ROLLING_UPGRADE, params.version):
-      Logger.info("Executing Livy Server Stack Upgrade pre-restart")
+      Logger.info("Executing Livy2 Server Stack Upgrade pre-restart")
       conf_select.select(params.stack_name, "spark", params.version)
-      stack_select.select("livy-server", params.version)
+      stack_select.select("livy2-server", params.version)
 
   def get_log_folder(self):
     import params
-    return params.livy_log_dir
+    return params.livy2_log_dir
 
   def get_user(self):
     import params
-    return params.livy_user
+    return params.livy2_user
 if __name__ == "__main__":
-  LivyServer().execute()
+    LivyServer().execute()
+

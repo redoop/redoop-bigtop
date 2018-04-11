@@ -39,18 +39,6 @@
             "spark.yarn.keytab": "${spark-env/hive_kerberos_keytab}",
             "spark.yarn.principal": "${spark-env/hive_kerberos_principal}"
           }
-        },
-        {
-          "livy-conf": {
-            "livy.server.auth.type": "kerberos",
-            "livy.impersonation.enabled": "true"
-          }
-        },
-        {
-          "core-site": {
-            "hadoop.proxyuser.${livy-env/livy_user}.groups": "*",
-            "hadoop.proxyuser.${livy-env/livy_user}.hosts": "*"
-          }
         }
       ],
       "components": [
@@ -73,44 +61,6 @@
             },
             {
               "name": "/HIVE/HIVE_SERVER/hive_server_hive"
-            }
-          ]
-        },
-        {
-          "name": "LIVY_SERVER",
-          "identities": [
-            {
-              "name": "/HDFS/NAMENODE/hdfs"
-            },
-            {
-              "name": "livyuser",
-              "principal": {
-                "value": "${livy-env/livy_user}/_HOST@${realm}",
-                "type" : "service",
-                "configuration": "livy-conf/livy.server.kerberos.principal",
-                "local_username": "${livy-env/livy_user}"
-              },
-              "keytab": {
-                "file": "${keytab_dir}/livy.service.keytab",
-                "owner": {
-                  "name": "${livy-env/livy_user}",
-                  "access": "r"
-                },
-                "group": {
-                  "name": "${cluster-env/user_group}",
-                  "access": ""
-                },
-                "configuration": "livy-conf/livy.server.kerberos.keytab"
-              }
-            },
-            {
-              "name": "/spnego",
-              "principal": {
-                "configuration": "livy-conf/livy.server.auth.kerberos.principal"
-              },
-              "keytab": {
-                "configuration": "livy-conf/livy.server.auth.kerberos.keytab"
-              }
             }
           ]
         }

@@ -22,15 +22,15 @@
             },
             "group": {
               "name": "${cluster-env/user_group}",
-               "access": ""
+              "access": ""
             },
             "configuration": "spark-defaults/spark.history.kerberos.keytab"
-           }
+          }
         }
       ],
       "configurations": [
         {
-          "spark-defaults": {
+          "spark2-defaults": {
             "spark.history.kerberos.enabled": "true"
           }
         },
@@ -41,15 +41,15 @@
           }
         },
         {
-          "livy-conf": {
+          "livy2-conf": {
             "livy.server.auth.type": "kerberos",
             "livy.impersonation.enabled": "true"
           }
         },
         {
           "core-site": {
-            "hadoop.proxyuser.${livy-env/livy_user}.groups": "*",
-            "hadoop.proxyuser.${livy-env/livy_user}.hosts": "*"
+            "hadoop.proxyuser.${livy2-env/livy2_user}.groups": "*",
+            "hadoop.proxyuser.${livy2-env/livy2_user}.hosts": "*"
           }
         }
       ],
@@ -80,7 +80,7 @@
           ]
         },
         {
-          "name": "LIVY_SERVER",
+          "name": "LIVY2_SERVER",
           "identities": [
             {
               "name": "hdfs",
@@ -89,32 +89,32 @@
             {
               "name": "livyuser",
               "principal": {
-                "value": "${livy-env/livy_user}/_HOST@${realm}",
+                "value": "${livy2-env/livy2_user}/_HOST@${realm}",
                 "type" : "service",
-                "configuration": "livy-conf/livy.server.launch.kerberos.principal",
-                "local_username": "${livy-env/livy_user}"
+                "configuration": "livy2-conf/livy.server.launch.kerberos.principal",
+                "local_username": "${livy2-env/livy2_user}"
               },
               "keytab": {
                 "file": "${keytab_dir}/livy.service.keytab",
                 "owner": {
-                  "name": "${livy-env/livy_user}",
+                  "name": "${livy2-env/livy2_user}",
                   "access": "r"
                 },
                 "group": {
                   "name": "${cluster-env/user_group}",
                   "access": ""
                 },
-                "configuration": "livy-conf/livy.server.launch.kerberos.keytab"
+                "configuration": "livy2-conf/livy.server.launch.kerberos.keytab"
               }
             },
             {
               "name": "livy_spnego",
               "reference": "/spnego",
               "principal": {
-                "configuration": "livy-conf/livy.server.auth.kerberos.principal"
+                "configuration": "livy2-conf/livy.server.auth.kerberos.principal"
               },
               "keytab": {
-                "configuration": "livy-conf/livy.server.auth.kerberos.keytab"
+                "configuration": "livy2-conf/livy.server.auth.kerberos.keytab"
               }
             }
           ]

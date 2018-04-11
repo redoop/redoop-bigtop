@@ -19,10 +19,10 @@
  */
 -->
 <configuration supports_final="false" supports_adding_forbidden="true">
-  <property>
-    <name>content</name>
-    <description>spark-blacklist.properties</description>
-    <value>
+    <property>
+        <name>content</name>
+        <description>spark-blacklist.properties</description>
+        <value>
             #
             # Configuration override / blacklist. Defines a list of properties that users are not allowed
             # to override when starting Spark sessions.
@@ -30,11 +30,23 @@
             # This file takes a list of property names (one per line). Empty lines and lines starting with "#"
             # are ignored.
             #
+
+            # Disallow overriding the master and the deploy mode.
+            spark.master
+            spark.submit.deployMode
+
+            # Disallow overriding the location of Spark cached jars.
+            spark.yarn.jar
+            spark.yarn.jars
+            spark.yarn.archive
+
+            # Don't allow users to override the RSC timeout.
+            livy.rsc.server.idle_timeout
         </value>
-    <value-attributes>
-      <type>content</type>
-      <show-property-name>false</show-property-name>
-    </value-attributes>
-    <on-ambari-upgrade add="true"/>
-  </property>
+        <value-attributes>
+            <type>content</type>
+            <show-property-name>false</show-property-name>
+        </value-attributes>
+        <on-ambari-upgrade add="false"/>
+    </property>
 </configuration>

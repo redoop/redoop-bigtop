@@ -41,7 +41,7 @@ limitations under the License.
   </property>
   <property>
     <name>hive.server2.thrift.port</name>
-    <value>10015</value>
+    <value>10016</value>
     <description>
       TCP port number to listen on, default 10015.
     </description>
