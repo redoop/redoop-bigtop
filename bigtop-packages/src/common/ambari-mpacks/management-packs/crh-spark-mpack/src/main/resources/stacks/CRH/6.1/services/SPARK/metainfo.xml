@@ -24,7 +24,7 @@
     <service>
       <name>SPARK</name>
       <comment>Apache Spark is a fast and general engine for large-scale data processing</comment>
-      <version>2.x</version>
+      <version>2.2.0</version>
       <!--<extends>6.0/services/SPARK</extends>-->
       <selection>DEFAULT</selection>
 
