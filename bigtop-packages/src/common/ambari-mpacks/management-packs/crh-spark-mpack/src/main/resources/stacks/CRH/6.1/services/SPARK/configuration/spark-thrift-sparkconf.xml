@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -18,12 +18,23 @@
  * limitations under the License.
  */
 -->
-<metainfo>
-  <schemaVersion>2.0</schemaVersion>
-  <services>
-    <service>
-      <name>SPARK</name>
-      <version>2.2.0</version>
-    </service>
-  </services>
-</metainfo>
+<configuration supports_final="true">
+  <property>
+    <name>spark.yarn.executor.failuresValidityInterval</name>
+    <value>2h</value>
+    <description>
+      Defines the validity interval for executor failure tracking.
+      Executor failures which are older than the validity interval will be ignored.
+    </description>
+    <on-ambari-upgrade add="false"/>
+  </property>
+  <property>
+    <name>spark.yarn.maxAppAttempts</name>
+    <value>1</value>
+    <description>
+      The maximum number of attempts that will be made to submit the application.
+      It should be no larger than the global number of max attempts in the YARN configuration.
+    </description>
+    <on-ambari-upgrade add="false"/>
+  </property>
+</configuration>
