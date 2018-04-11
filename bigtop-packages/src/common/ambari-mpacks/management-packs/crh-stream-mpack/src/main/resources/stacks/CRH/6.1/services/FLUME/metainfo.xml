@@ -21,7 +21,7 @@
     <service>
       <name>FLUME</name>
       <displayName>Flume</displayName>
-      <comment>A distributed service for collecting, aggregating, and moving large amounts of streaming data into HDFS,Add By NX</comment>
+      <comment>A distributed service for collecting, aggregating, and moving large amounts of streaming data into HDFS</comment>
       <version>1.7.0</version>
       <components>
         <component>
