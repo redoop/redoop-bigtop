@@ -95,7 +95,7 @@ Source6: hbase.nofiles.conf
 Source7: regionserver-init.d.tpl
 BuildArch: noarch
 Requires: coreutils, /usr/sbin/useradd, /sbin/chkconfig, /sbin/service
-Requires: hadoop%{crh_version_as_name}-client, zookeeper%{crh_version_as_name} >= 3.3.1, bigtop-utils >= 0.7
+Requires: hadoop%{crh_version_as_name}-client, zookeeper%{crh_version_as_name} >= 3.3.1, bigtop-utils >= 0.7, ambari-mpacks%{crh_version_as_name}-crh-ts
 
 %if  0%{?mgaversion}
 Requires: bsh-utils
