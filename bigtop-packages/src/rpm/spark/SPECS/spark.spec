@@ -23,7 +23,9 @@
 %define config_spark %{etc_spark}/conf
 %define bin /usr/bin
 %define man_dir /usr/share/man
-%define spark_services master worker
+%define spark_services master worker history-server thriftserver
+%define lib_hadoop_client %{crh_dir}/hadoop/client
+%define lib_hadoop_yarn %{crh_dir}/hadoop-yarn/
 
 %if  %{?suse_version:1}0
 %define doc_spark %{_docdir}/spark
@@ -45,14 +47,16 @@ Group: Development/Libraries
 BuildArch: noarch
 Buildroot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 License: ASL 2.0
-Source0: spark-%{spark_base_version}.tar.gz
+Source0: %{spark_name}-%{spark_base_version}.tar.gz
 Source1: do-component-build 
-Source2: install_spark.sh
+Source2: install_%{spark_name}.sh
 Source3: spark-master.svc
 Source4: spark-worker.svc
 Source6: init.d.tmpl
-Source7: bigtop.bom
-Requires: bigtop-utils >= 0.7, hadoop%{crh_version_as_name}-client
+Source7: spark-history-server.svc
+Source8: spark-thriftserver.svc
+Source9: bigtop.bom
+Requires: bigtop-utils >= 0.7, hadoop%{crh_version_as_name}-client, hadoop%{crh_version_as_name}-yarn
 Requires(preun): /sbin/service
 
 %global initd_dir %{_sysconfdir}/init.d
@@ -101,12 +105,36 @@ Requires: %{name} = %{version}-%{release}, python
 %description -n %{name}-python
 Includes PySpark, an interactive Python shell for Spark, and related libraries
 
+%package -n %{name}-history-server
+Summary: History server for Apache Spark
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description -n %{name}-history-server
+History server for Apache Spark
+
+%package -n %{name}-thriftserver
+Summary: Thrift server for Spark SQL
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description -n %{name}-thriftserver
+Thrift server for Spark SQL
+
 %package -n %{name}-datanucleus
 Summary: DataNucleus libraries for Apache Spark
 Group: Development/Libraries
 
 %description -n %{name}-datanucleus
 DataNucleus libraries used by Spark SQL with Hive Support
+
+%package -n %{name}-external
+Summary: External libraries for Apache Spark
+Group: Development/Libraries
+
+%description -n %{name}-external
+External libraries built for Apache Spark but not included in the main
+distribution (e.g., external streaming libraries)
 
 %package -n %{name}-yarn-shuffle
 Summary: Spark YARN Shuffle Service
@@ -115,8 +143,15 @@ Group: Development/Libraries
 %description -n %{name}-yarn-shuffle
 Spark YARN Shuffle Service
 
+%package -n %{name}-sparkr
+Summary: R package for Apache Spark
+Group: Development/Libraries
+
+%description -n %{name}-sparkr
+SparkR is an R package that provides a light-weight frontend to use Apache Spark from R.
+
 %prep
-%setup -n spark-%{spark_base_version}
+%setup -n %{spark_name}-%{spark_base_version}
 
 %build
 bash $RPM_SOURCE_DIR/do-component-build
@@ -124,6 +159,7 @@ bash $RPM_SOURCE_DIR/do-component-build
 %install
 %__rm -rf $RPM_BUILD_ROOT
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{initd_dir}/
+
 sed -i -e "s,{CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/* 
 
 env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} SPARK_VERSION=%{spark_base_version} bash $RPM_SOURCE_DIR/install_spark.sh \
@@ -131,6 +167,8 @@ env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} SPARK_VERSION=%{spark_
           --source-dir=$RPM_SOURCE_DIR \
           --prefix=$RPM_BUILD_ROOT  \
           --doc-dir=%{doc_spark}
+
+%__rm -f $RPM_BUILD_ROOT/%{lib_spark}/jars/hadoop-*.jar
 
 for service in %{spark_services}
 do
@@ -141,14 +179,14 @@ done
 
 %pre
 getent group spark >/dev/null || groupadd -r spark
-getent passwd spark >/dev/null || useradd -c "Spark" -s /bin/bash -g spark -r -d %{var_lib_spark} spark 2> /dev/null || :
+getent passwd spark >/dev/null || useradd -c "Spark" -s /sbin/bash -g spark -r -d %{var_lib_spark} spark 2> /dev/null || :
 
 %post
 
 if [ !  -e "/etc/spark/conf" ]; then
-      rm -f /etc/spark/conf
-      mkdir -p /etc/spark/conf
-      cp -rp /etc/spark/conf.dist/* /etc/spark/conf
+       rm -f /etc/spark/conf
+       mkdir -p /etc/spark/conf
+       cp -rp /etc/spark/conf.dist/* /etc/spark/conf
 fi 
 
 %{alternatives_cmd} --install %{config_spark} %{spark_name}-conf %{config_spark}.dist 30
@@ -176,28 +214,29 @@ done
 %{lib_spark}/NOTICE
 %{lib_spark}/README.md
 %{lib_spark}/RELEASE
-%{lib_spark}/bin 
 %{bin_spark}
 %exclude %{bin_spark}/pyspark
 %{lib_spark}/conf
 %{lib_spark}/data
 %{lib_spark}/examples
 %{lib_spark}/jars
-%exclude %{lib_spark}/yarn/spark-*-yarn-shuffle.jar
 %exclude %{lib_spark}/jars/datanucleus-*.jar
 %{lib_spark}/licenses
 %{lib_spark}/sbin
 %{lib_spark}/work
-%{lib_spark}/R
-%exclude %{lib_spark}/python
 %{etc_spark}
 %attr(0755,spark,spark) %{var_lib_spark}
 %attr(0755,spark,spark) %{var_run_spark}
 %attr(0755,spark,spark) %{var_log_spark}
+%{bin}/spark-*
+%{bin}/find-spark-home
+%exclude %{lib_spark}/R
+%exclude %{lib_spark}/bin/sparkR
+%exclude %{bin}/sparkR
 
 %files -n %{name}-python
 %defattr(-,root,root,755)
-#%attr(0755,root,root) %{bin}/pyspark
+%attr(0755,root,root) %{bin}/pyspark
 %attr(0755,root,root) %{lib_spark}/bin/pyspark
 %{lib_spark}/python
 
@@ -206,10 +245,20 @@ done
 %{lib_spark}/jars/datanucleus-*.jar
 %{lib_spark}/yarn/lib/datanucleus-*.jar
 
+%files -n %{name}-external
+%defattr(-,root,root,755)
+%{lib_spark}/external
+
 %files -n %{name}-yarn-shuffle
 %defattr(-,root,root,755)
 %{lib_spark}/yarn/spark-*-yarn-shuffle.jar
 %{lib_spark}/yarn/lib/spark-yarn-shuffle.jar
+
+%files -n %{name}-sparkr
+%defattr(-,root,root,755)
+%{lib_spark}/R
+%{lib_spark}/bin/sparkR
+%{bin}/sparkR
 
 %define service_macro() \
 %files -n %1 \
@@ -228,3 +277,5 @@ if [ $1 -ge 1 ]; then \
 fi
 %service_macro %{name}-master
 %service_macro %{name}-worker
+%service_macro %{name}-history-server
+%service_macro %{name}-thriftserver
