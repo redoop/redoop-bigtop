@@ -28,6 +28,7 @@
     <module>crh-stream-mpack</module>
     <module>crh-BI-mpack</module>
     <module>crh-spark-mpack</module>
+    <module>crh-security-mpack</module>
   </modules>
   <build>
     <pluginManagement>
@@ -100,6 +101,7 @@
         <module>crh-stream-mpack</module>
         <module>crh-BI-mpack</module>
         <module>crh-spark-mpack</module>
+        <module>crh-security-mpack</module>
       </modules>
     </profile>
   </profiles>
