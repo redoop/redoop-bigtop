@@ -42,7 +42,7 @@ class JobHistoryServer(Script):
     
     self.install_packages(env)
     
-  def configure(self, env, upgrade_type=None, config_dir=None):
+  def configure(self, env, upgrade_type=None):
     import params
     env.set_params(params)
     
@@ -76,7 +76,7 @@ class JobHistoryServer(Script):
 
     env.set_params(params)
     if params.version and check_stack_feature(StackFeature.ROLLING_UPGRADE, params.version):
-      Logger.info("Executing Spark2 Job History Server Stack Upgrade pre-restart")
+      Logger.info("Executing Spark Job History Server Stack Upgrade pre-restart")
       conf_select.select(params.stack_name, "spark", params.version)
       stack_select.select("spark-historyserver", params.version)
 

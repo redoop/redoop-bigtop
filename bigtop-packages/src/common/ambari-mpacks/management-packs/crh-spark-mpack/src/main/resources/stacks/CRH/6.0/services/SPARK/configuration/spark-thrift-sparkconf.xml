@@ -20,6 +20,22 @@
 -->
 <configuration supports_final="true">
   <property>
+    <name>spark.driver.extraLibraryPath</name>
+    <value>{{spark_hadoop_lib_native}}</value>
+    <description>
+      Set a special library path to use when launching the driver JVM.
+    </description>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <property>
+    <name>spark.executor.extraLibraryPath</name>
+    <value>{{spark_hadoop_lib_native}}</value>
+    <description>
+      Set a special library path to use when launching the executor JVM.
+    </description>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <property>
     <name>spark.yarn.queue</name>
     <value>default</value>
     <description>
@@ -32,22 +48,6 @@
       </property>
     </depends-on>
     <on-ambari-upgrade add="false"/>
-  </property>
-  <property>
-    <name>spark.driver.extraLibraryPath</name>
-    <value>{{spark_hadoop_lib_native}}</value>
-    <description>
-       Set a special library path to use when launching the driver JVM.
-    </description>
-    <on-ambari-upgrade add="true"/>
-  </property>
-  <property>
-    <name>spark.executor.extraLibraryPath</name>
-    <value>{{spark_hadoop_lib_native}}</value>
-    <description>
-      Set a special library path to use when launching the executor JVM.
-    </description>
-    <on-ambari-upgrade add="true"/>
   </property>
   <property>
     <name>spark.history.provider</name>
@@ -154,6 +154,22 @@
     <value>0</value>
     <description>
       Lower bound for the number of executors if dynamic allocation is enabled.
+    </description>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <property>
+    <name>spark.yarn.am.memory</name>
+    <value>512m</value>
+    <description>
+      Amount of memory to use for the YARN Application Master in client mode.
+    </description>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <property>
+    <name>spark.executor.memory</name>
+    <value>1g</value>
+    <description>
+      Amount of memory to use per executor process.
     </description>
     <on-ambari-upgrade add="true"/>
   </property>

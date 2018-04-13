@@ -22,7 +22,7 @@
     <service>
       <name>SPARK</name>
       <displayName>Spark</displayName>
-      <comment>Apache Spark 2.0 is a fast and general engine for large-scale data processing. This service is &lt;b&gt;Technical Preview&lt;/b&gt;.</comment>
+      <comment>Apache Spark is a fast and general engine for large-scale data processing.</comment>
       <version>2.2.0</version>
       <components>
         <component>
@@ -32,6 +32,13 @@
           <cardinality>1</cardinality>
           <versionAdvertised>true</versionAdvertised>
           <dependencies>
+            <!--<dependency>
+              <name>TEZ/TEZ_CLIENT</name>
+              <scope>host</scope>
+              <auto-deploy>
+                <enabled>true</enabled>
+              </auto-deploy>
+            </dependency>-->
             <dependency>
               <name>HDFS/HDFS_CLIENT</name>
               <scope>host</scope>
@@ -54,65 +61,17 @@
              </auto-deploy>
            </dependency>
           </dependencies>
-          <commandScript>
-            <script>scripts/job_history_server.py</script>
-            <scriptType>PYTHON</scriptType>
-            <timeout>600</timeout>
-          </commandScript>
           <logs>
             <log>
               <logId>spark_jobhistory_server</logId>
               <primary>true</primary>
             </log>
           </logs>
-        </component>
-        <component>
-          <name>SPARK_THRIFTSERVER</name>
-          <displayName>Spark Thrift Server</displayName>
-          <category>SLAVE</category>
-          <cardinality>0+</cardinality>
-          <versionAdvertised>true</versionAdvertised>
-          <dependencies>
-            <dependency>
-              <name>HDFS/HDFS_CLIENT</name>
-              <scope>host</scope>
-              <auto-deploy>
-                <enabled>true</enabled>
-              </auto-deploy>
-            </dependency>
-            <dependency>
-               <name>MAPREDUCE2/MAPREDUCE2_CLIENT</name>
-               <scope>host</scope>
-               <auto-deploy>
-                 <enabled>true</enabled>
-               </auto-deploy>
-            </dependency>
-            <dependency>
-              <name>YARN/YARN_CLIENT</name>
-              <scope>host</scope>
-              <auto-deploy>
-                <enabled>true</enabled>
-              </auto-deploy>
-            </dependency>
-            <!--<dependency>
-              <name>HIVE/HIVE_METASTORE</name>
-              <scope>cluster</scope>
-              <auto-deploy>
-                <enabled>true</enabled>
-              </auto-deploy>
-            </dependency> -->
-          </dependencies>
           <commandScript>
-            <script>scripts/spark_thrift_server.py</script>
+            <script>scripts/job_history_server.py</script>
             <scriptType>PYTHON</scriptType>
             <timeout>600</timeout>
           </commandScript>
-          <logs>
-            <log>
-              <logId>spark_thriftserver</logId>
-              <primary>true</primary>
-            </log>
-          </logs>
         </component>
         <component>
           <name>SPARK_CLIENT</name>
@@ -171,6 +130,95 @@
             </configFile>
           </configFiles>
         </component>
+        <component>
+          <name>SPARK_THRIFTSERVER</name>
+          <displayName>Spark Thrift Server</displayName>
+          <category>SLAVE</category>
+          <cardinality>0+</cardinality>
+          <versionAdvertised>true</versionAdvertised>
+          <dependencies>
+            <dependency>
+              <name>HDFS/HDFS_CLIENT</name>
+              <scope>host</scope>
+              <auto-deploy>
+                <enabled>true</enabled>
+              </auto-deploy>
+            </dependency>
+            <dependency>
+               <name>MAPREDUCE2/MAPREDUCE2_CLIENT</name>
+               <scope>host</scope>
+               <auto-deploy>
+                 <enabled>true</enabled>
+               </auto-deploy>
+            </dependency>
+            <dependency>
+              <name>YARN/YARN_CLIENT</name>
+              <scope>host</scope>
+              <auto-deploy>
+                <enabled>true</enabled>
+              </auto-deploy>
+            </dependency>
+            <!--<dependency>
+              <name>HIVE/HIVE_METASTORE</name>
+              <scope>cluster</scope>
+              <auto-deploy>
+                <enabled>true</enabled>
+              </auto-deploy>
+            </dependency> -->
+          </dependencies>
+          <logs>
+            <log>
+              <logId>spark_thriftserver</logId>
+              <primary>true</primary>
+            </log>
+          </logs>
+          <commandScript>
+            <script>scripts/spark_thrift_server.py</script>
+            <scriptType>PYTHON</scriptType>
+            <timeout>600</timeout>
+          </commandScript>
+        </component>
+        <component>
+          <name>LIVY_SERVER</name>
+          <displayName>Livy Server</displayName>
+          <category>SLAVE</category>
+          <cardinality>0+</cardinality>
+          <versionAdvertised>true</versionAdvertised>
+          <dependencies>
+            <dependency>
+              <name>SPARK/SPARK_CLIENT</name>
+              <scope>host</scope>
+              <auto-deploy>
+                <enabled>true</enabled>
+              </auto-deploy>
+            </dependency>
+            <dependency>
+              <name>HDFS/HDFS_CLIENT</name>
+              <scope>host</scope>
+              <auto-deploy>
+                <enabled>true</enabled>
+              </auto-deploy>
+            </dependency>
+            <dependency>
+              <name>YARN/YARN_CLIENT</name>
+              <scope>host</scope>
+              <auto-deploy>
+                <enabled>true</enabled>
+              </auto-deploy>
+            </dependency>
+          </dependencies>
+          <commandScript>
+            <script>scripts/livy_server.py</script>
+            <scriptType>PYTHON</scriptType>
+            <timeout>600</timeout>
+          </commandScript>
+          <logs>
+            <log>
+              <logId>livy_server</logId>
+              <primary>true</primary>
+            </log>
+          </logs>
+        </component>
       </components>
 
       <configuration-dependencies>
@@ -181,6 +229,10 @@
         <config-type>spark-thrift-sparkconf</config-type>
         <config-type>spark-hive-site-override</config-type>
         <config-type>spark-thrift-fairscheduler</config-type>
+        <config-type>livy-conf</config-type>
+        <config-type>livy-env</config-type>
+        <config-type>livy-log4j-properties</config-type>
+        <config-type>livy-spark-blacklist</config-type>
       </configuration-dependencies>
 
       <commandScript>
@@ -192,7 +244,8 @@
       <requiredServices>
         <service>HDFS</service>
         <service>YARN</service>
-        <!--<service>HIVE</service> -->
+       <!-- <service>HIVE</service>
+        <service>TEZ</service> -->
       </requiredServices>
 
       <osSpecifics>
@@ -205,24 +258,26 @@
             <package>
               <name>spark_${stack_version}-python</name>
             </package>
-            <!-- should install spark2_${stack_version}-datanucleus -->
+            <!-- should install spark_${stack_version}-datanucleus -->
             <package>
               <name>spark_${stack_version}-datanucleus</name>
             </package>
-            <!-- TODO CRH livy2
+            <!-- TODO CRH livy
             <package>
-              <name>livy2_${stack_version}</name>
+              <name>livy_${stack_version}</name>
             </package>
             -->
           </packages>
         </osSpecific>
       </osSpecifics>
+	  
       <quickLinksConfigurations>
         <quickLinksConfiguration>
           <fileName>quicklinks.json</fileName>
           <default>true</default>
         </quickLinksConfiguration>
       </quickLinksConfigurations>
+
     </service>
   </services>
 </metainfo>

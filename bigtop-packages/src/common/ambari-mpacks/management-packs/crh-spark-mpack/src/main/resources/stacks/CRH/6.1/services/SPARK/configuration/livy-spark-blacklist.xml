@@ -21,22 +21,27 @@
 <configuration supports_final="false" supports_adding_forbidden="true">
   <property>
     <name>content</name>
-    <display-name>spark-log4j-properties template</display-name>
-    <description>Spark-log4j-Properties</description>
+    <description>spark-blacklist.properties</description>
     <value>
-# Set everything to be logged to the console
-log4j.rootCategory=INFO, console
-log4j.appender.console=org.apache.log4j.ConsoleAppender
-log4j.appender.console.target=System.err
-log4j.appender.console.layout=org.apache.log4j.PatternLayout
-log4j.appender.console.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n
+#
+# Configuration override / blacklist. Defines a list of properties that users are not allowed
+# to override when starting Spark sessions.
+#
+# This file takes a list of property names (one per line). Empty lines and lines starting with "#"
+# are ignored.
+#
 
-# Settings to quiet third party logs that are too verbose
-log4j.logger.org.eclipse.jetty=WARN
-log4j.logger.org.eclipse.jetty.util.component.AbstractLifeCycle=ERROR
-log4j.logger.org.apache.spark.repl.SparkIMain$exprTyper=INFO
-log4j.logger.org.apache.spark.repl.SparkILoop$SparkILoopInterpreter=INFO
+# Disallow overriding the master and the deploy mode.
+spark.master
+spark.submit.deployMode
 
+# Disallow overriding the location of Spark cached jars.
+spark.yarn.jar
+spark.yarn.jars
+spark.yarn.archive
+
+# Don't allow users to override the RSC timeout.
+livy.rsc.server.idle_timeout
     </value>
     <value-attributes>
       <type>content</type>

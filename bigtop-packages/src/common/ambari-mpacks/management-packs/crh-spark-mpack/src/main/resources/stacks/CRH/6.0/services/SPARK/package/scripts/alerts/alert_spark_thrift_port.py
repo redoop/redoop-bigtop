@@ -16,41 +16,43 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import os
+import socket
 import time
 import logging
 import traceback
-import socket
-from resource_management import *
 from resource_management.libraries.functions import format
 from ambari_commons.os_family_impl import OsFamilyFuncImpl, OsFamilyImpl
 from resource_management.libraries.script.script import Script
-from resource_management.core.resources import Execute
-from resource_management.core.logger import Logger
-from resource_management.core import global_lock
 from resource_management.libraries.functions import get_kinit_path
+from resource_management.core.resources import Execute
+from resource_management.core import global_lock
 
+stack_root = Script.get_stack_root()
 
 OK_MESSAGE = "TCP OK - {0:.3f}s response on port {1}"
 CRITICAL_MESSAGE = "Connection failed on host {0}:{1} ({2})"
 
-logger = logging.getLogger('ambari_alerts')
-
-LIVY_SERVER_PORT_KEY = '{{livy2-conf/livy.server.port}}'
-
-LIVYUSER_DEFAULT = 'livy'
-
-CHECK_COMMAND_TIMEOUT_KEY = 'check.command.timeout'
-CHECK_COMMAND_TIMEOUT_DEFAULT = 60.0
-
+HIVE_SERVER_THRIFT_PORT_KEY = '{{spark-hive-site-override/hive.server2.thrift.port}}'
+HIVE_SERVER_TRANSPORT_MODE_KEY = '{{spark-hive-site-override/hive.server2.transport.mode}}'
 SECURITY_ENABLED_KEY = '{{cluster-env/security_enabled}}'
-SMOKEUSER_KEYTAB_KEY = '{{cluster-env/smokeuser_keytab}}'
-SMOKEUSER_PRINCIPAL_KEY = '{{cluster-env/smokeuser_principal_name}}'
-SMOKEUSER_KEY = '{{cluster-env/smokeuser}}'
-LIVY_SSL_ENABLED_KEY = '{{livy2-conf/livy.keystore}}'
+
+HIVE_SERVER2_AUTHENTICATION_KEY = '{{hive-site/hive.server2.authentication}}'
+HIVE_SERVER2_KERBEROS_KEYTAB = '{{hive-site/hive.server2.authentication.kerberos.keytab}}'
+HIVE_SERVER2_PRINCIPAL_KEY = '{{hive-site/hive.server2.authentication.kerberos.principal}}'
 
 # The configured Kerberos executable search paths, if any
 KERBEROS_EXECUTABLE_SEARCH_PATHS_KEY = '{{kerberos-env/executable_search_paths}}'
 
+THRIFT_PORT_DEFAULT = 10001
+HIVE_SERVER_TRANSPORT_MODE_DEFAULT = 'binary'
+
+HIVEUSER_DEFAULT = 'hive'
+
+CHECK_COMMAND_TIMEOUT_KEY = 'check.command.timeout'
+CHECK_COMMAND_TIMEOUT_DEFAULT = 60.0
+
+logger = logging.getLogger('ambari_alerts')
 
 @OsFamilyFuncImpl(os_family=OsFamilyImpl.DEFAULT)
 def get_tokens():
@@ -58,7 +60,8 @@ def get_tokens():
     Returns a tuple of tokens in the format {{site/property}} that will be used
     to build the dictionary passed into execute
     """
-    return (LIVY_SERVER_PORT_KEY,LIVYUSER_DEFAULT,SECURITY_ENABLED_KEY,SMOKEUSER_KEYTAB_KEY,SMOKEUSER_PRINCIPAL_KEY,SMOKEUSER_KEY,LIVY_SSL_ENABLED_KEY)
+    return (HIVE_SERVER_THRIFT_PORT_KEY, HIVE_SERVER_TRANSPORT_MODE_KEY, SECURITY_ENABLED_KEY, KERBEROS_EXECUTABLE_SEARCH_PATHS_KEY,
+            HIVEUSER_DEFAULT, HIVE_SERVER2_KERBEROS_KEYTAB, HIVE_SERVER2_PRINCIPAL_KEY)
 
 @OsFamilyFuncImpl(os_family=OsFamilyImpl.DEFAULT)
 def execute(configurations={}, parameters={}, host_name=None):
@@ -71,35 +74,34 @@ def execute(configurations={}, parameters={}, host_name=None):
     host_name (string): the name of this host where the alert is running
     """
 
+    spark_home = os.path.join(stack_root, "current", 'spark-client')
+
     if configurations is None:
         return ('UNKNOWN', ['There were no configurations supplied to the script.'])
 
-    LIVY_PORT_DEFAULT = 8999
+    transport_mode = HIVE_SERVER_TRANSPORT_MODE_DEFAULT
+    if HIVE_SERVER_TRANSPORT_MODE_KEY in configurations:
+        transport_mode = configurations[HIVE_SERVER_TRANSPORT_MODE_KEY]
 
-    port = LIVY_PORT_DEFAULT
-    if LIVY_SERVER_PORT_KEY in configurations:
-        port = int(configurations[LIVY_SERVER_PORT_KEY])
-
-    if host_name is None:
-        host_name = socket.getfqdn()
-
-    livyuser = configurations[SMOKEUSER_KEY]
+    port = THRIFT_PORT_DEFAULT
+    if transport_mode.lower() == 'binary' and HIVE_SERVER_THRIFT_PORT_KEY in configurations:
+        port = int(configurations[HIVE_SERVER_THRIFT_PORT_KEY])
 
     security_enabled = False
     if SECURITY_ENABLED_KEY in configurations:
         security_enabled = str(configurations[SECURITY_ENABLED_KEY]).upper() == 'TRUE'
 
-    smokeuser_kerberos_keytab = None
-    if SMOKEUSER_KEYTAB_KEY in configurations:
-        smokeuser_kerberos_keytab = configurations[SMOKEUSER_KEYTAB_KEY]
+    hive_kerberos_keytab = None
+    if HIVE_SERVER2_KERBEROS_KEYTAB in configurations:
+        hive_kerberos_keytab = configurations[HIVE_SERVER2_KERBEROS_KEYTAB]
 
     if host_name is None:
         host_name = socket.getfqdn()
 
-    smokeuser_principal = None
-    if SMOKEUSER_PRINCIPAL_KEY in configurations:
-        smokeuser_principal = configurations[SMOKEUSER_PRINCIPAL_KEY]
-        smokeuser_principal = smokeuser_principal.replace('_HOST',host_name.lower())
+    hive_principal = None
+    if HIVE_SERVER2_PRINCIPAL_KEY in configurations:
+        hive_principal = configurations[HIVE_SERVER2_PRINCIPAL_KEY]
+        hive_principal = hive_principal.replace('_HOST',host_name.lower())
 
     # Get the configured Kerberos executable search paths, if any
     if KERBEROS_EXECUTABLE_SEARCH_PATHS_KEY in configurations:
@@ -109,32 +111,36 @@ def execute(configurations={}, parameters={}, host_name=None):
 
     kinit_path_local = get_kinit_path(kerberos_executable_search_paths)
 
+    hiveruser = HIVEUSER_DEFAULT
+
     if security_enabled:
-        kinitcmd = format("{kinit_path_local} -kt {smokeuser_kerberos_keytab} {smokeuser_principal}; ")
+        kinitcmd = format("{kinit_path_local} -kt {hive_kerberos_keytab} {hive_principal}; ")
         # prevent concurrent kinit
         kinit_lock = global_lock.get_lock(global_lock.LOCK_TYPE_KERBEROS)
         kinit_lock.acquire()
         try:
-            Execute(kinitcmd, user=livyuser)
+            Execute(kinitcmd, user=hiveruser)
         finally:
             kinit_lock.release()
 
-    http_scheme = 'https' if LIVY_SSL_ENABLED_KEY in configurations else 'http'
     result_code = None
     try:
+        if host_name is None:
+            host_name = socket.getfqdn()
+
+        if security_enabled:
+            beeline_url = ["'jdbc:hive2://{host_name}:{port}/default;principal={hive_principal}'","transportMode={transport_mode}"]
+        else:
+            beeline_url = ["'jdbc:hive2://{host_name}:{port}/default'","transportMode={transport_mode}"]
+        # append url according to used transport
+
+        beeline_cmd = os.path.join(spark_home, "bin", "beeline")
+        cmd = "! beeline -u %s  -e '' 2>&1| awk '{print}'|grep -i -e 'Connection refused' -e 'Invalid URL'" % \
+         (format(" ".join(beeline_url)))
+
         start_time = time.time()
         try:
-            livy2_livyserver_host = str(host_name)
-
-            livy_cmd = format("curl -s -o /dev/null -w'%{{http_code}}' --negotiate -u: -k {http_scheme}://{livy2_livyserver_host}:{port}/sessions | grep 200 ")
-
-            Execute(livy_cmd,
-                    tries=3,
-                    try_sleep=1,
-                    logoutput=True,
-                    user=livyuser
-                    )
-
+            Execute(cmd, user=hiveruser, path=[beeline_cmd], timeout=CHECK_COMMAND_TIMEOUT_DEFAULT)
             total_time = time.time() - start_time
             result_code = 'OK'
             label = OK_MESSAGE.format(total_time, port)
