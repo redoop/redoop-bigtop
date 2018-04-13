@@ -163,6 +163,7 @@ Source27: hdfs.1
 Source28: mapred.1
 Source29: hadoop-yarn-timelineserver.svc
 #BIGTOP_PATCH_FILES
+Patch0: HADOOP-14922.01.patch
 Buildroot: %{_tmppath}/%{hadoop_name}-%{version}-%{release}-root-%(%{__id} -u -n)
 BuildRequires: fuse-devel, fuse
 Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service, bigtop-utils >= 0.7, zookeeper%{crh_version_as_name} >= 3.4.0
@@ -443,6 +444,7 @@ These projects (enumerated below) allow HDFS to be mounted (on most flavors of U
 
 %prep
 %setup -n %{hadoop_name}-%{hadoop_base_version}-src
+%patch0 -p1
 
 #BIGTOP_PATCH_COMMANDS
 %build
