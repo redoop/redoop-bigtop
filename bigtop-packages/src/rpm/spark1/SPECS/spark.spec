@@ -13,45 +13,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 %define crh_dir /usr/%{crh_tag}/%{crh_version_with_bn}
-%define spark2_name spark2
-%define lib_spark2 %{crh_dir}/%{spark2_name}
-%define var_lib_spark2 /var/lib/%{spark2_name}
-%define var_run_spark2 /var/run/%{spark2_name}
-%define var_log_spark2 /var/log/%{spark2_name}
-%define bin_spark2 %{crh_dir}/%{spark2_name}/bin
-%define etc_spark2 /etc/%{spark2_name}
-%define config_spark2 %{etc_spark2}/conf
+%define spark_name spark
+%define lib_spark %{crh_dir}/%{spark_name}
+%define var_lib_spark /var/lib/%{spark_name}
+%define var_run_spark /var/run/%{spark_name}
+%define var_log_spark /var/log/%{spark_name}
+%define bin_spark %{crh_dir}/%{spark_name}/bin
+%define etc_spark /etc/%{spark_name}
+%define config_spark %{etc_spark}/conf
 %define bin /usr/bin
 %define man_dir /usr/share/man
-%define spark2_services master worker
+%define spark_services master worker history-server thriftserver
 
 %if  %{?suse_version:1}0
-%define doc_spark2 %{_docdir}/spark2
+%define doc_spark %{_docdir}/spark
 %define alternatives_cmd update-alternatives
 %else
-%define doc_spark2 %{_docdir}/spark2-%{spark2_version}
+%define doc_spark %{_docdir}/spark-%{spark_version}
 %define alternatives_cmd alternatives
 %endif
 
 # disable repacking jars
 %define __os_install_post %{nil}
 
-Name: spark2%{crh_version_as_name}
-Version: %{spark2_version}
-Release: %{spark2_release}
+Name: spark%{crh_version_as_name}
+Version: %{spark_version}
+Release: %{spark_release}
 Summary: Lightning-Fast Cluster Computing
 URL: http://spark.apache.org/
 Group: Development/Libraries
 BuildArch: noarch
 Buildroot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 License: ASL 2.0
-Source0: spark-%{spark2_base_version}.tar.gz
+Source0: %{spark_name}-%{spark_base_version}.tar.gz
 Source1: do-component-build 
-Source2: install_spark.sh
+Source2: install_%{spark_name}.sh
 Source3: spark-master.svc
 Source4: spark-worker.svc
 Source6: init.d.tmpl
-Source7: bigtop.bom
+Source7: spark-history-server.svc
+Source8: spark-thriftserver.svc
+Source9: bigtop.bom
 Requires: bigtop-utils >= 0.7, hadoop%{crh_version_as_name}-client
 Requires(preun): /sbin/service
 
@@ -101,12 +103,36 @@ Requires: %{name} = %{version}-%{release}, python
 %description -n %{name}-python
 Includes PySpark, an interactive Python shell for Spark, and related libraries
 
+%package -n %{name}-history-server
+Summary: History server for Apache Spark
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description -n %{name}-history-server
+History server for Apache Spark
+
+%package -n %{name}-thriftserver
+Summary: Thrift server for Spark SQL
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description -n %{name}-thriftserver
+Thrift server for Spark SQL
+
 %package -n %{name}-datanucleus
 Summary: DataNucleus libraries for Apache Spark
 Group: Development/Libraries
 
 %description -n %{name}-datanucleus
 DataNucleus libraries used by Spark SQL with Hive Support
+
+%package -n %{name}-extras
+Summary: External/extra libraries for Apache Spark
+Group: Development/Libraries
+
+%description -n %{name}-extras
+External/extra libraries built for Apache Spark but not included in the main
+assembly JAR (e.g., external streaming libraries)
 
 %package -n %{name}-yarn-shuffle
 Summary: Spark YARN Shuffle Service
@@ -116,7 +142,7 @@ Group: Development/Libraries
 Spark YARN Shuffle Service
 
 %prep
-%setup -n spark-%{spark2_base_version}
+%setup -n %{spark_name}-%{spark_base_version}
 
 %build
 bash $RPM_SOURCE_DIR/do-component-build
@@ -124,15 +150,17 @@ bash $RPM_SOURCE_DIR/do-component-build
 %install
 %__rm -rf $RPM_BUILD_ROOT
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{initd_dir}/
-sed -i -e "s,{CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/* 
 
-env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} SPARK_VERSION=%{spark2_base_version} bash $RPM_SOURCE_DIR/install_spark.sh \
+sed -i -e "s,{CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/*
+
+env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} SPARK_VERSION=%{spark_base_version} bash $RPM_SOURCE_DIR/install_spark.sh \
           --build-dir=`pwd`         \
           --source-dir=$RPM_SOURCE_DIR \
           --prefix=$RPM_BUILD_ROOT  \
-          --doc-dir=%{doc_spark2}
+          --doc-dir=%{doc_spark} \
+          --pyspark-python=python
 
-for service in %{spark2_services}
+for service in %{spark_services}
 do
     # Install init script
     init_file=$RPM_BUILD_ROOT/%{initd_dir}/%{name}-${service}
@@ -141,27 +169,27 @@ done
 
 %pre
 getent group spark >/dev/null || groupadd -r spark
-getent passwd spark >/dev/null || useradd -c "Spark" -s /bin/bash -g spark -r -d %{var_lib_spark2} spark 2> /dev/null || :
+getent passwd spark >/dev/null || useradd -c "Spark" -s /sbin/nologin -g spark -r -d %{var_lib_spark} spark 2> /dev/null || :
 
 %post
 
-if [ !  -e "/etc/spark2/conf" ]; then
-      rm -f /etc/spark2/conf
-      mkdir -p /etc/spark2/conf
-      cp -rp /etc/spark2/conf.dist/* /etc/spark2/conf
-fi 
+if [ !  -e "/etc/spark/conf" ]; then
+     rm -f /etc/spark/conf
+     mkdir -p /etc/spark/conf
+     cp -rp /etc/spark/conf.dist/* /etc/spark/conf
+ fi
 
-%{alternatives_cmd} --install %{config_spark2} %{spark2_name}-conf %{config_spark2}.dist 30
+%{alternatives_cmd} --install %{config_spark} %{spark_name}-conf %{config_spark}.dist 30
 
 %preun
 if [ "$1" = 0 ]; then
-        %{alternatives_cmd} --remove %{spark2_name}-conf %{config_spark2}.dist || :
+        %{alternatives_cmd} --remove %{spark_name}-conf %{config_spark}.dist || :
 fi
 
-for service in %{spark2_services}; do
-  /sbin/service %{spark2_name}-${service} status > /dev/null 2>&1
+for service in %{spark_services}; do
+  /sbin/service %{spark_name}-${service} status > /dev/null 2>&1
   if [ $? -eq 0 ]; then
-    /sbin/service %{spark2_name}-${service} stop > /dev/null 2>&1
+    /sbin/service %{spark_name}-${service} stop > /dev/null 2>&1
   fi
 done
 
@@ -170,46 +198,50 @@ done
 #######################
 %files
 %defattr(-,root,root,755)
-%config(noreplace) %{config_spark2}.dist
-%doc %{doc_spark2}
-%{lib_spark2}/LICENSE
-%{lib_spark2}/NOTICE
-%{lib_spark2}/README.md
-%{lib_spark2}/RELEASE
-%{lib_spark2}/bin 
-%{bin_spark2}
-%exclude %{bin_spark2}/pyspark
-%{lib_spark2}/conf
-%{lib_spark2}/data
-%{lib_spark2}/examples
-%{lib_spark2}/jars
-%exclude %{lib_spark2}/yarn/spark-*-yarn-shuffle.jar
-%exclude %{lib_spark2}/jars/datanucleus-*.jar
-%{lib_spark2}/licenses
-%{lib_spark2}/sbin
-%{lib_spark2}/work
-%{lib_spark2}/R
-%exclude %{lib_spark2}/python
-%{etc_spark2}
-%attr(0755,spark2,spark2) %{var_lib_spark2}
-%attr(0755,spark2,spark2) %{var_run_spark2}
-%attr(0755,spark2,spark2) %{var_log_spark2}
+%config(noreplace) %{config_spark}.dist
+%doc %{doc_spark}
+%{lib_spark}/conf
+%{lib_spark}/LICENSE
+%{lib_spark}/RELEASE
+%{lib_spark}/NOTICE
+%{lib_spark}/bin
+%{lib_spark}/lib
+%exclude %{lib_spark}/lib/datanucleus-*.jar
+%exclude %{lib_spark}/lib/spark-*-yarn-shuffle.jar
+%{lib_spark}/sbin
+%{lib_spark}/data
+%{lib_spark}/examples
+%{lib_spark}/work
+%exclude %{bin_spark}/pyspark
+%exclude %{lib_spark}/python
+%{etc_spark}
+%attr(0755,spark,spark) %{var_lib_spark}
+%attr(0755,spark,spark) %{var_run_spark}
+%attr(0755,spark,spark) %{var_log_spark}
+%{bin}/spark-class
+%{bin}/spark-shell
+%{bin}/spark-sql
+%{bin}/spark-submit
 
 %files -n %{name}-python
 %defattr(-,root,root,755)
-#%attr(0755,root,root) %{bin}/pyspark
-%attr(0755,root,root) %{lib_spark2}/bin/pyspark
-%{lib_spark2}/python
+%attr(0755,root,root) %{bin}/pyspark
+%attr(0755,root,root) %{lib_spark}/bin/pyspark
+%{lib_spark}/python
 
 %files -n %{name}-datanucleus
 %defattr(-,root,root,755)
-%{lib_spark2}/jars/datanucleus-*.jar
-%{lib_spark2}/yarn/lib/datanucleus-*.jar
+%{lib_spark}/lib/datanucleus-*.jar
+%{lib_spark}/../hadoop-yarn/lib/datanucleus-*.jar
+
+%files -n %{name}-extras
+%defattr(-,root,root,755)
+%{lib_spark}/extras
 
 %files -n %{name}-yarn-shuffle
 %defattr(-,root,root,755)
-%{lib_spark2}/yarn/spark-*-yarn-shuffle.jar
-%{lib_spark2}/yarn/lib/spark-yarn-shuffle.jar
+%{lib_spark}/lib/spark-*-yarn-shuffle.jar
+%{lib_spark}/../hadoop-yarn/lib/spark-yarn-shuffle.jar
 
 %define service_macro() \
 %files -n %1 \
@@ -228,3 +260,5 @@ if [ $1 -ge 1 ]; then \
 fi
 %service_macro %{name}-master
 %service_macro %{name}-worker
+%service_macro %{name}-history-server
+%service_macro %{name}-thriftserver

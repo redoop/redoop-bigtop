@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-TYPE="worker"
+TYPE="thriftserver"
 DAEMON="spark-${TYPE}"
 DESC="Spark ${TYPE}"
-EXEC_PATH="{CRH_DIR}/spark/bin/spark-class"
+EXEC_PATH="{CRH_DIR}/spark/bin/spark-submit"
 SVC_USER="spark"
 WORKING_DIR="/var/lib/spark"
 DAEMON_FLAGS=""
@@ -37,17 +37,18 @@ start() {
         exit 0
     fi
 
+    function usage {
+      echo
+    }
+    export SUBMIT_USAGE_FUNCTION=usage
+
     LOG_FILE=/var/log/spark/${DAEMON}.out
 
-    if [ -f $CONF_DIR/spark-env.sh ]; then
-        . $CONF_DIR/spark-env.sh
-    fi
-
     su -s /bin/bash $SVC_USER -c "nohup nice -n 0 \
-        ${EXEC_PATH} org.apache.spark.deploy.worker.Worker $SPARK_MASTER_URL $DAEMON_FLAGS \
+        ${EXEC_PATH} --class org.apache.spark.sql.hive.thriftserver.HiveThriftServer2 1 $DAEMON_FLAGS \
         > $LOG_FILE 2>&1 & "'echo $!' > "$PIDFILE"
 
-    sleep 3
+    sleep 7
 
     checkstatusofproc
     RETVAL=$?
@@ -72,4 +73,3 @@ stop() {
 __EOT__
 
 }
-

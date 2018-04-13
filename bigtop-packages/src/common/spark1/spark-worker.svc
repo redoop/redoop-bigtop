@@ -16,12 +16,12 @@
 TYPE="worker"
 DAEMON="spark-${TYPE}"
 DESC="Spark ${TYPE}"
-EXEC_PATH="{CRH_DIR}/spark2/bin/spark-class"
+EXEC_PATH="{CRH_DIR}/spark/bin/spark-class"
 SVC_USER="spark"
-WORKING_DIR="/var/lib/spark2"
+WORKING_DIR="/var/lib/spark"
 DAEMON_FLAGS=""
-CONF_DIR="/etc/spark2/conf"
-PIDFILE="/var/run/spark2/${DAEMON}.pid"
+CONF_DIR="/etc/spark/conf"
+PIDFILE="/var/run/spark/${DAEMON}.pid"
 
 generate_start() {
 
@@ -37,14 +37,14 @@ start() {
         exit 0
     fi
 
-    LOG_FILE=/var/log/spark2/${DAEMON}.out
+    LOG_FILE=/var/log/spark/${DAEMON}.out
 
     if [ -f $CONF_DIR/spark-env.sh ]; then
         . $CONF_DIR/spark-env.sh
     fi
 
     su -s /bin/bash $SVC_USER -c "nohup nice -n 0 \
-        ${EXEC_PATH} org.apache.spark.deploy.worker.Worker $SPARK_MASTER_URL $DAEMON_FLAGS \
+        ${EXEC_PATH} org.apache.spark.deploy.worker.Worker spark://$SPARK_MASTER_IP:$SPARK_MASTER_PORT $DAEMON_FLAGS \
         > $LOG_FILE 2>&1 & "'echo $!' > "$PIDFILE"
 
     sleep 3
