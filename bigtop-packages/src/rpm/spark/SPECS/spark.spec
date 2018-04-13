@@ -168,7 +168,7 @@ env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} SPARK_VERSION=%{spark_
           --prefix=$RPM_BUILD_ROOT  \
           --doc-dir=%{doc_spark}
 
-%__rm -f $RPM_BUILD_ROOT/%{lib_spark}/jars/hadoop-*.jar
+#%__rm -f $RPM_BUILD_ROOT/%{lib_spark}/jars/hadoop-*.jar
 
 for service in %{spark_services}
 do
