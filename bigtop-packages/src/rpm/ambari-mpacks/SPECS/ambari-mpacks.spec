@@ -60,7 +60,7 @@ cp -ra $RPM_SOURCE_DIR/selector/* ${RPM_BUILD_ROOT}/usr/bin/
 
 # Redoop Management Packs
 install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
-%__cp -ra crh-ts-mpack/target/crh-ts-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-hadoop3-mpack/target/crh-hadoop3-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-dw-mpack/target/crh-dw-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-stream-mpack/target/crh-stream-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-BI-mpack/target/crh-BI-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
@@ -75,12 +75,12 @@ AutoReqProv: no
 Distro Select
 
 
-%package crh-ts
+%package crh-hadoop3
 Summary: CRH Time Series Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description crh-ts
+%description crh-hadoop3
 Redoop Ambari CRH Time Series Mpack
 
 
@@ -129,7 +129,7 @@ Redoop Ambari CRH spark Mpack
 ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz --verbose \
 ambari-server restart
 
-%service_macro crh-ts
+%service_macro crh-hadoop3
 %service_macro crh-dw
 %service_macro crh-stream
 %service_macro crh-spark
