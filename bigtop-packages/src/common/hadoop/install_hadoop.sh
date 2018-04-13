@@ -40,7 +40,6 @@ OPTS=$(getopt \
   -l 'native-build-string:' \
   -l 'installed-lib-dir:' \
   -l 'hadoop-dir:' \
-  -l 'httpfs-dir:' \
   -l 'hdfs-dir:' \
   -l 'yarn-dir:' \
   -l 'mapreduce-dir:' \
@@ -49,7 +48,6 @@ OPTS=$(getopt \
   -l 'system-lib-dir:' \
   -l 'system-libexec-dir:' \
   -l 'hadoop-etc-dir:' \
-  -l 'httpfs-etc-dir:' \
   -l 'doc-dir:' \
   -l 'man-dir:' \
   -l 'example-dir:' \
@@ -68,9 +66,6 @@ while true ; do
         ;;
         --distro-dir)
         DISTRO_DIR=$2 ; shift 2
-        ;;
-        --httpfs-dir)
-        HTTPFS_DIR=$2 ; shift 2
         ;;
         --hadoop-dir)
         HADOOP_DIR=$2 ; shift 2
@@ -94,7 +89,7 @@ while true ; do
         SYSTEM_LIB_DIR=$2 ; shift 2
         ;;
         --system-libexec-dir)
-        SYSTEM_LIBEXEC_DIR=$2 ; shift 2
+        HADOOP_LIBEXEC_DIR=$2 ; shift 2
         ;;
         --build-dir)
         BUILD_DIR=$2 ; shift 2
@@ -107,9 +102,6 @@ while true ; do
         ;;
         --hadoop-etc-dir)
         HADOOP_ETC_DIR=$2 ; shift 2
-        ;;
-        --httpfs-etc-dir)
-        HTTPFS_ETC_DIR=$2 ; shift 2
         ;;
         --installed-lib-dir)
         INSTALLED_LIB_DIR=$2 ; shift 2
@@ -138,24 +130,21 @@ for var in PREFIX BUILD_DIR; do
   fi
 done
 
-HADOOP_DIR=${HADOOP_DIR:-$PREFIX$CRH_DIR/hadoop}
-HDFS_DIR=${HDFS_DIR:-$PREFIX$CRH_DIR/hadoop-hdfs}
-YARN_DIR=${YARN_DIR:-$PREFIX$CRH_DIR/hadoop-yarn}
-MAPREDUCE_DIR=${MAPREDUCE_DIR:-$PREFIX$CRH_DIR/hadoop-mapreduce}
-CLIENT_DIR=${CLIENT_DIR:-$PREFIX$CRH_DIR/hadoop/client}
-HTTPFS_DIR=${HTTPFS_DIR:-$PREFIX$CRH_DIR/hadoop-httpfs}
+HADOOP_DIR=${HADOOP_DIR:-$PREFIX${CRH_DIR}/hadoop}
+HDFS_DIR=${HDFS_DIR:-$PREFIX${CRH_DIR}/hadoop-hdfs}
+YARN_DIR=${YARN_DIR:-$PREFIX${CRH_DIR}/hadoop-yarn}
+MAPREDUCE_DIR=${MAPREDUCE_DIR:-$PREFIX${CRH_DIR}/hadoop-mapreduce}
+CLIENT_DIR=${CLIENT_DIR:-${HADOOP_DIR}/client}
+HADOOP_LIBEXEC_DIR=${HADOOP_LIBEXEC_DIR:-${HADOOP_DIR}/libexec}
 SYSTEM_LIB_DIR=${SYSTEM_LIB_DIR:-/usr/lib}
 BIN_DIR=${BIN_DIR:-$PREFIX/usr/bin}
 DOC_DIR=${DOC_DIR:-$PREFIX/usr/share/doc/hadoop}
 MAN_DIR=${MAN_DIR:-$PREFIX/usr/man}
 SYSTEM_INCLUDE_DIR=${SYSTEM_INCLUDE_DIR:-$PREFIX/usr/include}
-SYSTEM_LIBEXEC_DIR=${SYSTEM_LIBEXEC_DIR:-$PREFIX$CRH_DIR/libexec}
 EXAMPLE_DIR=${EXAMPLE_DIR:-$DOC_DIR/examples}
 HADOOP_ETC_DIR=${HADOOP_ETC_DIR:-$PREFIX/etc/hadoop}
-HTTPFS_ETC_DIR=${HTTPFS_ETC_DIR:-$PREFIX/etc/hadoop-httpfs}
 BASH_COMPLETION_DIR=${BASH_COMPLETION_DIR:-$PREFIX/etc/bash_completion.d}
 
-INSTALLED_HADOOP_DIR=${INSTALLED_HADOOP_DIR:-$CRH_DIR/hadoop}
 HADOOP_NATIVE_LIB_DIR=${HADOOP_DIR}/lib/native
 
 ##Needed for some distros to find ldconfig
@@ -186,26 +175,60 @@ EOF
   chmod 755 $wrapper
 done
 
+# Install fuse wrapper
+fuse_wrapper=${BIN_DIR}/hadoop-fuse-dfs
+cat > $fuse_wrapper << EOF
+#!/bin/bash
+
+/sbin/modprobe fuse
+
+# Autodetect JAVA_HOME if not defined
+. /usr/lib/bigtop-utils/bigtop-detect-javahome
+
+export HADOOP_HOME=\${HADOOP_HOME:-${HADOOP_DIR#${PREFIX}}}
+
+BIGTOP_DEFAULTS_DIR=\${BIGTOP_DEFAULTS_DIR-/etc/default}
+[ -n "\${BIGTOP_DEFAULTS_DIR}" -a -r \${BIGTOP_DEFAULTS_DIR}/hadoop-fuse ] && . \${BIGTOP_DEFAULTS_DIR}/hadoop-fuse
+
+export HADOOP_LIBEXEC_DIR=${HADOOP_LIBEXEC_DIR#${PREFIX}}
+
+if [ "\${LD_LIBRARY_PATH}" = "" ]; then
+  export JAVA_NATIVE_LIBS="libjvm.so"
+  . /usr/lib/bigtop-utils/bigtop-detect-javalibs
+  export LD_LIBRARY_PATH=\${JAVA_NATIVE_PATH}:/usr/lib
+fi
+
+# Pulls all jars from hadoop client package
+for jar in \${HADOOP_HOME}/client/*.jar; do
+  CLASSPATH+="\$jar:"
+done
+CLASSPATH="/etc/hadoop/conf:\${CLASSPATH}"
+
+env CLASSPATH="\${CLASSPATH}" \${HADOOP_HOME}/bin/fuse_dfs \$@
+EOF
+
+chmod 755 $fuse_wrapper
+
 #libexec
-install -d -m 0755 ${SYSTEM_LIBEXEC_DIR}
-cp ${BUILD_DIR}/libexec/* ${SYSTEM_LIBEXEC_DIR}/
+install -d -m 0755 ${HADOOP_LIBEXEC_DIR}/
+cp -ra ${BUILD_DIR}/libexec/* ${HADOOP_LIBEXEC_DIR}/
 sed -i -e "s,{CRH_DIR},${CRH_DIR}," ${DISTRO_DIR}/hadoop-layout.sh
 sed -i -e "s,{CRH_DIR},${CRH_DIR}," ${DISTRO_DIR}/hadoop.default
 sed -i -e "s,{CRH_DIR},${CRH_DIR}," ${DISTRO_DIR}/init-hdfs.sh
 sed -i -e "s,{CRH_DIR},${CRH_DIR}," ${DISTRO_DIR}/init-hcfs.groovy
-cp ${DISTRO_DIR}/hadoop-layout.sh ${SYSTEM_LIBEXEC_DIR}/
-install -m 0755 ${DISTRO_DIR}/init-hdfs.sh ${SYSTEM_LIBEXEC_DIR}/
-install -m 0755 ${DISTRO_DIR}/init-hcfs.json ${SYSTEM_LIBEXEC_DIR}/
-install -m 0755 ${DISTRO_DIR}/init-hcfs.groovy ${SYSTEM_LIBEXEC_DIR}/
-rm -rf ${SYSTEM_LIBEXEC_DIR}/*.cmd
+cp ${DISTRO_DIR}/hadoop-layout.sh ${HADOOP_LIBEXEC_DIR}/
+install -m 0755 ${DISTRO_DIR}/init-hdfs.sh ${HADOOP_LIBEXEC_DIR}/
+install -m 0755 ${DISTRO_DIR}/init-hcfs.json ${HADOOP_LIBEXEC_DIR}/
+install -m 0755 ${DISTRO_DIR}/init-hcfs.groovy ${HADOOP_LIBEXEC_DIR}/
+rm -rf ${HADOOP_LIBEXEC_DIR}/*.cmd
 
 
 # hadoop-config
-hadoop_config_wrapper=${SYSTEM_LIBEXEC_DIR}/hadoop-config.sh
+hadoop_config_wrapper=${HADOOP_LIBEXEC_DIR}/hadoop-config.sh
 cat >> $hadoop_config_wrapper << EOF
-if [ -d "$CRH_DIR/tez" ]; then
-  export HADOOP_CLASSPATH=\${HADOOP_CLASSPATH}:$CRH_DIR/tez/*:$CRH_DIR/tez/lib/*:$CRH_DIR/tez/conf
-  export CLASSPATH=\${CLASSPATH}:$CRH_DIR/tez/*:$CRH_DIR/tez/lib/*:$CRH_DIR/tez/conf
+if [ -d "${CRH_DIR}/tez" ]; then
+  export HADOOP_CLASSPATH=\${HADOOP_CLASSPATH}:${CRH_DIR}/tez/*:${CRH_DIR}/tez/lib/*:${CRH_DIR}/tez/conf
+  export CLASSPATH=\${CLASSPATH}:${CRH_DIR}/tez/*:${CRH_DIR}/tez/lib/*:${CRH_DIR}/tez/conf
 fi
 EOF
 
@@ -213,8 +236,7 @@ EOF
 # hadoop jar
 install -d -m 0755 ${HADOOP_DIR}
 cp ${BUILD_DIR}/share/hadoop/common/*.jar ${HADOOP_DIR}/
-cp ${BUILD_DIR}/share/hadoop/common/lib/hadoop-auth*.jar ${HADOOP_DIR}/
-cp ${BUILD_DIR}/share/hadoop/mapreduce/lib/hadoop-annotations*.jar ${HADOOP_DIR}/
+cp ${BUILD_DIR}/share/hadoop/common/lib/hadoop*.jar ${HADOOP_DIR}/
 install -d -m 0755 ${MAPREDUCE_DIR}
 cp ${BUILD_DIR}/share/hadoop/mapreduce/hadoop-mapreduce*.jar ${MAPREDUCE_DIR}
 cp ${BUILD_DIR}/share/hadoop/tools/lib/*.jar ${MAPREDUCE_DIR}
@@ -222,18 +244,20 @@ install -d -m 0755 ${HDFS_DIR}
 cp ${BUILD_DIR}/share/hadoop/hdfs/*.jar ${HDFS_DIR}/
 install -d -m 0755 ${YARN_DIR}
 cp ${BUILD_DIR}/share/hadoop/yarn/hadoop-yarn*.jar ${YARN_DIR}/
-chmod 644 ${HADOOP_DIR}/*.jar ${MAPREDUCE_DIR}/*.jar ${HDFS_DIR}/*.jar ${YARN_DIR}/*.jar
+install -d -m 0755 ${CLIENT_DIR}
+cp -ra ${BUILD_DIR}/share/hadoop/client/*.jar ${CLIENT_DIR}
+chmod 644 ${HADOOP_DIR}/*.jar ${MAPREDUCE_DIR}/*.jar ${HDFS_DIR}/*.jar ${YARN_DIR}/*.jar ${CLIENT_DIR}/*.jar
 
 # lib jars
 install -d -m 0755 ${HADOOP_DIR}/lib
 cp ${BUILD_DIR}/share/hadoop/common/lib/*.jar ${HADOOP_DIR}/lib
-install -d -m 0755 ${MAPREDUCE_DIR}/lib
-cp ${BUILD_DIR}/share/hadoop/mapreduce/lib/*.jar ${MAPREDUCE_DIR}/lib
+install -d -m 0755 ${MAPREDUCE_DIR}/lib-examples
+cp ${BUILD_DIR}/share/hadoop/mapreduce/lib-examples/*.jar ${MAPREDUCE_DIR}/lib-examples
 install -d -m 0755 ${HDFS_DIR}/lib
 cp ${BUILD_DIR}/share/hadoop/hdfs/lib/*.jar ${HDFS_DIR}/lib
 install -d -m 0755 ${YARN_DIR}/lib
 cp ${BUILD_DIR}/share/hadoop/yarn/lib/*.jar ${YARN_DIR}/lib
-chmod 644 ${HADOOP_DIR}/lib/*.jar ${MAPREDUCE_DIR}/lib/*.jar ${HDFS_DIR}/lib/*.jar ${YARN_DIR}/lib/*.jar
+chmod 644 ${HADOOP_DIR}/lib/*.jar ${MAPREDUCE_DIR}/lib-examples/*.jar ${HDFS_DIR}/lib/*.jar ${YARN_DIR}/lib/*.jar
 
 # Install webapps
 cp -ra ${BUILD_DIR}/share/hadoop/hdfs/webapps ${HDFS_DIR}/
@@ -250,27 +274,24 @@ popd
 
 # bin
 install -d -m 0755 ${HADOOP_DIR}/bin
-cp -a ${BUILD_DIR}/bin/{rcc,fuse_dfs} ${HADOOP_DIR}/bin
+cp -a ${BUILD_DIR}/bin/fuse_dfs ${HADOOP_DIR}/bin
 cp -a ${BUILD_DIR}/bin/hadoop ${HADOOP_DIR}/bin/hadoop.distro
-cp -a ${BIN_DIR}/hadoop ${HADOOP_DIR}/bin/hadoop
+cp -a ${BIN_DIR}/{hadoop,hdfs,yarn,mapred,hadoop-fuse-dfs} ${HADOOP_DIR}/bin
 install -d -m 0755 ${HDFS_DIR}/bin
 cp -a ${BUILD_DIR}/bin/hdfs ${HDFS_DIR}/bin/hdfs.distro
-cp -a ${BIN_DIR}/hdfs ${HDFS_DIR}/bin/hdfs
+cp -a ${BIN_DIR}/hdfs ${HDFS_DIR}/bin
 install -d -m 0755 ${YARN_DIR}/bin
 cp -a ${BUILD_DIR}/bin/container-executor ${YARN_DIR}/bin
 cp -a ${BUILD_DIR}/bin/yarn ${YARN_DIR}/bin/yarn.distro
-cp -a ${BIN_DIR}/yarn ${YARN_DIR}/bin/yarn
+cp -a ${BIN_DIR}/{yarn,mapred} ${YARN_DIR}/bin
 install -d -m 0755 ${MAPREDUCE_DIR}/bin
 cp -a ${BUILD_DIR}/bin/mapred ${MAPREDUCE_DIR}/bin/mapred.distro
-cp -a ${BIN_DIR}/mapred ${MAPREDUCE_DIR}/bin/mapred
-# FIXME: MAPREDUCE-3980
-cp -a ${BUILD_DIR}/bin/mapred ${YARN_DIR}/bin/mapred.distro
-cp -a ${BIN_DIR}/mapred ${YARN_DIR}/bin/mapred
+cp -a ${BIN_DIR}/mapred ${MAPREDUCE_DIR}/bin
 
 
 # sbin
 install -d -m 0755 ${HADOOP_DIR}/sbin
-cp -a ${BUILD_DIR}/sbin/{hadoop-daemon,hadoop-daemons,slaves}.sh ${HADOOP_DIR}/sbin
+cp -a ${BUILD_DIR}/sbin/{hadoop-daemon,hadoop-daemons,workers}.sh ${HADOOP_DIR}/sbin
 install -d -m 0755 ${HDFS_DIR}/sbin
 cp -a ${BUILD_DIR}/sbin/{distribute-exclude,refresh-namenodes}.sh ${HDFS_DIR}/sbin
 install -d -m 0755 ${YARN_DIR}/sbin
@@ -297,39 +318,6 @@ for library in `cd ${BUILD_DIR}/lib/native ; ls libsnappy.so.1.* 2>/dev/null` li
   ln -s ${library} ${HADOOP_NATIVE_LIB_DIR}/${library/.so.*/}.so
 done
 
-# Install fuse wrapper
-fuse_wrapper=${BIN_DIR}/hadoop-fuse-dfs
-cat > $fuse_wrapper << EOF
-#!/bin/bash
-
-/sbin/modprobe fuse
-
-# Autodetect JAVA_HOME if not defined
-. /usr/lib/bigtop-utils/bigtop-detect-javahome
-
-export HADOOP_HOME=\${HADOOP_HOME:-${HADOOP_DIR#${PREFIX}}}
-
-BIGTOP_DEFAULTS_DIR=\${BIGTOP_DEFAULTS_DIR-/etc/default}
-[ -n "\${BIGTOP_DEFAULTS_DIR}" -a -r \${BIGTOP_DEFAULTS_DIR}/hadoop-fuse ] && . \${BIGTOP_DEFAULTS_DIR}/hadoop-fuse
-
-export HADOOP_LIBEXEC_DIR=${SYSTEM_LIBEXEC_DIR#${PREFIX}}
-
-if [ "\${LD_LIBRARY_PATH}" = "" ]; then
-  export JAVA_NATIVE_LIBS="libjvm.so"
-  . /usr/lib/bigtop-utils/bigtop-detect-javalibs
-  export LD_LIBRARY_PATH=\${JAVA_NATIVE_PATH}:/usr/lib
-fi
-
-# Pulls all jars from hadoop client package
-for jar in \${HADOOP_HOME}/client/*.jar; do
-  CLASSPATH+="\$jar:"
-done
-CLASSPATH="/etc/hadoop/conf:\${CLASSPATH}"
-
-env CLASSPATH="\${CLASSPATH}" \${HADOOP_HOME}/bin/fuse_dfs \$@
-EOF
-
-chmod 755 $fuse_wrapper
 
 # Bash tab completion
 install -d -m 0755 $BASH_COMPLETION_DIR
@@ -339,16 +327,14 @@ install -m 0644 \
 
 # conf
 install -d -m 0755 $HADOOP_ETC_DIR/conf.empty
-cp ${DISTRO_DIR}/conf.empty/mapred-site.xml $HADOOP_ETC_DIR/conf.empty
-
-ln -s /etc/hadoop/conf $HADOOP_DIR/conf
-
 # disable everything that's definied in hadoop-env.sh
 # so that it can still be used as example, but doesn't affect anything
 # by default
 sed -i -e '/^[^#]/s,^,#,' ${BUILD_DIR}/etc/hadoop/hadoop-env.sh
-cp ${BUILD_DIR}/etc/hadoop/* $HADOOP_ETC_DIR/conf.empty
+cp -ra ${BUILD_DIR}/etc/hadoop/* $HADOOP_ETC_DIR/conf.empty
 rm -rf $HADOOP_ETC_DIR/conf.empty/*.cmd
+# for ambari
+ln -s /etc/hadoop/conf $HADOOP_DIR/conf
 
 # docs
 install -d -m 0755 ${DOC_DIR}
@@ -362,28 +348,11 @@ for manpage in hadoop hdfs yarn mapred; do
 done
 
 # HTTPFS
-install -d -m 0755 ${HTTPFS_DIR}/sbin
-cp ${BUILD_DIR}/sbin/httpfs.sh ${HTTPFS_DIR}/sbin/
-cp -r ${BUILD_DIR}/share/hadoop/httpfs/tomcat/webapps ${HTTPFS_DIR}/webapps
-install -d -m 0755 ${PREFIX}/var/lib/hadoop-httpfs
-install -d -m 0755 $HTTPFS_ETC_DIR/conf.empty
+# change for hadoop 3.0
+cp ${BUILD_DIR}/sbin/httpfs.sh ${HADOOP_DIR}/sbin/
 
-install -m 0755 ${DISTRO_DIR}/httpfs-tomcat-deployment.sh ${HTTPFS_DIR}/tomcat-deployment.sh
+install -m 0755 ${DISTRO_DIR}/httpfs-tomcat-deployment.sh ${HADOOP_DIR}/tomcat-deployment.sh
 
-HTTP_DIRECTORY=$HTTPFS_ETC_DIR/tomcat-conf.dist
-HTTPS_DIRECTORY=$HTTPFS_ETC_DIR/tomcat-conf.https
-
-install -d -m 0755 ${HTTP_DIRECTORY}
-cp -r ${BUILD_DIR}/share/hadoop/httpfs/tomcat/conf ${HTTP_DIRECTORY}
-chmod 644 ${HTTP_DIRECTORY}/conf/*
-install -d -m 0755 ${HTTP_DIRECTORY}/WEB-INF
-mv ${HTTPFS_DIR}/webapps/webhdfs/WEB-INF/*.xml ${HTTP_DIRECTORY}/WEB-INF/
-
-cp -r ${HTTP_DIRECTORY} ${HTTPS_DIRECTORY}
-mv ${HTTPS_DIRECTORY}/conf/ssl-server.xml ${HTTPS_DIRECTORY}/conf/server.xml
-rm ${HTTP_DIRECTORY}/conf/ssl-server.xml
-
-mv $HADOOP_ETC_DIR/conf.empty/httpfs* $HTTPFS_ETC_DIR/conf.empty
 sed -i -e '/<\/configuration>/i\
   <!-- HUE proxy user setting -->\
   <property>\
@@ -398,13 +367,13 @@ sed -i -e '/<\/configuration>/i\
   <property>\
     <name>httpfs.hadoop.config.dir</name>\
     <value>/etc/hadoop/conf</value>\
-  </property>' $HTTPFS_ETC_DIR/conf.empty/httpfs-site.xml
+  </property>' $HADOOP_ETC_DIR/conf.empty/httpfs-site.xml
 
 # Make the pseudo-distributed config
 for conf in conf.pseudo ; do
   install -d -m 0755 $HADOOP_ETC_DIR/$conf
   # Install the upstream config files
-  cp ${BUILD_DIR}/etc/hadoop/* $HADOOP_ETC_DIR/$conf
+  cp -ra ${BUILD_DIR}/etc/hadoop/* $HADOOP_ETC_DIR/$conf
   # Remove the ones that shouldn't be installed
   rm -rf $HADOOP_ETC_DIR/$conf/httpfs*
   rm -rf $HADOOP_ETC_DIR/$conf/*.cmd
@@ -428,7 +397,7 @@ install -d -m 0755 $PREFIX/var/{log,run,lib}/hadoop-yarn
 install -d -m 0755 $PREFIX/var/{log,run,lib}/hadoop-mapreduce
 
 # Remove all source and create version-less symlinks to offer integration point with other projects
-for DIR in ${HADOOP_DIR} ${HDFS_DIR} ${YARN_DIR} ${MAPREDUCE_DIR} ${HTTPFS_DIR} ; do
+for DIR in ${HADOOP_DIR} ${HDFS_DIR} ${YARN_DIR} ${MAPREDUCE_DIR} ; do
   (cd $DIR &&
    rm -fv *-sources.jar
    rm -fv lib/hadoop-*.jar
@@ -441,7 +410,6 @@ for DIR in ${HADOOP_DIR} ${HDFS_DIR} ${YARN_DIR} ${MAPREDUCE_DIR} ${HTTPFS_DIR} 
 done
 
 # Now create a client installation area full of symlinks
-install -d -m 0755 ${CLIENT_DIR}
 for file in `cat ${BUILD_DIR}/hadoop-client.list` ; do
   for dir in ${HADOOP_DIR}/{lib,} ${HDFS_DIR}/{lib,} ${YARN_DIR}/{lib,} ${MAPREDUCE_DIR}/{lib,} ; do
     [ -e $dir/$file ] && \

@@ -25,14 +25,10 @@
 %define hadoop_name hadoop
 %define etc_hadoop /etc/%{hadoop_name}
 %define etc_yarn /etc/yarn
-%define etc_httpfs /etc/%{hadoop_name}-httpfs
 %define config_hadoop %{etc_hadoop}/conf
 %define config_yarn %{etc_yarn}/conf
-%define config_httpfs %{etc_httpfs}/conf
-%define tomcat_deployment_httpfs %{etc_httpfs}/tomcat-conf
 %define lib_hadoop_dirname %{crh_dir}
 %define lib_hadoop %{lib_hadoop_dirname}/%{hadoop_name}
-%define lib_httpfs %{lib_hadoop_dirname}/%{hadoop_name}-httpfs
 %define lib_hdfs %{lib_hadoop_dirname}/%{hadoop_name}-hdfs
 %define lib_yarn %{lib_hadoop_dirname}/%{hadoop_name}-yarn
 %define lib_mapreduce %{lib_hadoop_dirname}/%{hadoop_name}-mapreduce
@@ -40,28 +36,24 @@
 %define log_hadoop %{log_hadoop_dirname}/%{hadoop_name}
 %define log_yarn %{log_hadoop_dirname}/%{hadoop_name}-yarn
 %define log_hdfs %{log_hadoop_dirname}/%{hadoop_name}-hdfs
-%define log_httpfs %{log_hadoop_dirname}/%{hadoop_name}-httpfs
 %define log_mapreduce %{log_hadoop_dirname}/%{hadoop_name}-mapreduce
 %define run_hadoop_dirname /var/run
 %define run_hadoop %{run_hadoop_dirname}/hadoop
 %define run_yarn %{run_hadoop_dirname}/%{hadoop_name}-yarn
 %define run_hdfs %{run_hadoop_dirname}/%{hadoop_name}-hdfs
-%define run_httpfs %{run_hadoop_dirname}/%{hadoop_name}-httpfs
 %define run_mapreduce %{run_hadoop_dirname}/%{hadoop_name}-mapreduce
 %define state_hadoop_dirname /var/lib
 %define state_hadoop %{state_hadoop_dirname}/hadoop
 %define state_yarn %{state_hadoop_dirname}/%{hadoop_name}-yarn
 %define state_hdfs %{state_hadoop_dirname}/%{hadoop_name}-hdfs
 %define state_mapreduce %{state_hadoop_dirname}/%{hadoop_name}-mapreduce
-%define state_httpfs %{state_hadoop_dirname}/%{hadoop_name}-httpfs
 %define bin_hadoop %{_bindir}
 %define man_hadoop %{_mandir}
 %define doc_hadoop %{_docdir}/%{hadoop_name}-%{hadoop_version}
-%define httpfs_services httpfs
 %define mapreduce_services mapreduce-historyserver
 %define hdfs_services hdfs-namenode hdfs-secondarynamenode hdfs-datanode hdfs-zkfc hdfs-journalnode
 %define yarn_services yarn-resourcemanager yarn-nodemanager yarn-proxyserver yarn-timelineserver
-%define hadoop_services %{hdfs_services} %{mapreduce_services} %{yarn_services} %{httpfs_services}
+%define hadoop_services %{hdfs_services} %{mapreduce_services} %{yarn_services}
 # Hadoop outputs built binaries into %{hadoop_build}
 %define hadoop_build_path build
 %define static_images_dir src/webapps/static/images
@@ -172,7 +164,7 @@ Source28: mapred.1
 Source29: hadoop-yarn-timelineserver.svc
 #BIGTOP_PATCH_FILES
 Buildroot: %{_tmppath}/%{hadoop_name}-%{version}-%{release}-root-%(%{__id} -u -n)
-BuildRequires: fuse-devel, fuse, cmake
+BuildRequires: fuse-devel, fuse
 Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service, bigtop-utils >= 0.7, zookeeper%{crh_version_as_name} >= 3.4.0
 Requires: psmisc, %{netcat_package}
 Requires: spark%{crh_version_as_name}-yarn-shuffle, ranger%{crh_version_as_name}-hdfs-plugin, ranger%{crh_version_as_name}-yarn-plugin
@@ -325,17 +317,6 @@ The Data Nodes in the Hadoop Cluster are responsible for serving up
 blocks of data over the network to Hadoop Distributed Filesystem
 (HDFS) clients.
 
-%package httpfs
-Summary: HTTPFS for Hadoop
-Group: System/Daemons
-Requires: %{name}-hdfs = %{version}-%{release}, bigtop-tomcat
-Requires(pre): %{name} = %{version}-%{release}
-Requires(pre): %{name}-hdfs = %{version}-%{release}
-
-%description httpfs
-The server providing HTTP REST API support for the complete FileSystem/FileContext
-interface in HDFS.
-
 %package yarn-resourcemanager
 Summary: YARN Resource Manager
 Group: System/Daemons
@@ -435,7 +416,7 @@ Hadoop Filesystem Library
 %package libhdfs-devel
 Summary: Development support for libhdfs
 Group: Development/Libraries
-Requires: hadoop = %{version}-%{release}, hadoop-libhdfs = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}, %{name}-libhdfs = %{version}-%{release}
 
 %description libhdfs-devel
 Includes examples and header files for accessing HDFS from C
@@ -479,22 +460,16 @@ env HADOOP_VERSION=%{hadoop_base_version} HADOOP_ARCH=%{hadoop_arch} bash %{SOUR
 %install
 %__rm -rf $RPM_BUILD_ROOT
 
-sed -i -e "s,{CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/*.sh
-sed -i -e "s,{CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/*.default
-sed -i -e "s,{CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/*.groovy
-
 
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{lib_hadoop}
 
 env HADOOP_VERSION=%{hadoop_base_version} CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn}  bash %{SOURCE2} \
   --distro-dir=$RPM_SOURCE_DIR \
   --build-dir=$PWD/build \
-  --httpfs-dir=$RPM_BUILD_ROOT%{lib_httpfs} \
   --system-include-dir=$RPM_BUILD_ROOT%{_includedir} \
   --system-lib-dir=$RPM_BUILD_ROOT%{_libdir} \
   --system-libexec-dir=$RPM_BUILD_ROOT/%{lib_hadoop}/libexec \
   --hadoop-etc-dir=$RPM_BUILD_ROOT%{etc_hadoop} \
-  --httpfs-etc-dir=$RPM_BUILD_ROOT%{etc_httpfs} \
   --prefix=$RPM_BUILD_ROOT \
   --doc-dir=$RPM_BUILD_ROOT%{doc_hadoop} \
   --example-dir=$RPM_BUILD_ROOT%{doc_hadoop}/examples \
@@ -543,12 +518,10 @@ done
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{log_yarn}
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{log_hdfs}
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{log_mapreduce}
-%__install -d -m 0755 $RPM_BUILD_ROOT/%{log_httpfs}
 # /var/run/*
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{run_yarn}
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{run_hdfs}
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{run_mapreduce}
-%__install -d -m 0755 $RPM_BUILD_ROOT/%{run_httpfs}
 
 %pre
 getent group hadoop >/dev/null || groupadd -r hadoop
@@ -556,10 +529,6 @@ getent group hadoop >/dev/null || groupadd -r hadoop
 %pre hdfs
 getent group hdfs >/dev/null   || groupadd -r hdfs
 getent passwd hdfs >/dev/null || /usr/sbin/useradd --comment "Hadoop HDFS" --shell /bin/bash -M -r -g hdfs -G hadoop --home %{state_hdfs} hdfs
-
-%pre httpfs
-getent group httpfs >/dev/null   || groupadd -r httpfs
-getent passwd httpfs >/dev/null || /usr/sbin/useradd --comment "Hadoop HTTPFS" --shell /bin/bash -M -r -g httpfs -G httpfs --home %{run_httpfs} httpfs
 
 %pre yarn
 getent group yarn >/dev/null   || groupadd -r yarn
@@ -593,30 +562,10 @@ fi
 
 %{alternatives_cmd} --install %{config_hadoop} %{hadoop_name}-conf %{etc_hadoop}/conf.empty 10
 
-%post httpfs
-%{alternatives_cmd} --install %{config_httpfs} %{hadoop_name}-httpfs-conf %{etc_httpfs}/conf.empty 10
-%{alternatives_cmd} --install %{tomcat_deployment_httpfs} %{hadoop_name}-httpfs-tomcat-conf %{etc_httpfs}/tomcat-conf.dist 10
-%{alternatives_cmd} --install %{tomcat_deployment_httpfs} %{hadoop_name}-httpfs-tomcat-conf %{etc_httpfs}/tomcat-conf.https 5
-
-chkconfig --add %{hadoop_name}-httpfs
 
 %preun
 if [ "$1" = 0 ]; then
   %{alternatives_cmd} --remove %{hadoop_name}-conf %{etc_hadoop}/conf.empty || :
-fi
-
-%preun httpfs
-if [ $1 = 0 ]; then
-  service %{hadoop_name}-httpfs stop > /dev/null 2>&1
-  chkconfig --del %{hadoop_name}-httpfs
-  %{alternatives_cmd} --remove %{hadoop_name}-httpfs-conf %{etc_httpfs}/conf.empty || :
-  %{alternatives_cmd} --remove %{hadoop_name}-httpfs-tomcat-conf %{etc_httpfs}/tomcat-conf.dist || :
-  %{alternatives_cmd} --remove %{hadoop_name}-httpfs-tomcat-conf %{etc_httpfs}/tomcat-conf.https || :
-fi
-
-%postun httpfs
-if [ $1 -ge 1 ]; then
-  service %{hadoop_name}-httpfs condrestart >/dev/null 2>&1
 fi
 
 
@@ -639,6 +588,10 @@ fi
 %files hdfs
 %defattr(-,root,root)
 %config(noreplace) %{etc_hadoop}/conf.empty/hdfs-site.xml
+%config(noreplace) %{etc_hadoop}/conf.empty/httpfs-env.sh
+%config(noreplace) %{etc_hadoop}/conf.empty/httpfs-log4j.properties
+%config(noreplace) %{etc_hadoop}/conf.empty/httpfs-signature.secret
+%config(noreplace) %{etc_hadoop}/conf.empty/httpfs-site.xml
 %config(noreplace) /etc/security/limits.d/hdfs.conf
 %{lib_hdfs}
 %{lib_hadoop}/libexec/hdfs-config.sh
@@ -656,7 +609,7 @@ fi
 %config(noreplace) %{etc_hadoop}/conf.empty/mapred-site.xml
 %config(noreplace) %{etc_hadoop}/conf.empty/mapred-env.sh
 %config(noreplace) %{etc_hadoop}/conf.empty/mapred-queues.xml.template
-%config(noreplace) %{etc_hadoop}/conf.empty/mapred-site.xml.template
+%config(noreplace) %{etc_hadoop}/conf.empty/mapred-site.xml
 %config(noreplace) /etc/security/limits.d/mapreduce.conf
 %{lib_mapreduce}
 %{lib_hadoop}/libexec/mapred-config.sh
@@ -670,19 +623,21 @@ fi
 %files
 %defattr(-,root,root)
 %config(noreplace) %{etc_hadoop}/conf.empty/core-site.xml
-%config(noreplace) %{etc_hadoop}/conf.empty/hadoop-metrics.properties
 %config(noreplace) %{etc_hadoop}/conf.empty/hadoop-metrics2.properties
 %config(noreplace) %{etc_hadoop}/conf.empty/log4j.properties
-%config(noreplace) %{etc_hadoop}/conf.empty/slaves
+%config(noreplace) %{etc_hadoop}/conf.empty/workers
 %config(noreplace) %{etc_hadoop}/conf.empty/ssl-client.xml.example
 %config(noreplace) %{etc_hadoop}/conf.empty/ssl-server.xml.example
 %config(noreplace) %{etc_hadoop}/conf.empty/configuration.xsl
 %config(noreplace) %{etc_hadoop}/conf.empty/hadoop-env.sh
 %config(noreplace) %{etc_hadoop}/conf.empty/hadoop-policy.xml
+%config(noreplace) %{etc_hadoop}/conf.empty/hadoop-user-functions.sh.example
+%config(noreplace) %{etc_hadoop}/conf.empty/user_ec_policies.xml.template
 %config(noreplace) %{etc_hadoop}/conf.empty/kms-acls.xml
 %config(noreplace) %{etc_hadoop}/conf.empty/kms-env.sh
 %config(noreplace) %{etc_hadoop}/conf.empty/kms-log4j.properties
 %config(noreplace) %{etc_hadoop}/conf.empty/kms-site.xml
+%{etc_hadoop}/conf.empty/shellprofile.d
 %config(noreplace) /etc/default/hadoop
 /etc/bash_completion.d/hadoop
 %{crh_dir}/%{hadoop_name}/mapreduce.tar.gz
@@ -693,8 +648,10 @@ fi
 %{lib_hadoop}/etc
 %{lib_hadoop}/conf
 %{lib_hadoop}/libexec/hadoop-config.sh
+%{lib_hadoop}/libexec/hadoop-functions.sh
 %{lib_hadoop}/libexec/hadoop-layout.sh
-%{lib_hadoop}/libexec/kms-config.sh
+%{lib_hadoop}/libexec/shellprofile.d
+%{lib_hadoop}/libexec/tools
 %{bin_hadoop}/hadoop
 %{man_hadoop}/man1/hadoop.1.*
 %{man_hadoop}/man1/yarn.1.*
@@ -707,17 +664,6 @@ fi
 %files doc
 %defattr(-,root,root)
 %doc %{doc_hadoop}
-
-%files httpfs
-%defattr(-,root,root)
-%config(noreplace) %{etc_httpfs}
-%config(noreplace) /etc/default/%{hadoop_name}-httpfs
-%{lib_hadoop}/libexec/httpfs-config.sh
-%{initd_dir}/%{hadoop_name}-httpfs
-%{lib_httpfs}
-%attr(0775,httpfs,httpfs) %{run_httpfs}
-%attr(0775,httpfs,httpfs) %{log_httpfs}
-%attr(0775,httpfs,httpfs) %{state_httpfs}
 
 # Service file management RPMs
 %define service_macro() \
