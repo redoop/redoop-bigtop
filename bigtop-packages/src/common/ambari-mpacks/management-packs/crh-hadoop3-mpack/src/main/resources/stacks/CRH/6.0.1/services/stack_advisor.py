@@ -24,6 +24,6 @@ import re
 from resource_management.libraries.functions import format
 
 
-class CRH52StackAdvisor(CRH51StackAdvisor):
+class CRH603StackAdvisor(CRH60StackAdvisor):
   
   pass

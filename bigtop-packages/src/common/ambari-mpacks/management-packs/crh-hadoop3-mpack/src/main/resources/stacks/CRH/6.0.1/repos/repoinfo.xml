@@ -19,7 +19,7 @@
   <os family="redhat7">
     <repo>
       <baseurl>http://archive.redoop.com/crh/</baseurl>
-      <repoid>CRH-6.0</repoid>
+      <repoid>CRH-6.0.1</repoid>
       <reponame>CRH</reponame>
       <unique>true</unique>
     </repo>
@@ -33,7 +33,7 @@
   <os family="redhat-ppc7">
     <repo>
       <baseurl>http://archive.redoop.com/crh/</baseurl>
-      <repoid>CRH-6.0</repoid>
+      <repoid>CRH-6.0.1</repoid>
       <reponame>CRH</reponame>
       <unique>true</unique>
     </repo>

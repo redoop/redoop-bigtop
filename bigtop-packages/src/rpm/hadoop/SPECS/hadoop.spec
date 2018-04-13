@@ -167,7 +167,7 @@ Buildroot: %{_tmppath}/%{hadoop_name}-%{version}-%{release}-root-%(%{__id} -u -n
 BuildRequires: fuse-devel, fuse
 Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service, bigtop-utils >= 0.7, zookeeper%{crh_version_as_name} >= 3.4.0
 Requires: psmisc, %{netcat_package}
-Requires: spark%{crh_version_as_name}-yarn-shuffle, ranger%{crh_version_as_name}-hdfs-plugin, ranger%{crh_version_as_name}-yarn-plugin
+Requires: spark%{crh_version_as_name}-yarn-shuffle
 # Sadly, Sun/Oracle JDK in RPM form doesn't provide libjvm.so, which means we have
 # to set AutoReq to no in order to minimize confusion. Not ideal, but seems to work.
 # I wish there was a way to disable just one auto dependency (libjvm.so)
