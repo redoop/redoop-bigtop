@@ -23,7 +23,7 @@
   <version>2.0.0.0-SNAPSHOT</version>
   <name>Ambari Contrib Management Packs</name>
   <modules>
-    <module>crh-ts-mpack</module>
+    <module>crh-hadoop3-mpack</module>
     <module>crh-dw-mpack</module>
     <module>crh-stream-mpack</module>
     <module>crh-BI-mpack</module>
@@ -95,7 +95,7 @@
         </os>
       </activation>
       <modules>
-        <module>crh-ts-mpack</module>
+        <module>crh-hadoop3-mpack</module>
         <module>crh-dw-mpack</module>
         <module>crh-stream-mpack</module>
         <module>crh-BI-mpack</module>
