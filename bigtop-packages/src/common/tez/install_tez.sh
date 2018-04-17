@@ -113,10 +113,8 @@ install -d -m 0755 $PREFIX/$MAN_DIR
 
 cp tez-site.xml  $PREFIX/$CONF_DIR
 
-#tar -C  $PREFIX/$LIB_DIR -xzf  $BUILD_DIR/tez-dist/target/tez*-minimal.tar.gz
+tar -C  $PREFIX/$LIB_DIR -xzf  $BUILD_DIR/tez-dist/target/tez*-minimal.tar.gz
 
-test ! -d $BUILD_DIR/lib || cp -ra $BUILD_DIR/lib/* $PREFIX/$LIB_DIR/lib 
-test ! -d $BUILD_DIR || cp $BUILD_DIR/tez*.jar $PREFIX/$LIB_DIR 
-test ! -d $BUILD_DIR || cp $BUILD_DIR/*.war $PREFIX/$LIB_DIR/ui/ 
-test ! -d $BUILD_DIR || cp $BUILD_DIR/tez*.tar.gz $PREFIX/$LIB_DIR/lib/tez.tar.gz 
-test ! -d $BUILD_DIR/conf || cp -a $BUILD_DIR/conf $PREFIX/$CONF_DIR
+mv $PREFIX/$LIB_DIR/*.war $PREFIX/$LIB_DIR/ui/ 
+mv $BUILD_DIR/tez-dist/target/tez-${TEZ_BASE_VERSION}.tar.gz $PREFIX/$LIB_DIR/lib/tez.tar.gz
+

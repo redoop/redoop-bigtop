@@ -67,6 +67,9 @@ Source6: init.d.tmpl
 BuildArch: noarch
 Requires: hadoop%{crh_version_as_name} hadoop%{crh_version_as_name}-hdfs hadoop%{crh_version_as_name}-yarn hadoop%{crh_version_as_name}-mapreduce
 
+Patch1: patch1-bower-allow-root.diff
+
+
 %if  0%{?mgaversion}
 Requires: bsh-utils
 %else
@@ -81,6 +84,8 @@ processing data. It is currently built atop Apache Hadoop YARN
 
 %prep
 %setup -q -n apache-%{tez_name}-%{tez_base_version}-src
+%patch1 -p1
+
 
 %build
 env TEZ_VERSION=%{version} tez_name=%{tez_name} tez_base_version=%{tez_base_version} bash %{SOURCE1}
@@ -89,11 +94,11 @@ env TEZ_VERSION=%{version} tez_name=%{tez_name} tez_base_version=%{tez_base_vers
 %__rm -rf $RPM_BUILD_ROOT
 
 cp %{SOURCE3} %{SOURCE4} .
-env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} sh %{SOURCE2} \
-	--build-dir=build \
+env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} TEZ_BASE_VERSION=%{tez_base_version} sh %{SOURCE2} \
+        --build-dir=. \
         --doc-dir=%{doc_tez} \
         --libexec-dir=%{libexec_tez} \
-	--prefix=$RPM_BUILD_ROOT
+	    --prefix=$RPM_BUILD_ROOT
 
 %__ln_s -f %{crh_dir}/hadoop/hadoop-annotations.jar $RPM_BUILD_ROOT/%{lib_tez}/hadoop-annotations.jar
 %__ln_s -f %{crh_dir}/hadoop/hadoop-auth.jar $RPM_BUILD_ROOT/%{lib_tez}/hadoop-auth.jar

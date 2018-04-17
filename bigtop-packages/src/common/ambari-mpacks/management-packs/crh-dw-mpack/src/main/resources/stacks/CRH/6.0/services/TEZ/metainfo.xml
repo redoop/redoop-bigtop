@@ -19,7 +19,22 @@
   <schemaVersion>2.0</schemaVersion>
   <services>
     <service>
-      <name>PIG</name>
+      <name>TEZ</name>
+      <displayName>Tez</displayName>
+      <extends>common-services/TEZ/0.4.0.2.1</extends>
+      <version>0.7.0</version>
+
+      <osSpecifics>
+        <osSpecific>
+          <osFamily>redhat7</osFamily>
+          <packages>
+            <package>
+              <name>tez_${stack_version}</name>
+            </package>
+          </packages>
+        </osSpecific>
+      </osSpecifics>
+      
     </service>
   </services>
 </metainfo>
