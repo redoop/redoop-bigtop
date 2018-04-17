@@ -85,7 +85,7 @@ Source1: do-component-build
 Source2: install_pig.sh
 Source3: pig.1
 Source4: bigtop.bom
-Requires: hadoop%{crh_version_as_name}-client, hbase%{crh_version_as_name}, hive%{crh_version_as_name}, zookeeper%{crh_version_as_name}, bigtop-utils >= 0.7
+Requires: hadoop%{crh_version_as_name}-client, zookeeper%{crh_version_as_name}, bigtop-utils >= 0.7
 
 %description 
 Pig is a platform for analyzing large data sets that consists of a high-level language 
