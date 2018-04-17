@@ -20,6 +20,7 @@
   <services>
     <service>
       <name>TEZ</name>
+      <version>0.9.1</version>
     </service>
   </services>
 </metainfo>
