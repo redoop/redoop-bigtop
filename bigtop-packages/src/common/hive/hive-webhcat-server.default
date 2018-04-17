@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export HCAT_PREFIX={CRH_DIR}/hive-hcatalog
+export HCAT_PREFIX={SED_CRH_DIR}/hive-hcatalog
 export WEBHCAT_LOG_DIR=/var/log/hive-hcatalog
 export WEBHCAT_PID_DIR=/var/lib/hive-hcatalog
 # FIXME: HCATALOG-636
-export HIVE_HOME={CRH_DIR}/hive
+export HIVE_HOME={SED_CRH_DIR}/hive
 export HIVE_CONF_DIR=/etc/hive/conf
-export HCAT_HOME={CRH_DIR}/hive-hcatalog
+export HCAT_HOME={SED_CRH_DIR}/hive-hcatalog

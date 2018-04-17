@@ -47,7 +47,8 @@ OPTS=$(getopt \
   -l 'python-dir:' \
   -l 'hcatalog-dir:' \
   -l 'installed-hcatalog-dir:' \
-  -l 'build-dir:' -- "$@")
+  -l 'build-dir:' \
+  -l 'hive-version:' -- "$@")
 
 if [ $? != 0 ] ; then
     usage
@@ -86,6 +87,9 @@ while true ; do
         --installed-hcatalog-dir)
         INSTALLED_HCATALOG_DIR=$2 ; shift 2
         ;;
+        --hive-version)
+        HIVE_VERSION=$2 ; shift 2
+        ;;
         --)
         shift ; break
         ;;
@@ -106,14 +110,14 @@ done
 
 MAN_DIR=$PREFIX/usr/share/man/man1
 DOC_DIR=${DOC_DIR:-$PREFIX/usr/share/doc/hive}
-HIVE_DIR=${HIVE_DIR:-$PREFIX$CRH_DIR/hive}
-INSTALLED_HIVE_DIR=${INSTALLED_HIVE_DIR:-$CRH_DIR/hive}
+HIVE_DIR=${HIVE_DIR:-$PREFIX${CRH_DIR}/hive}
+INSTALLED_HIVE_DIR=${INSTALLED_HIVE_DIR:-${CRH_DIR}/hive}
 EXAMPLES_DIR=${EXAMPLES_DIR:-$DOC_DIR/examples}
 BIN_DIR=${BIN_DIR:-$PREFIX/usr/bin}
 PYTHON_DIR=${PYTHON_DIR:-$HIVE_DIR/lib/py}
-HCATALOG_DIR=${HCATALOG_DIR:-$PREFIX$CRH_DIR/hive-hcatalog}
+HCATALOG_DIR=${HCATALOG_DIR:-$PREFIX${CRH_DIR}/hive-hcatalog}
 HCATALOG_SHARE_DIR=${HCATALOG_DIR}/share/hcatalog
-INSTALLED_HCATALOG_DIR=${INSTALLED_HCATALOG_DIR:-$CRH_DIR/hive-hcatalog}
+INSTALLED_HCATALOG_DIR=${INSTALLED_HCATALOG_DIR:-${CRH_DIR}/hive-hcatalog}
 CONF_DIR=/etc/hive
 CONF_DIST_DIR=/etc/hive/conf.dist
 
@@ -147,15 +151,12 @@ fi
 BIGTOP_DEFAULTS_DIR=\${BIGTOP_DEFAULTS_DIR-/etc/default}
 [ -n "\${BIGTOP_DEFAULTS_DIR}" -a -r \${BIGTOP_DEFAULTS_DIR}/hbase ] && . \${BIGTOP_DEFAULTS_DIR}/hbase
 
-
-export HIVE_HOME=\${HIVE_HOME:-$CRH_DIR/hive}
-export HADOOP_HOME=\${HADOOP_HOME:-$CRH_DIR/hadoop}
-
+export HADOOP_HOME=\${HADOOP_HOME:-${CRH_DIR}/hadoop}
 export HIVE_HOME=$INSTALLED_HIVE_DIR
-exec "\${HIVE_HOME}/bin/$file.distro" "\$@"
+exec $INSTALLED_HIVE_DIR/bin/$file.distro "\$@"
 EOF
   chmod 755 $wrapper
-  cp $BIN_DIR/$file ${HIVE_DIR}/bin/$file
+  cp $wrapper ${HIVE_DIR}/bin/$file
 done
 
 # Config
@@ -218,7 +219,7 @@ done
 mv ${HCATALOG_DIR}/bin/hcat ${HCATALOG_DIR}/bin/hcat.distro
 wrapper=$BIN_DIR/hcat
 cat >>$wrapper <<EOF
-#!/bin/bash
+#!/bin/sh
 
 BIGTOP_DEFAULTS_DIR=${BIGTOP_DEFAULTS_DIR-/etc/default}
 [ -n "${BIGTOP_DEFAULTS_DIR}" -a -r ${BIGTOP_DEFAULTS_DIR}/hadoop ] && . ${BIGTOP_DEFAULTS_DIR}/hadoop
@@ -229,17 +230,18 @@ if [ -e /usr/lib/bigtop-utils/bigtop-detect-javahome ]; then
 fi
 
 # FIXME: HCATALOG-636 (and also HIVE-2757)
-export HADOOP_HOME=$CRH_DIR/hadoop
-export HIVE_HOME=$CRH_DIR/hive
+export HADOOP_HOME=${CRH_DIR}/hadoop
+export HIVE_HOME=${CRH_DIR}/hive
 export HIVE_CONF_DIR=/etc/hive/conf
 export HCAT_HOME=$INSTALLED_HCATALOG_DIR
 
 export HCATALOG_HOME=$INSTALLED_HCATALOG_DIR
-exec $CRH_DIR/hive-hcatalog/bin/hcat.distro "\$@"
+exec $INSTALLED_HCATALOG_DIR/bin/hcat.distro "\$@"
 EOF
 chmod 755 $wrapper
 cp ${BIN_DIR}/hcat ${HCATALOG_DIR}/bin/hcat 
 cp ${BIN_DIR}/hcat ${HIVE_DIR}/bin/hcat
+
 
 # Install the docs
 install -d -m 0755 ${DOC_DIR}
@@ -250,7 +252,8 @@ install -d -m 0755 $MAN_DIR
 gzip -c hive-hcatalog.1 > $MAN_DIR/hive-hcatalog.1.gz
 
 # Provide the runtime dirs
-install -d -m 0755 $PREFIX/var/{lib,log,run}/hive
+install -d -m 0755 $PREFIX/var/lib/hive
+install -d -m 0755 $PREFIX/var/log/hive
 
 install -d -m 0755 $PREFIX/var/lib/hive-hcatalog
 install -d -m 0755 $PREFIX/var/log/hive-hcatalog
@@ -267,6 +270,7 @@ done
 # Remove Windows files
 find ${HIVE_DIR}/bin -name '*.cmd' | xargs rm -f
 find ${HCATALOG_DIR}/bin -name '*.cmd' | xargs rm -f
+
 
 #Creating hive.jar for use by webhcat etc., 
 ABS_HIVE_DIR=$(cd ${HIVE_DIR} && pwd) 

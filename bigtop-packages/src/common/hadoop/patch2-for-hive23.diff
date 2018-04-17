@@ -1,0 +1,12 @@
+diff -uNr hadoop-2.7.5-src/hadoop-project/pom.xml hadoop-2.7.5-srcp/hadoop-project/pom.xml
+--- hadoop-2.7.5-src/hadoop-project/pom.xml	2017-12-16 06:53:52.000000000 +0800
++++ hadoop-2.7.5-srcp/hadoop-project/pom.xml	2018-04-17 17:00:18.573713274 +0800
+@@ -68,7 +68,7 @@
+ 
+     <!-- jackson versions -->
+     <jackson.version>1.9.13</jackson.version>
+-    <jackson2.version>2.2.3</jackson2.version>
++    <jackson2.version>2.6.5</jackson2.version>
+ 
+     <!-- ProtocolBuffer version, used to verify the protoc version and -->
+     <!-- define the protobuf JAR version                               -->

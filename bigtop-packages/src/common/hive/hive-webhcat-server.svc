@@ -14,7 +14,7 @@
 # limitations under the License.
 DAEMON="hive-webhcat-server"
 DESC="WEBHCat server"
-EXEC_PATH="{CRH_DIR}/hive-hcatalog/sbin/webhcat_server.sh"
+EXEC_PATH="{SED_CRH_DIR}/hive-hcatalog/sbin/webhcat_server.sh"
 SVC_USER="hive"
 DAEMON_FLAGS=""
 CONF_DIR="/etc/hive-webhcat/conf"
