@@ -12,7 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-%define crh_dir /usr/%{crh_tag}/%{crh_version_with_bn} 
+%define crh_dir /usr/%{crh_tag}/%{crh_version_with_bn}
+%define distroselect crh-select
 %define hbase_name hbase
 %define etc_hbase_conf %{_sysconfdir}/%{hbase_name}/conf
 %define etc_hbase_conf_dist %{etc_hbase_conf}.dist
@@ -342,7 +343,11 @@ if [ !  -e "/etc/hbase/conf" ]; then
      rm -f /etc/hbase/conf
      mkdir -p /etc/hbase/conf
      cp -rp /etc/hbase/conf.dist/* /etc/hbase/conf
- fi
+fi
+
+/usr/bin/%{distroselect} --rpm-mode set hbase-client %{crh_version_with_bn}
+/usr/bin/%{distroselect} --rpm-mode set hbase-master %{crh_version_with_bn}
+/usr/bin/%{distroselect} --rpm-mode set hbase-regionserver %{crh_version_with_bn}
 
 %{alternatives_cmd} --install %{etc_hbase_conf} %{hbase_name}-conf %{etc_hbase_conf_dist} 30
 
