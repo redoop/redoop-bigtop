@@ -99,8 +99,8 @@ Buildroot: %{_topdir}/INSTALL/%{component_name}-%{version}
 Source0: %{component_name}-%{ranger_base_version}.tar.gz
 Source1: do-component-build
 Source2: install_%{component_name}.sh
-Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service,  %{distroselect} >= %{crh_version_with_bn}
-Requires: psmisc
+Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service
+Requires: psmisc,ambari-mpacks%{crh_version_as_name}-crh-security
 # Sadly, Sun/Oracle JDK in RPM form doesn't provide libjvm.so, which means we have
 # to set AutoReq to no in order to minimize confusion. Not ideal, but seems to work.
 # I wish there was a way to disable just one auto dependency (libjvm.so)
@@ -129,7 +129,7 @@ Ranger is a framework to secure hadoop data
 %package admin
 Summary: Web Interface for Ranger 
 Group: System/Daemons
-Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service,  %{distroselect} >= %{crh_version_with_bn}
+Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service
 Requires: psmisc
 # Sadly, Sun/Oracle JDK in RPM form doesn't provide libjvm.so, which means we have
 # to set AutoReq to no in order to minimize confusion. Not ideal, but seems to work.
@@ -159,7 +159,7 @@ Ranger-admin is admin component associated with the Ranger framework
 %package usersync
 Summary: Synchronize User/Group information from Corporate LD/AD or Unix
 Group: System/Daemons
-Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service,  %{distroselect} >= %{crh_version_with_bn}
+Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service
 Requires: psmisc
 # Sadly, Sun/Oracle JDK in RPM form doesn't provide libjvm.so, which means we have
 # to set AutoReq to no in order to minimize confusion. Not ideal, but seems to work.
@@ -189,7 +189,7 @@ Ranger-usersync is user/group synchronization component associated with the Rang
 %package kms
 Summary: Key Management Server
 Group: System/Daemons
-Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service,  %{distroselect} >= %{crh_version_with_bn}
+Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service
 Requires: psmisc
 # Sadly, Sun/Oracle JDK in RPM form doesn't provide libjvm.so, which means we have
 # to set AutoReq to no in order to minimize confusion. Not ideal, but seems to work.
@@ -220,7 +220,7 @@ Ranger-kms is key management server component associated with the Ranger framewo
 %package tagsync
 Summary: Tag Synchronizer
 Group: System/Daemons
-Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service,  %{distroselect} >= %{crh_version_with_bn}
+Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service
 Requires: psmisc
 # Sadly, Sun/Oracle JDK in RPM form doesn't provide libjvm.so, which means we have
 # to set AutoReq to no in order to minimize confusion. Not ideal, but seems to work.
