@@ -58,14 +58,14 @@ bash $RPM_SOURCE_DIR/do-component-build
 install -d -m 0755 ${RPM_BUILD_ROOT}/usr/bin
 cp -ra $RPM_SOURCE_DIR/selector/* ${RPM_BUILD_ROOT}/usr/bin/
 
-# Redoop Management Packs
+# Redoop CRH Management Packs
 install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
-%__cp -ra crh-ts-mpack/target/crh-ts-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-dw-mpack/target/crh-dw-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-stream-mpack/target/crh-stream-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-DW-mpack/target/crh-DW-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-BI-mpack/target/crh-BI-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-spark-mpack/target/crh-spark-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-security-mpack/target/crh-security-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-SPARK-mpack/target/crh-SPARK-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-Security-mpack/target/crh-Security-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-TS-mpack/target/crh-TS-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+
 
 %package -n %{distro_select}
 Summary: Distro Select
@@ -76,30 +76,13 @@ AutoReqProv: no
 Distro Select
 
 
-%package crh-ts
-Summary: CRH Time Series Mpack
-Group: Development/Libraries
-AutoProv: no
-AutoReqProv: no
-%description crh-ts
-Redoop Ambari CRH Time Series Mpack
-
-
-%package crh-dw
+%package crh-DW
 Summary: CRH Data Warehouse Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description crh-dw
+%description crh-DW
 Redoop Ambari CRH Data Warehouse Mpack
-
-%package crh-stream
-Summary: CRH stream  Mpack
-Group: Development/Libraries
-AutoProv: no
-AutoReqProv: no
-%description crh-stream
-Redoop Ambari CRH stream Mpack
 
 %package crh-BI
 Summary: CRH BI  Mpack
@@ -109,21 +92,30 @@ AutoReqProv: no
 %description crh-BI
 Redoop Ambari CRH BI Mpack
 
-%package crh-spark
-Summary: CRH spark  Mpack
+%package crh-SPARK
+Summary: CRH SPARK Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description crh-spark
-Redoop Ambari CRH spark Mpack
+%description crh-SPARK
+Redoop Ambari CRH SPARK Mpack
 
-%package crh-security
-Summary: CRH cluster security  Mpack
+%package crh-Security
+Summary: CRH Cluster Security  Mpack
 Group: Development/Libraries
 AutoProv: no
 AutoReqProv: no
-%description crh-security
-Redoop Ambari CRH cluster security Mpack
+%description crh-Security
+Redoop Ambari CRH Cluster Security Mpack
+
+%package crh-TS
+Summary: CRH Time Series Mpack
+Group: Development/Libraries
+AutoProv: no
+AutoReqProv: no
+%description crh-TS
+Redoop Ambari CRH Time Series Mpack
+
 
 %files -n %{distro_select}
 %attr(755,root,root) /usr/bin/%{distro_select}
@@ -138,9 +130,8 @@ Redoop Ambari CRH cluster security Mpack
 ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz --verbose \
 ambari-server restart
 
-%service_macro crh-ts
-%service_macro crh-dw
-%service_macro crh-stream
-%service_macro crh-spark
+%service_macro crh-DW
 %service_macro crh-BI
-%service_macro crh-security
+%service_macro crh-SPARK
+%service_macro crh-Security
+%service_macro crh-TS

@@ -23,12 +23,11 @@
   <version>2.0.0.0-SNAPSHOT</version>
   <name>Ambari Contrib Management Packs</name>
   <modules>
-    <module>crh-ts-mpack</module>
-    <module>crh-dw-mpack</module>
-    <module>crh-stream-mpack</module>
+    <module>crh-DW-mpack</module>
     <module>crh-BI-mpack</module>
-    <module>crh-spark-mpack</module>
-    <module>crh-security-mpack</module>
+    <module>crh-SPARK-mpack</module>
+    <module>crh-Security-mpack</module>
+    <module>crh-TS-mpack</module>
   </modules>
   <build>
     <pluginManagement>
@@ -96,12 +95,11 @@
         </os>
       </activation>
       <modules>
-        <module>crh-ts-mpack</module>
-        <module>crh-dw-mpack</module>
-        <module>crh-stream-mpack</module>
+        <module>crh-DW-mpack</module>
         <module>crh-BI-mpack</module>
-        <module>crh-spark-mpack</module>
-        <module>crh-security-mpack</module>
+        <module>crh-SPARK-mpack</module>
+        <module>crh-Security-mpack</module>
+        <module>crh-TS-mpack</module>
       </modules>
     </profile>
   </profiles>
