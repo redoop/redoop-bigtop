@@ -90,7 +90,7 @@ Source4: bigtop.bom
 Source5: %{phoenix_name}-queryserver.svc
 Source6: %{phoenix_name}-queryserver.default
 BuildArch: noarch
-Requires: hadoop%{crh_version_as_name}, hadoop%{crh_version_as_name}-mapreduce, hadoop%{crh_version_as_name}-yarn, hbase%{crh_version_as_name}, zookeeper%{crh_version_as_name},ambari-mpacks%{crh_version_as_name}-crh-ts
+Requires: hadoop%{crh_version_as_name}, hadoop%{crh_version_as_name}-mapreduce, hadoop%{crh_version_as_name}-yarn, hbase%{crh_version_as_name}, zookeeper%{crh_version_as_name}
 
 %if  0%{?mgaversion}
 Requires: bsh-utils
