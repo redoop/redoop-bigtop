@@ -58,14 +58,14 @@ bash $RPM_SOURCE_DIR/do-component-build
 install -d -m 0755 ${RPM_BUILD_ROOT}/usr/bin
 cp -ra $RPM_SOURCE_DIR/selector/* ${RPM_BUILD_ROOT}/usr/bin/
 
-# Redoop Management Packs
+# Redoop CRH Management Packs
 install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
-%__cp -ra crh-ts-mpack/target/crh-ts-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-dw-mpack/target/crh-dw-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-stream-mpack/target/crh-stream-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-DW-mpack/target/crh-DW-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-BI-mpack/target/crh-BI-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-spark-mpack/target/crh-spark-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-security-mpack/target/crh-security-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-SPARK-mpack/target/crh-SPARK-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-Security-mpack/target/crh-Security-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-TS-mpack/target/crh-TS-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+
 
 %package -n %{distro_select}
 Summary: Distro Select
