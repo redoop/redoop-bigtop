@@ -55,7 +55,7 @@ leaves = {
            "hive-metastore": "hive",
            "hive-server2": "hive",
            "hive-webhcat": "hive-hcatalog",
-           "hive-server2-hive2": "hive2",
+           "hive-server2-hive2": "hive",
            "kafka-broker": "kafka",
            "knox-server": "knox",
            "livy-client": "livy",
