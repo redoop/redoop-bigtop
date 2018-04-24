@@ -74,7 +74,7 @@
 }
 .services-menu {
   width: 250px;
-  background: #3985e4;
+  background: #79afda;
 }
 .services-menu .nav-list >li >a {
   color: #fff;
@@ -84,20 +84,20 @@
 }
 .services-menu .nav-list >li >a:hover {
   color: #fff;
-  background: #3878cb;
-  border-bottom: 1px solid #4ac3f9;
+  background: #5893c2;
+  border-bottom: 1px solid #41759f;
 }
 .services-menu .nav-list > .active > a {
   color: #fff;
-  background: #3878cb;
-  border-bottom: 1px solid #4ac3f9;
+  background: #5893c2;
+  border-bottom: 1px solid #41759f;
 }
 .services-menu .nav-list .health-status-LIVE,
 .services-menu .nav-list .icon-laptop {
-  color: #fff;
+  color: #198311;
 }
 .services-menu .btn {
-  background: #3878cb;
+  background: #5893c2;
   color: #fff;
   text-shadow: none;
   border: 1px solid rgba(0,0,0,0.2);
@@ -106,18 +106,18 @@
   border-top-color: #fff;
 }
 .services-menu .btn-group.open .btn.dropdown-toggle {
-  background: #3878cb;
+  background: #5893c2;
   box-shadow: none;
 }
 .services-menu .dropdown-menu {
-  background: #3878cb;
+  background: #5893c2;
   width: 82%;
 }
 .services-menu .dropdown-menu a {
   color: #fff;
 }
 .services-menu .dropdown-menu a:hover {
-  background: #4487e1;
+  background: #41759f;
   color: #fff;
 }
 .services-menu .divider {
@@ -165,7 +165,7 @@
   background: #6cbc5e;
 }
 #config_history .label-success {
-  background: #4ac3f9;
+  background: #41759f;
 }
 #config_history .page-bar {
   background: none;
