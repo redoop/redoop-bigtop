@@ -104,7 +104,7 @@ AutoReqProv: no
 Redoop Ambari CRH Spark Mpack
 
 %package crh-Security
-Summary: CRH Cluster Security  Mpack
+Summary: CRH Cluster Security Mpack
 Group: Development/Libraries
 Requires: ambari-server
 AutoProv: no

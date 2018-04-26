@@ -20,7 +20,7 @@
   <artifactId>crh-Spark-mpack</artifactId>
   <packaging>pom</packaging>
   <version>1.0.0.0-SNAPSHOT</version>
-  <name>CRH Time Series Management Pack</name>
+  <name>CRH Spark Management Pack</name>
   <url>http://ambari.apache.org/</url>
   <properties>
     <minAmbariVersion>2.5.0.0</minAmbariVersion>
