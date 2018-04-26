@@ -12,7 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
 %define crh_dir /usr/%{crh_tag}/%{crh_version_with_bn} 
+%define distroselect crh-select
 %define sqoop_name sqoop
 %define lib_sqoop %{crh_dir}/sqoop
 %define conf_sqoop %{_sysconfdir}/%{sqoop_name}/conf
@@ -146,8 +149,8 @@ if [ !  -e "/etc/sqoop/conf" ]; then
      cp -rp /etc/sqoop/conf.dist/* /etc/sqoop/conf 
 fi
 
-ln -s %{crh_dir}/hadoop/libexec/ %{crh_dir}/hbase/libexec 
-cp %{crh_dir}/hadoop/bin/hadoop %{crh_dir}/hbase/bin
+/usr/bin/%{distroselect} --rpm-mode set sqoop-client %{crh_version_with_bn}
+/usr/bin/%{distroselect} --rpm-mode set sqoop-server %{crh_version_with_bn}
 
 
 %{alternatives_cmd} --install %{conf_sqoop} %{sqoop_name}-conf %{conf_sqoop_dist} 30
