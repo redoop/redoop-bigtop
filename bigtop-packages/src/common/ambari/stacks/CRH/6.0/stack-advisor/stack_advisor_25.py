@@ -829,9 +829,9 @@ class HDP25StackAdvisor(HDP24StackAdvisor):
     if self.__isServiceDeployed(services, "TEZ"):
       timeline_plugin_classes_values.append('org.apache.tez.dag.history.logging.ats.TimelineCachePluginImpl')
 
-    if self.__isServiceDeployed(services, "SPARK"):
-      timeline_plugin_classes_values.append('org.apache.spark.deploy.history.yarn.plugin.SparkATSPlugin')
-      timeline_plugin_classpath_values.append(stack_root + "/{{spark_version}}/spark/hdpLib/*")
+   # if self.__isServiceDeployed(services, "SPARK"):
+   #   timeline_plugin_classes_values.append('org.apache.spark.deploy.history.yarn.plugin.SparkATSPlugin')
+   #   timeline_plugin_classpath_values.append(stack_root + "/{{spark_version}}/spark/hdpLib/*")
 
     putYarnSiteProperty('yarn.timeline-service.entity-group-fs-store.group-id-plugin-classes', ",".join(timeline_plugin_classes_values))
     putYarnSiteProperty('yarn.timeline-service.entity-group-fs-store.group-id-plugin-classpath', ":".join(timeline_plugin_classpath_values))
