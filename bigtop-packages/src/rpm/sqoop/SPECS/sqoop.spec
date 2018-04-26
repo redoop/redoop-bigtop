@@ -65,6 +65,7 @@ Source4: sqoop-metastore.sh.suse
 Buildarch: noarch
 BuildRequires: asciidoc, xmlto
 Requires: hadoop%{crh_version_as_name}-client,hbase%{crh_version_as_name}, bigtop-utils >= 0.7
+Requires: ambari-mpacks%{crh_version_as_name}-crh-DW
 
 %description 
 Sqoop allows easy imports and exports of data sets between databases and the Hadoop Distributed File System (HDFS).

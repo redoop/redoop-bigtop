@@ -59,6 +59,7 @@ Source7: spark-history-server.svc
 Source8: spark-thriftserver.svc
 Source9: bigtop.bom
 Requires: bigtop-utils >= 0.7, hadoop%{crh_version_as_name}-client, hadoop%{crh_version_as_name}-yarn
+Requires: ambari-mpacks%{crh_version_as_name}-crh-Spark
 Requires(preun): /sbin/service
 
 %global initd_dir %{_sysconfdir}/init.d

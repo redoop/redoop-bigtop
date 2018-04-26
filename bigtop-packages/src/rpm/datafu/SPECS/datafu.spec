@@ -38,6 +38,7 @@ Source0: %{datafu_name}-%{datafu_base_version}.tar.gz
 Source1: do-component-build 
 Source2: install_%{datafu_name}.sh
 Requires: hadoop%{crh_version_as_name}-client, bigtop-utils >= 0.7
+Requires: ambari-mpacks%{crh_version_as_name}-crh-DW
 
 
 %description 
