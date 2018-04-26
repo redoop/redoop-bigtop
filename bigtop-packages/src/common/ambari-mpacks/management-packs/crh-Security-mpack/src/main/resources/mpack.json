@@ -4,7 +4,7 @@
   "version": "${project.version}",
   "hash": "${buildNumber}",
   "branch": "${scmBranch}",
-  "description" : "CRH Time Series Management Pack",
+  "description" : "CRH Cluster Security Management Pack",
   "prerequisites": {
     "min-ambari-version" : "${minAmbariVersion}",
     "max-ambari-version" : "${maxAmbariVersion}"

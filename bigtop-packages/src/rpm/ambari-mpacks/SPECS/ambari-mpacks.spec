@@ -62,7 +62,7 @@ cp -ra $RPM_SOURCE_DIR/selector/* ${RPM_BUILD_ROOT}/usr/bin/
 install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
 %__cp -ra crh-DW-mpack/target/crh-DW-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-BI-mpack/target/crh-BI-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-SPARK-mpack/target/crh-SPARK-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crh-Spark-mpack/target/crh-Spark-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-Security-mpack/target/crh-Security-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-TS-mpack/target/crh-TS-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 
@@ -79,30 +79,34 @@ Distro Select
 %package crh-DW
 Summary: CRH Data Warehouse Mpack
 Group: Development/Libraries
+Requires: ambari-server
 AutoProv: no
 AutoReqProv: no
 %description crh-DW
 Redoop Ambari CRH Data Warehouse Mpack
 
 %package crh-BI
-Summary: CRH BI  Mpack
+Summary: CRH Business Intelligence Mpack
 Group: Development/Libraries
+Requires: ambari-server
 AutoProv: no
 AutoReqProv: no
 %description crh-BI
-Redoop Ambari CRH BI Mpack
+Redoop Ambari CRH Business Intelligence Mpack
 
-%package crh-SPARK
-Summary: CRH SPARK Mpack
+%package crh-Spark
+Summary: CRH Spark Mpack
 Group: Development/Libraries
+Requires: ambari-server
 AutoProv: no
 AutoReqProv: no
-%description crh-SPARK
-Redoop Ambari CRH SPARK Mpack
+%description crh-Spark
+Redoop Ambari CRH Spark Mpack
 
 %package crh-Security
-Summary: CRH Cluster Security  Mpack
+Summary: CRH Cluster Security Mpack
 Group: Development/Libraries
+Requires: ambari-server
 AutoProv: no
 AutoReqProv: no
 %description crh-Security
@@ -111,6 +115,7 @@ Redoop Ambari CRH Cluster Security Mpack
 %package crh-TS
 Summary: CRH Time Series Mpack
 Group: Development/Libraries
+Requires: ambari-server
 AutoProv: no
 AutoReqProv: no
 %description crh-TS
@@ -128,10 +133,13 @@ Redoop Ambari CRH Time Series Mpack
 %attr(644,root,root) /var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz \
 %post %1 \
 ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz --verbose \
-ambari-server restart
+ambari-server restart \
+%postun %1 \
+rm -rf /var/lib/ambari-server/resources/mpacks/cache/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz \
+rm -rf /var/lib/ambari-server/resources/mpacks/%1-mpack-1.0.0.0-SNAPSHOT
 
 %service_macro crh-DW
 %service_macro crh-BI
-%service_macro crh-SPARK
+%service_macro crh-Spark
 %service_macro crh-Security
 %service_macro crh-TS
