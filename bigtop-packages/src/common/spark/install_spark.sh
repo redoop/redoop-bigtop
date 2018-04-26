@@ -27,7 +27,7 @@ usage: $0 <options>
 
   Optional options:
      --doc-dir=DIR               path to install docs into [/usr/share/doc/spark]
-     --lib-dir=DIR               path to install Spark home [$CRH_DIR/spark]
+     --lib-dir=DIR               path to install Spark home [/usr/lib/spark]
      --installed-lib-dir=DIR     path where lib-dir will end up on target system
      --bin-dir=DIR               path to install bins [/usr/bin]
      ... [ see source for more similar options ]
@@ -99,8 +99,8 @@ fi
 DIST_DIR=${BUILD_DIR}/dist
 MAN_DIR=${MAN_DIR:-/usr/share/man/man1}
 DOC_DIR=${DOC_DIR:-/usr/share/doc/spark}
-LIB_DIR=${LIB_DIR:-$CRH_DIR/spark}
-INSTALLED_LIB_DIR=${INSTALLED_LIB_DIR:-$CRH_DIR/spark}
+LIB_DIR=${LIB_DIR:-${CRH_DIR}/spark}
+INSTALLED_LIB_DIR=${INSTALLED_LIB_DIR:-${CRH_DIR}/spark}
 BIN_DIR=${BIN_DIR:-/usr/bin}
 CONF_DIR=${CONF_DIR:-/etc/spark/conf.dist}
 PYSPARK_PYTHON=${PYSPARK_PYTHON:-python}
@@ -108,6 +108,7 @@ PYSPARK_PYTHON=${PYSPARK_PYTHON:-python}
 install -d -m 0755 $PREFIX/$LIB_DIR
 install -d -m 0755 $PREFIX/$LIB_DIR/external/lib
 install -d -m 0755 $PREFIX/$LIB_DIR/yarn/lib
+install -d -m 0755 $PREFIX/$LIB_DIR/../hadoop-yarn/lib
 install -d -m 0755 $PREFIX/$CONF_DIR
 install -d -m 0755 $PREFIX/$DOC_DIR
 
@@ -189,6 +190,14 @@ ln -s ../../jars/datanucleus-api-jdo*.jar datanucleus-api-jdo.jar
 ln -s ../../jars/datanucleus-core*.jar datanucleus-core.jar
 ln -s ../../jars/datanucleus-rdbms*.jar datanucleus-rdbms.jar
 popd
+# For YARN
+pushd $PREFIX/$LIB_DIR/../hadoop-yarn/lib
+ln -s ../../spark/yarn/spark-*-yarn-shuffle.jar spark-yarn-shuffle.jar
+ln -s ../../spark/jars/datanucleus-api-jdo*.jar datanucleus-api-jdo.jar
+ln -s ../../spark/jars/datanucleus-core*.jar datanucleus-core.jar
+ln -s ../../spark/jars/datanucleus-rdbms*.jar datanucleus-rdbms.jar
+popd
+
 pushd $PREFIX/$LIB_DIR/external/lib
 for j in $(ls *.jar); do
   ln -s $j $(echo $j | sed -n 's/\(.*\)\(_.\+\)\(.jar\)/\1\3/p')

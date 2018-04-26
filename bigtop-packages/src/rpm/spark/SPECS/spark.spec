@@ -12,7 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 %define crh_dir /usr/%{crh_tag}/%{crh_version_with_bn}
+%define distroselect crh-select
 %define spark_name spark
 %define lib_spark %{crh_dir}/%{spark_name}
 %define var_lib_spark /var/lib/%{spark_name}
@@ -81,73 +83,73 @@ written in Scala, a high-level language for the JVM, and exposes a clean
 language-integrated syntax that makes it easy to write parallel jobs.
 Spark runs on top of the Apache Mesos cluster manager.
 
-%package -n %{name}-master
+%package master
 Summary: Server for Spark master
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: spark%{crh_version_as_name} = %{version}-%{release}
 
-%description -n %{name}-master
+%description master
 Server for Spark master
 
-%package -n %{name}-worker
+%package worker
 Summary: Server for Spark worker
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: spark%{crh_version_as_name} = %{version}-%{release}
 
-%description -n %{name}-worker
+%description worker
 Server for Spark worker
 
-%package -n %{name}-python
+%package python
 Summary: Python client for Spark
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}, python
+Requires: spark%{crh_version_as_name} = %{version}-%{release}, python
 
-%description -n %{name}-python
+%description python
 Includes PySpark, an interactive Python shell for Spark, and related libraries
 
-%package -n %{name}-history-server
+%package history-server
 Summary: History server for Apache Spark
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: spark%{crh_version_as_name} = %{version}-%{release}
 
-%description -n %{name}-history-server
+%description history-server
 History server for Apache Spark
 
-%package -n %{name}-thriftserver
+%package thriftserver
 Summary: Thrift server for Spark SQL
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: spark%{crh_version_as_name} = %{version}-%{release}
 
-%description -n %{name}-thriftserver
+%description thriftserver
 Thrift server for Spark SQL
 
-%package -n %{name}-datanucleus
+%package datanucleus
 Summary: DataNucleus libraries for Apache Spark
 Group: Development/Libraries
 
-%description -n %{name}-datanucleus
+%description datanucleus
 DataNucleus libraries used by Spark SQL with Hive Support
 
-%package -n %{name}-external
+%package external
 Summary: External libraries for Apache Spark
 Group: Development/Libraries
 
-%description -n %{name}-external
+%description external
 External libraries built for Apache Spark but not included in the main
 distribution (e.g., external streaming libraries)
 
-%package -n %{name}-yarn-shuffle
+%package yarn-shuffle
 Summary: Spark YARN Shuffle Service
 Group: Development/Libraries
 
-%description -n %{name}-yarn-shuffle
+%description yarn-shuffle
 Spark YARN Shuffle Service
 
-%package -n %{name}-sparkr
+%package sparkr
 Summary: R package for Apache Spark
 Group: Development/Libraries
 
-%description -n %{name}-sparkr
+%description sparkr
 SparkR is an R package that provides a light-weight frontend to use Apache Spark from R.
 
 %prep
@@ -160,7 +162,8 @@ bash $RPM_SOURCE_DIR/do-component-build
 %__rm -rf $RPM_BUILD_ROOT
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{initd_dir}/
 
-sed -i -e "s,{CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/* 
+# set crh_dir value 
+sed -i -e "s,{SED_CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/*
 
 env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} SPARK_VERSION=%{spark_base_version} bash $RPM_SOURCE_DIR/install_spark.sh \
           --build-dir=`pwd`         \
@@ -168,27 +171,20 @@ env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} SPARK_VERSION=%{spark_
           --prefix=$RPM_BUILD_ROOT  \
           --doc-dir=%{doc_spark}
 
-#%__rm -f $RPM_BUILD_ROOT/%{lib_spark}/jars/hadoop-*.jar
+%__rm -f $RPM_BUILD_ROOT/%{lib_spark}/jars/hadoop-*.jar
 
 for service in %{spark_services}
 do
     # Install init script
-    init_file=$RPM_BUILD_ROOT/%{initd_dir}/%{name}-${service}
+    init_file=$RPM_BUILD_ROOT/%{initd_dir}/%{spark_name}-${service}
     bash $RPM_SOURCE_DIR/init.d.tmpl $RPM_SOURCE_DIR/spark-${service}.svc rpm $init_file
 done
 
 %pre
 getent group spark >/dev/null || groupadd -r spark
-getent passwd spark >/dev/null || useradd -c "Spark" -s /sbin/bash -g spark -r -d %{var_lib_spark} spark 2> /dev/null || :
+getent passwd spark >/dev/null || useradd -c "Spark" -s /sbin/nologin -g spark -r -d %{var_lib_spark} spark 2> /dev/null || :
 
 %post
-
-if [ !  -e "/etc/spark/conf" ]; then
-       rm -f /etc/spark/conf
-       mkdir -p /etc/spark/conf
-       cp -rp /etc/spark/conf.dist/* /etc/spark/conf
-fi 
-
 %{alternatives_cmd} --install %{config_spark} %{spark_name}-conf %{config_spark}.dist 30
 
 %preun
@@ -234,48 +230,50 @@ done
 %exclude %{lib_spark}/bin/sparkR
 %exclude %{bin}/sparkR
 
-%files -n %{name}-python
+%files python
 %defattr(-,root,root,755)
 %attr(0755,root,root) %{bin}/pyspark
 %attr(0755,root,root) %{lib_spark}/bin/pyspark
 %{lib_spark}/python
 
-%files -n %{name}-datanucleus
+%files datanucleus
 %defattr(-,root,root,755)
 %{lib_spark}/jars/datanucleus-*.jar
 %{lib_spark}/yarn/lib/datanucleus-*.jar
+%{lib_spark}/../hadoop-yarn/lib/datanucleus-*.jar
 
-%files -n %{name}-external
+%files external
 %defattr(-,root,root,755)
 %{lib_spark}/external
 
-%files -n %{name}-yarn-shuffle
+%files yarn-shuffle
 %defattr(-,root,root,755)
 %{lib_spark}/yarn/spark-*-yarn-shuffle.jar
 %{lib_spark}/yarn/lib/spark-yarn-shuffle.jar
+%{lib_spark}/../hadoop-yarn/lib/spark-yarn-shuffle.jar
 
-%files -n %{name}-sparkr
+%files sparkr
 %defattr(-,root,root,755)
 %{lib_spark}/R
 %{lib_spark}/bin/sparkR
 %{bin}/sparkR
 
 %define service_macro() \
-%files -n %1 \
-%attr(0755,root,root)/%{initd_dir}/%1 \
-%post -n %1 \
-chkconfig --add %1 \
+%files %1 \
+%attr(0755,root,root)/%{initd_dir}/spark-%1 \
+%post %1 \
+chkconfig --add spark-%1 \
 \
-%preun -n %1 \
+%preun %1 \
 if [ $1 = 0 ] ; then \
-        service %1 stop > /dev/null 2>&1 \
-        chkconfig --del %1 \
+        service spark-%1 stop > /dev/null 2>&1 \
+        chkconfig --del spark-%1 \
 fi \
-%postun -n %1 \
+%postun %1 \
 if [ $1 -ge 1 ]; then \
-        service %1 condrestart >/dev/null 2>&1 \
+        service spark-%1 condrestart >/dev/null 2>&1 \
 fi
-%service_macro %{name}-master
-%service_macro %{name}-worker
-%service_macro %{name}-history-server
-%service_macro %{name}-thriftserver
+%service_macro master
+%service_macro worker
+%service_macro history-server
+%service_macro thriftserver

@@ -16,7 +16,7 @@
 TYPE="thriftserver"
 DAEMON="spark-${TYPE}"
 DESC="Spark ${TYPE}"
-EXEC_PATH="{CRH_DIR}/spark/bin/spark-submit"
+EXEC_PATH="{SED_CRH_DIR}/spark/bin/spark-submit"
 SVC_USER="spark"
 WORKING_DIR="/var/lib/spark"
 DAEMON_FLAGS=""
