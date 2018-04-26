@@ -33,19 +33,19 @@ def setup_livy(env, type, upgrade_type = None, action = None):
   )
   if type == 'server' and action == 'config':
     params.HdfsResource(params.livy_hdfs_user_dir,
-                       type="directory",
-                       action="create_on_execute",
-                       owner=params.livy_user,
-                       mode=0775
+                        type="directory",
+                        action="create_on_execute",
+                        owner=params.livy_user,
+                        mode=0775
     )
     params.HdfsResource(None, action="execute")
 
     params.HdfsResource(params.livy_recovery_dir,
-                       type="directory",
-                       action="create_on_execute",
-                       owner=params.livy_user,
-                       mode=0700
-    )
+                        type="directory",
+                        action="create_on_execute",
+                        owner=params.livy_user,
+                        mode=0700
+       )
     params.HdfsResource(None, action="execute")
 
   # create livy-env.sh in etc/conf dir
@@ -54,14 +54,14 @@ def setup_livy(env, type, upgrade_type = None, action = None):
        group=params.livy_group,
        content=InlineTemplate(params.livy_env_sh),
        mode=0644,
-       )
+  )
 
   # create livy.conf in etc/conf dir
   PropertiesFile(format("{livy_conf}/livy.conf"),
-    properties = params.config['configurations']['livy-conf'],
-    key_value_delimiter = " ",
-    owner=params.livy_user,
-    group=params.livy_group,
+                properties = params.config['configurations']['livy-conf'],
+                key_value_delimiter = " ",
+                owner=params.livy_user,
+                group=params.livy_group,
   )
 
   # create log4j.properties in etc/conf dir
@@ -78,10 +78,11 @@ def setup_livy(env, type, upgrade_type = None, action = None):
        group=params.livy_group,
        content=params.livy_spark_blacklist_properties,
        mode=0644,
-       )
+  )
 
   Directory(params.livy_logs_dir,
-       owner=params.livy_user,
-       group=params.livy_group,
-       mode=0755,
+            owner=params.livy_user,
+            group=params.livy_group,
+            mode=0755,
   )
+

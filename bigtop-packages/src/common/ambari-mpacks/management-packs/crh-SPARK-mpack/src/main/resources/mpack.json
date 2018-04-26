@@ -1,10 +1,10 @@
 {
   "type" : "full-release",
-  "name" : "crh-SPARK-mpack",
+  "name" : "crh-Spark-mpack",
   "version": "${project.version}",
   "hash": "${buildNumber}",
   "branch": "${scmBranch}",
-  "description" : "CRH Time Series Management Pack",
+  "description" : "CRH Spark Management Pack",
   "prerequisites": {
     "min-ambari-version" : "${minAmbariVersion}",
     "max-ambari-version" : "${maxAmbariVersion}"

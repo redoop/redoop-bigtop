@@ -22,7 +22,6 @@ import sys
 import os
 
 from resource_management.libraries.script.script import Script
-from resource_management.libraries.functions import conf_select
 from resource_management.libraries.functions import stack_select
 from resource_management.libraries.functions.copy_tarball import copy_to_hdfs
 from resource_management.libraries.functions.check_process_status import check_process_status
@@ -42,7 +41,7 @@ class JobHistoryServer(Script):
     
     self.install_packages(env)
     
-  def configure(self, env, upgrade_type=None):
+  def configure(self, env, upgrade_type=None, config_dir=None):
     import params
     env.set_params(params)
     
@@ -68,19 +67,15 @@ class JobHistoryServer(Script):
     check_process_status(status_params.spark_history_server_pid_file)
     
 
-  def get_component_name(self):
-    return "spark-historyserver"
-
   def pre_upgrade_restart(self, env, upgrade_type=None):
     import params
 
     env.set_params(params)
     if params.version and check_stack_feature(StackFeature.ROLLING_UPGRADE, params.version):
       Logger.info("Executing Spark Job History Server Stack Upgrade pre-restart")
-      conf_select.select(params.stack_name, "spark", params.version)
-      stack_select.select("spark-historyserver", params.version)
+      stack_select.select_packages(params.version)
 
-      # Spark 1.3.1.2.3, and higher, which was included in HDP 2.3, does not have a dependency on Tez, so it does not
+      # Spark 1.3.1.2.3, and higher, which was included in CRH 5.1, does not have a dependency on Tez, so it does not
       # need to copy the tarball, otherwise, copy it.
       if params.version and check_stack_feature(StackFeature.TEZ_FOR_SPARK, params.version):
         resource_created = copy_to_hdfs(

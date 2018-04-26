@@ -74,7 +74,7 @@ def execute(configurations={}, parameters={}, host_name=None):
     if configurations is None:
         return ('UNKNOWN', ['There were no configurations supplied to the script.'])
 
-    LIVY_PORT_DEFAULT = 8998
+    LIVY_PORT_DEFAULT = 8999
 
     port = LIVY_PORT_DEFAULT
     if LIVY_SERVER_PORT_KEY in configurations:
