@@ -124,6 +124,9 @@ SPARK_NICENESS=0
 export HADOOP_HOME=${HADOOP_HOME:-{{hadoop_home}}}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-{{hadoop_conf_dir}}}
 
+# Include Hadoop's package jars
+export SPARK_DIST_CLASSPATH=$(${HADOOP_HOME}/bin/hadoop classpath)
+
 # The java implementation to use.
 export JAVA_HOME={{java_home}}
 
