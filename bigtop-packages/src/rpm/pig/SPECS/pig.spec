@@ -86,6 +86,7 @@ Source2: install_pig.sh
 Source3: pig.1
 Source4: bigtop.bom
 Requires: hadoop%{crh_version_as_name}-client, zookeeper%{crh_version_as_name}, bigtop-utils >= 0.7
+Requires: ambari-mpacks%{crh_version_as_name}-crh-DW
 
 %description 
 Pig is a platform for analyzing large data sets that consists of a high-level language 

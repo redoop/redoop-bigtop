@@ -93,7 +93,7 @@ Source0: %{component_name}-%{atlas_base_version}.tar.gz
 Source1: do-component-build
 Source2: install_atlas.sh
 Requires: zookeeper%{crh_version_as_name},hadoop%{crh_version_as_name},hbase%{crh_version_as_name}
-#Requires: ranger%{crh_version_as_name}-atlas-plugin
+Requires: ambari-mpacks%{crh_version_as_name}-crh-DW
 
 
 %description

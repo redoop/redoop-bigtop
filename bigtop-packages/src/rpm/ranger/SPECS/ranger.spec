@@ -100,7 +100,7 @@ Source0: %{component_name}-%{ranger_base_version}.tar.gz
 Source1: do-component-build
 Source2: install_%{component_name}.sh
 Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service
-Requires: psmisc,ambari-mpacks%{crh_version_as_name}-crh-security
+Requires: psmisc
 # Sadly, Sun/Oracle JDK in RPM form doesn't provide libjvm.so, which means we have
 # to set AutoReq to no in order to minimize confusion. Not ideal, but seems to work.
 # I wish there was a way to disable just one auto dependency (libjvm.so)
@@ -131,6 +131,7 @@ Summary: Web Interface for Ranger
 Group: System/Daemons
 Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service
 Requires: psmisc
+Requires: ambari-mpacks%{crh_version_as_name}-crh-Security
 # Sadly, Sun/Oracle JDK in RPM form doesn't provide libjvm.so, which means we have
 # to set AutoReq to no in order to minimize confusion. Not ideal, but seems to work.
 # I wish there was a way to disable just one auto dependency (libjvm.so)

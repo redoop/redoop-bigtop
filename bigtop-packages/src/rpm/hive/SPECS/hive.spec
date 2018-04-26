@@ -87,6 +87,7 @@ Source17: hive-webhcat-server.default
 Source18: bigtop.bom
 #BIGTOP_PATCH_FILES
 Requires: hadoop%{crh_version_as_name}-client, bigtop-utils >= 0.7, zookeeper%{crh_version_as_name}, hive%{crh_version_as_name}-jdbc = %{version}-%{release}
+Requires: ambari-mpacks%{crh_version_as_name}-crh-DW
 Conflicts: hadoop%{crh_version_as_name}-hive
 Obsoletes: %{hive_name}-webinterface
 

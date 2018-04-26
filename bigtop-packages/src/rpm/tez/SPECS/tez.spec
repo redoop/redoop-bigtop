@@ -66,6 +66,7 @@ Source5: bigtop.bom
 Source6: init.d.tmpl
 BuildArch: noarch
 Requires: hadoop%{crh_version_as_name} hadoop%{crh_version_as_name}-hdfs hadoop%{crh_version_as_name}-yarn hadoop%{crh_version_as_name}-mapreduce
+Requires: ambari-mpacks%{crh_version_as_name}-crh-DW
 
 Patch1: patch1-bower-allow-root.diff
 
