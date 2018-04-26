@@ -86,7 +86,7 @@ Spark runs on top of the Apache Mesos cluster manager.
 %package master
 Summary: Server for Spark master
 Group: Development/Libraries
-Requires: spark%{crh_version_as_name} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description master
 Server for Spark master
@@ -94,7 +94,7 @@ Server for Spark master
 %package worker
 Summary: Server for Spark worker
 Group: Development/Libraries
-Requires: spark%{crh_version_as_name} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description worker
 Server for Spark worker
@@ -102,7 +102,7 @@ Server for Spark worker
 %package python
 Summary: Python client for Spark
 Group: Development/Libraries
-Requires: spark%{crh_version_as_name} = %{version}-%{release}, python
+Requires: %{name} = %{version}-%{release}, python
 
 %description python
 Includes PySpark, an interactive Python shell for Spark, and related libraries
@@ -110,7 +110,7 @@ Includes PySpark, an interactive Python shell for Spark, and related libraries
 %package history-server
 Summary: History server for Apache Spark
 Group: Development/Libraries
-Requires: spark%{crh_version_as_name} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description history-server
 History server for Apache Spark
@@ -118,7 +118,7 @@ History server for Apache Spark
 %package thriftserver
 Summary: Thrift server for Spark SQL
 Group: Development/Libraries
-Requires: spark%{crh_version_as_name} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 
 %description thriftserver
 Thrift server for Spark SQL
