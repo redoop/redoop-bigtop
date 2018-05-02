@@ -32,5 +32,10 @@ mvn ${HIVE_MAVEN_OPTS} clean install -Pdist "$@"
 mkdir -p build/dist
 tar -C build/dist --strip-components=1 -xzf packaging/target/apache-hive-${HIVE_VERSION}-bin.tar.gz
 
+pushd build/dist/lib
+rm icu4j*.jar
+wget http://central.maven.org/maven2/com/ibm/icu/icu4j/54.1.1/icu4j-54.1.1.jar
+popd
+
 # HIVE-13177 
 sed -i "s#jdbcStandaloneJarPath=\`ls \${HIVE_LIB}/hive-jdbc-\*-standalone.jar\`#jdbcStandaloneJarPath=#" build/dist/bin/ext/beeline.sh
