@@ -23,8 +23,7 @@ HIVE_MAVEN_OPTS=" -Dhbase.version=$HBASE_VERSION \
 -Dhadoop.version=$HADOOP_VERSION \
 -DskipTests \
 -Dtez.version=${TEZ_VERSION} \
--Dspark.version=${SPARK_VERSION} \
--Ddruid.version=0.10.1
+-Dspark.version=${SPARK_VERSION}
 "
 
 export MAVEN_OPTS="-Xmx1500m -Xms1500m"
@@ -32,6 +31,11 @@ mvn ${HIVE_MAVEN_OPTS} clean install -Pdist "$@"
 
 mkdir -p build/dist
 tar -C build/dist --strip-components=1 -xzf packaging/target/apache-hive-${HIVE_VERSION}-bin.tar.gz
+
+pushd build/dist/lib
+rm icu4j*.jar
+wget http://central.maven.org/maven2/com/ibm/icu/icu4j/54.1.1/icu4j-54.1.1.jar
+popd
 
 # HIVE-13177 
 sed -i "s#jdbcStandaloneJarPath=\`ls \${HIVE_LIB}/hive-jdbc-\*-standalone.jar\`#jdbcStandaloneJarPath=#" build/dist/bin/ext/beeline.sh
