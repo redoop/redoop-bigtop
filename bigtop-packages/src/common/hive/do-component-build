@@ -23,7 +23,8 @@ HIVE_MAVEN_OPTS=" -Dhbase.version=$HBASE_VERSION \
 -Dhadoop.version=$HADOOP_VERSION \
 -DskipTests \
 -Dtez.version=${TEZ_VERSION} \
--Dspark.version=${SPARK_VERSION}
+-Dspark.version=${SPARK_VERSION} \
+-Ddruid.version=0.12.0
 "
 
 export MAVEN_OPTS="-Xmx1500m -Xms1500m"
