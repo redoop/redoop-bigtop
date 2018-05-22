@@ -29,6 +29,7 @@ RANGER_MAVEN_OPTS=" -Dhbase.version=$HBASE_VERSION \
 -Dstorm.version=${STORM_VERSION} \
 -DskipTests \
 -Drat.skip
+"
 
 mvn ${RANGER_MAVEN_OPTS} clean compile package assembly:assembly install "$@"
 
