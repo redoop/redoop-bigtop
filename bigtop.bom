@@ -44,7 +44,7 @@
      APACHE_MIRROR = "http://apache.osuosl.org"
      APACHE_ARCHIVE = "https://archive.apache.org/dist"
    }
-   git { // *optional* This is a global setting to access protected git repositories, 
+   git { // *optional* This is a global setting to access protected git repositories,
          //            can be specified per component as well
      user = "john_doe"
      token = "john's access token"
@@ -87,7 +87,7 @@ bigtop {
     APACHE_MIRROR = "http://compile.redoop.org/redoop/bigtop"
     APACHE_ARCHIVE = "http://compile.redoop.org/redoop/archive/dist"
   }
-  git { 
+  git {
     user = "redoop-crh"
     token = "crh@redoop.org"
    }
@@ -258,7 +258,7 @@ bigtop {
                 archive = "${apache.APACHE_ARCHIVE}/${download_path}" }
     }
 
-   
+
     'mahout' {
       name    = 'mahout'
       relNotes = 'Apache Mahout'
@@ -493,8 +493,8 @@ bigtop {
     'ranger' {
       name    = 'ranger'
       relNotes = 'Apache Ranger'
-      version { base = '0.7.1'; pkg = base; release = 1 }
-      tarball { source      = "$name-${version.base}-src.tar.gz"
+      version { base = '1.0.0'; pkg = base; release = 1 }
+      tarball { source      = "apache-$name-${version.base}.tar.gz"
                 destination = "$name-${version.base}.tar.gz" }
       url     { download_path = "/$name/$name-${version.base}/"
                 site = "${apache.APACHE_MIRROR}/${download_path}"
