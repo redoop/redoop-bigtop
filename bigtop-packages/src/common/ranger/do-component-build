@@ -24,7 +24,6 @@ echo "-------------- Ranger-do-component-build-started -----------"
 RANGER_MAVEN_OPTS=" -Dhbase.version=$HBASE_VERSION \
 -Dhadoop.version=$HADOOP_VERSION \
 -Dhive.version=$HIVE_VERSION \
--Dsqoop.version=${SQOOP_VERSION} \
 -Dstorm.version=${STORM_VERSION} \
 -DskipTests \
 -Drat.skip
