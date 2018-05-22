@@ -123,11 +123,11 @@ Requires: sh-utils, redhat-lsb
 Requires: chkconfig, xinetd-simple-services, zlib, initscripts
 %endif
 
-%description 
-Ranger is a framework to secure hadoop data 
+%description
+Ranger is a framework to secure hadoop data
 
 %package admin
-Summary: Web Interface for Ranger 
+Summary: Web Interface for Ranger
 Group: System/Daemons
 Requires: coreutils, /usr/sbin/useradd, /usr/sbin/usermod, /sbin/chkconfig, /sbin/service
 Requires: psmisc
@@ -300,7 +300,7 @@ Group: System/Daemons
 Ranger ATLAS plugnin component runs within namenode to provoide enterprise security using ranger framework
 
 %prep
-%setup -q -n %{component_name}-%{ranger_base_version}
+%setup -q -n apache-%{component_name}-%{ranger_base_version}
 
 %build
 bash %{SOURCE1}
