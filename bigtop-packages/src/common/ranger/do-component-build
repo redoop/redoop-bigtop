@@ -21,7 +21,16 @@ echo "-------------- Ranger-do-component-build-started -----------"
 . `dirname $0`/bigtop.bom
 
 
-mvn clean compile package assembly:assembly install -DskipTests -Drat.skip "$@"
+RANGER_MAVEN_OPTS=" -Dhbase.version=$HBASE_VERSION \
+-Dhadoop.version=$HADOOP_VERSION \
+-Dhive.version=$HIVE_VERSION \
+-Dkafka.version=${KAFKA_VERSION} \
+-Dsqoop.version=${SQOOP_VERSION} \
+-Dstorm.version=${STORM_VERSION} \
+-DskipTests \
+-Drat.skip
+
+mvn ${RANGER_MAVEN_OPTS} clean compile package assembly:assembly install "$@"
 
 echo;echo
 mkdir build
@@ -30,4 +39,3 @@ do
 	tar -C build -xf ${f}
 done
 echo "-------------- Ranger-do-component-build-completed --------------"
-
