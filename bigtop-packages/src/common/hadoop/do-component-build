@@ -61,6 +61,28 @@ elif [ $HOSTTYPE = "aarch64" ] ; then
         #cleanup
         rm -rf ${LEVELDBJNI_HOME}
         rm -rf ${LEVELDB_HOME}
+elif [ $HOSTTYPE = "mips64el" ] ; then
+        #download the ARM64 version of leveldb
+        git clone https://github.com/Xingwd/leveldb.git
+        git clone https://github.com/Xingwd/leveldbjni.git
+        export SNAPPY_HOME=/usr/lib
+        export LEVELDB_HOME=`cd leveldb; pwd`
+        export LEVELDBJNI_HOME=`cd leveldbjni; pwd`
+        cd ${LEVELDB_HOME}
+        export LIBRARY_PATH=${SNAPPY_HOME}
+        export C_INCLUDE_PATH=${LIBRARY_PATH}
+        export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
+        git apply ../leveldbjni/leveldb.patch
+        make
+        cp out-static/libleveldb.a .
+        #Now use maven to build and update the local maven repository with aarch64 version of
+        #leveldbjni.
+        cd ${LEVELDBJNI_HOME}
+        mvn clean install -DskipTests -P download -Plinux64,all
+        cd ..
+        #cleanup
+        rm -rf ${LEVELDBJNI_HOME}
+        rm -rf ${LEVELDB_HOME}
 fi
 ## BIGTOP-2288
 
