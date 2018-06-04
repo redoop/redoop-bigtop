@@ -15,7 +15,7 @@
 
 DAEMON="hive-server2"
 DESC="Hive Server2"
-EXEC_PATH="{SED_CRH_DIR}/hive/bin/hive"
+EXEC_PATH="{CRH_DIR}/hive/bin/hive"
 SVC_USER="hive"
 WORKING_DIR="/var/lib/hive"
 DAEMON_FLAGS=""

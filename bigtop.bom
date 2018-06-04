@@ -180,6 +180,16 @@ bigtop {
     'hive' {
       name    = 'hive'
       relNotes = 'Apache Hive'
+      version { base = '1.2.1'; pkg = base; release = 1 }
+      tarball { destination = "apache-${name}-${version.base}-src.tar.gz"
+                source      = destination }
+      url     { download_path = "/$name/${version.base}/"
+                site = "${apache.APACHE_MIRROR}/${download_path}"
+                archive = "${apache.APACHE_ARCHIVE}/${download_path}" }
+    }
+    'hive23' {
+      name    = 'hive'
+      relNotes = 'Apache Hive'
       version { base = '2.3.3'; pkg = base; release = 1 }
       tarball { destination = "apache-${name}-${version.base}-src.tar.gz"
                 source      = destination }
