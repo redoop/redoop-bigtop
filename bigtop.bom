@@ -188,7 +188,7 @@ bigtop {
                 archive = "${apache.APACHE_ARCHIVE}/${download_path}" }
     }
     'hive23' {
-      name    = 'hive'
+      name    = 'hive23'
       relNotes = 'Apache Hive'
       version { base = '2.3.3'; pkg = base; release = 1 }
       tarball { destination = "apache-${name}-${version.base}-src.tar.gz"
