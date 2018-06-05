@@ -41,7 +41,7 @@
 
 <property>
   <name>hive.hwi.war.file</name>
-  <value>{CRH_DIR}/hive/lib/hive-hwi-@VERSION@.war</value>
+  <value>{SED_CRH_DIR}/hive/lib/hive-hwi-@VERSION@.war</value>
   <description>This is the WAR file with the jsp content for Hive Web Interface</description>
 </property>
 

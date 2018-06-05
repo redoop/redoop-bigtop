@@ -12,12 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-DAEMON="hive-hcatalog-server"
-DESC="HCatalog server"
-EXEC_PATH="{CRH_DIR}/hive-hcatalog/sbin/hcat_server.sh"
+DAEMON="hive-webhcat-server"
+DESC="WEBHCat server"
+EXEC_PATH="{SED_CRH_DIR}/hive-hcatalog/sbin/webhcat_server.sh"
 SVC_USER="hive"
 DAEMON_FLAGS=""
-CONF_DIR="/etc/hive-hcatalog/conf"
+CONF_DIR="/etc/hive-webhcat/conf"
 # FIXME: HCATALOG-636
-PIDFILE="/var/lib/hive-hcatalog/hcat.pid"
+PIDFILE="/var/lib/hive-hcatalog/webhcat.pid"
 WORKING_DIR="/var/lib/hive-hcatalog"
+

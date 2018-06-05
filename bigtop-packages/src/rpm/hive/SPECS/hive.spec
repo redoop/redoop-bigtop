@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 %define crh_dir /usr/%{crh_tag}/%{crh_version_with_bn}
-%define distroselect crh-select
 %define hive_name hive
 %define hadoop_username hadoop
 %define etc_hive /etc/%{hive_name}
@@ -87,8 +86,7 @@ Source17: hive-webhcat-server.default
 Source18: bigtop.bom
 #BIGTOP_PATCH_FILES
 Requires: hadoop%{crh_version_as_name}-client, bigtop-utils >= 0.7, zookeeper%{crh_version_as_name}, hive%{crh_version_as_name}-jdbc = %{version}-%{release}
-Requires: ambari-mpacks%{crh_version_as_name}-crh-DW
-Conflicts: hadoop%{crh_version_as_name}-hive
+Conflicts: hadoop-hive
 Obsoletes: %{hive_name}-webinterface
 
 %description 
@@ -118,6 +116,7 @@ Requires: /lib/lsb/init-functions
 
 %description server2
 This optional package hosts a Thrift server for Hive clients across a network to use with improved concurrency support.
+
 %package metastore
 Summary: Shared metadata repository for Hive.
 Group: System/Daemons
@@ -139,7 +138,7 @@ This optional package hosts a metadata server for Hive clients across a network 
 %package hbase
 Summary: Provides integration between Apache HBase and Apache Hive
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}, hbase%{crh_version_as_name}
 
 %description hbase
 This optional package provides integration between Apache HBase and Apache Hive
@@ -245,19 +244,16 @@ bash %{SOURCE1}
 %install
 %__rm -rf $RPM_BUILD_ROOT
 
-
 # set crh_dir value 
-sed -i -e "s,{SED_CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/*
-
+sed -i -e "s,{CRH_DIR},%{crh_dir}," $RPM_SOURCE_DIR/*
 
 cp $RPM_SOURCE_DIR/hive.1 .
 cp $RPM_SOURCE_DIR/hive-hcatalog.1 .
 cp $RPM_SOURCE_DIR/hive-site.xml .
-env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} /bin/bash %{SOURCE2} \
+env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} HIVE_VERSION=%{hive_base_version} /bin/bash %{SOURCE2} \
   --prefix=$RPM_BUILD_ROOT \
   --build-dir=%{hive_dist} \
-  --doc-dir=$RPM_BUILD_ROOT/%{doc_hive} \
-  --hive-version=%{hive_base_version}
+  --doc-dir=$RPM_BUILD_ROOT/%{doc_hive}
 
 %__install -d -m 0755 $RPM_BUILD_ROOT/%{initd_dir}/
 %__install -d -m 0755 $RPM_BUILD_ROOT/etc/default/
@@ -271,9 +267,8 @@ env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} /bin/bash %{SOURCE2} \
 
 # We need to get rid of jars that happen to be shipped in other Bigtop packages
 %__rm -f $RPM_BUILD_ROOT/%{usr_lib_hive}/lib/hbase-*.jar $RPM_BUILD_ROOT/%{usr_lib_hive}/lib/zookeeper-*.jar
-%__ln_s  %{crh_dir}/zookeeper/zookeeper.jar  $RPM_BUILD_ROOT/%{usr_lib_hive}/lib/
-%__ln_s  %{crh_dir}/hbase/hbase-common.jar %{crh_dir}/hbase/hbase-client.jar %{crh_dir}/hbase/hbase-hadoop-compat.jar %{crh_dir}/hbase/hbase-hadoop2-compat.jar $RPM_BUILD_ROOT/%{usr_lib_hive}/lib/
-%__ln_s  %{crh_dir}/hbase/hbase-prefix-tree.jar %{crh_dir}/hbase/hbase-procedure.jar %{crh_dir}/hbase/hbase-protocol.jar %{crh_dir}/hbase/hbase-server.jar $RPM_BUILD_ROOT/%{usr_lib_hive}/lib/
+%__ln_s  /usr/lib/zookeeper/zookeeper.jar  $RPM_BUILD_ROOT/%{usr_lib_hive}/lib/
+%__ln_s  /usr/lib/hbase/hbase-common.jar /usr/lib/hbase/hbase-client.jar $RPM_BUILD_ROOT/%{usr_lib_hive}/lib/
 
 # Workaround for BIGTOP-583
 %__rm -f $RPM_BUILD_ROOT/%{usr_lib_hive}/lib/slf4j-log4j12-*.jar
@@ -287,20 +282,19 @@ done
 
 %pre
 getent group hive >/dev/null || groupadd -r hive
-getent passwd hive >/dev/null || useradd -c "Hive" -s /bin/bash -g hive -r -d %{var_lib_hive} hive 2> /dev/null || :
+getent passwd hive >/dev/null || useradd -c "Hive" -s /sbin/nologin -g hive -r -d %{var_lib_hive} hive 2> /dev/null || :
 
 # Manage configuration symlink
 %post
 
+if [ !  -e "/etc/hive/conf" ]; then
+     rm -f /etc/hive/conf
+     mkdir -p /etc/hive/conf
+     cp -rp /etc/hive/conf.dist/* /etc/hive/conf 
+fi
+
 # Install config alternatives
 %{alternatives_cmd} --install %{config_hive} %{hive_name}-conf %{etc_hive}/conf.dist 30
-
-/usr/bin/%{distroselect} --rpm-mode set hive-client %{crh_version_with_bn}
-/usr/bin/%{distroselect} --rpm-mode set hive-metastore %{crh_version_with_bn}
-/usr/bin/%{distroselect} --rpm-mode set hive-server2 %{crh_version_with_bn}
-/usr/bin/%{distroselect} --rpm-mode set hive-server2-hive2 %{crh_version_with_bn}
-/usr/bin/%{distroselect} --rpm-mode set hive-webhcat %{crh_version_with_bn}
-
 
 
 # Upgrade
@@ -319,11 +313,14 @@ fi
 
 
 %post hcatalog
+
+#ln -s %{crh_dir}/hive-hcatalog/share/hcatalog/hive-hcatalog-core-1.2.1.jar %{crh_dir}/hive-hcatalog/share/hcatalog/hive-hcatalog-core.jar 
 if [ !  -e "/etc/hive-hcatalog/conf" ]; then
      rm -f /etc/hive-hcatalog/conf
      mkdir -p /etc/hive-hcatalog/conf
      cp -rp /etc/hive-hcatalog/conf.dist/* /etc/hive-hcatalog/conf 
 fi
+
 %{alternatives_cmd} --install %{conf_hcatalog} hive-hcatalog-conf %{conf_hcatalog}.dist 30
 
 %preun hcatalog
@@ -332,11 +329,13 @@ if [ "$1" = 0 ]; then
 fi
 
 %post webhcat
+
 if [ !  -e "/etc/hive-webhcat/conf" ]; then
      rm -f /etc/hive-webhcat/conf
      mkdir -p /etc/hive-webhcat/conf
      cp -rp /etc/hive-webhcat/conf.dist/* /etc/hive-webhcat/conf 
 fi
+
 %{alternatives_cmd} --install %{conf_webhcat} hive-webhcat-conf %{conf_webhcat}.dist 30
 
 %preun webhcat
@@ -362,8 +361,18 @@ fi
 %doc %{doc_hive}
 %{man_dir}/man1/hive.1.*
 %exclude %dir %{usr_lib_hive}
-%exclude %dir %{usr_lib_hive}/jdbc
-%exclude %{usr_lib_hive}/jdbc/hive-jdbc-*.jar
+%exclude %dir %{usr_lib_hive}/lib
+%exclude %{usr_lib_hive}/lib/hive-jdbc-*.jar
+%exclude %{usr_lib_hive}/lib/hive-metastore-*.jar
+%exclude %{usr_lib_hive}/lib/hive-serde-*.jar
+%exclude %{usr_lib_hive}/lib/hive-exec-*.jar
+%exclude %{usr_lib_hive}/lib/libthrift-*.jar
+%exclude %{usr_lib_hive}/lib/hive-service-*.jar
+%exclude %{usr_lib_hive}/lib/libfb303-*.jar
+%exclude %{usr_lib_hive}/lib/log4j-*.jar
+%exclude %{usr_lib_hive}/lib/commons-logging-*.jar
+%exclude %{usr_lib_hive}/lib/hbase-*.jar
+%exclude %{usr_lib_hive}/lib/hive-hbase-handler*.jar
 
 %files hbase
 %defattr(-,root,root,755)
@@ -373,8 +382,16 @@ fi
 %files jdbc
 %defattr(-,root,root,755)
 %dir %{usr_lib_hive}
-%dir %{usr_lib_hive}/jdbc
-%{usr_lib_hive}/jdbc/hive-jdbc-*.jar
+%dir %{usr_lib_hive}/lib
+%{usr_lib_hive}/lib/hive-jdbc-*.jar
+%{usr_lib_hive}/lib/hive-metastore-*.jar
+%{usr_lib_hive}/lib/hive-serde-*.jar
+%{usr_lib_hive}/lib/hive-exec-*.jar
+%{usr_lib_hive}/lib/libthrift-*.jar
+%{usr_lib_hive}/lib/hive-service-*.jar
+%{usr_lib_hive}/lib/libfb303-*.jar
+%{usr_lib_hive}/lib/log4j-*.jar
+%{usr_lib_hive}/lib/commons-logging-*.jar
 
 %files hcatalog
 %defattr(-,root,root,755)

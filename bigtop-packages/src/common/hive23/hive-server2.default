@@ -12,12 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-DAEMON="hive-hcatalog-server"
-DESC="HCatalog server"
-EXEC_PATH="{CRH_DIR}/hive-hcatalog/sbin/hcat_server.sh"
-SVC_USER="hive"
-DAEMON_FLAGS=""
-CONF_DIR="/etc/hive-hcatalog/conf"
-# FIXME: HCATALOG-636
-PIDFILE="/var/lib/hive-hcatalog/hcat.pid"
-WORKING_DIR="/var/lib/hive-hcatalog"
+
+# The port for Hive server2 daemon to listen to.
+# Unfortunatelly, there is no way to specify the interfaces 
+# to which the daemon binds.
+#
+#PORT=

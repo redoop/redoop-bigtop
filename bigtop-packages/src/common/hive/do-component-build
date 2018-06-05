@@ -20,22 +20,20 @@ set -ex
 
 HIVE_MAVEN_OPTS=" -Dhbase.version=$HBASE_VERSION \
 -Dzookeeper.version=$ZOOKEEPER_VERSION \
--Dhadoop.version=$HADOOP_VERSION \
+-Dhadoop.mr.rev=23 \
+-Dhadoop.security.version=$HADOOP_VERSION \
+-Dhadoop-23.version=$HADOOP_VERSION \
+-Dhbase.hadoop2.version=$HBASE_VERSION \
+-Dmvn.hadoop.profile=hadoop23 \
 -DskipTests \
+-Dhbase.version.with.hadoop.version=$HBASE_VERSION \
 -Dtez.version=${TEZ_VERSION} \
--Dspark.version=${SPARK_VERSION}
+-Dspark.version=${SPARK1_VERSION}
 "
 
-export MAVEN_OPTS="-Xmx1500m -Xms1500m"
-mvn ${HIVE_MAVEN_OPTS} clean install -Pdist "$@"
+mvn versions:set -DnewVersion=${HIVE_VERSION}
+export MAVEN_OPTS="-Xmx1500m -Xms1500m -XX:MaxPermSize=256m"
+mvn ${HIVE_MAVEN_OPTS} clean install -Phadoop-2,dist "$@"
 
 mkdir -p build/dist
 tar -C build/dist --strip-components=1 -xzf packaging/target/apache-hive-${HIVE_VERSION}-bin.tar.gz
-
-pushd build/dist/lib
-rm icu4j*.jar
-wget http://central.maven.org/maven2/com/ibm/icu/icu4j/54.1.1/icu4j-54.1.1.jar
-popd
-
-# HIVE-13177 
-sed -i "s#jdbcStandaloneJarPath=\`ls \${HIVE_LIB}/hive-jdbc-\*-standalone.jar\`#jdbcStandaloneJarPath=#" build/dist/bin/ext/beeline.sh
