@@ -21,8 +21,31 @@
 -->
 <configuration supports_adding_forbidden="true">
   <property>
+    <name>hbase_log_dir</name>
+    <value>/var/log/hbase</value>
+    <display-name>HBase Log Dir Prefix</display-name>
+    <description>Log Directories for HBase.</description>
+    <value-attributes>
+      <type>directory</type>
+      <overridable>false</overridable>
+    </value-attributes>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <property>
+    <name>hbase_pid_dir</name>
+    <value>/var/run/hbase</value>
+    <display-name>HBase PID Dir</display-name>
+    <description>Pid Directory for HBase.</description>
+    <value-attributes>
+      <type>directory</type>
+      <overridable>false</overridable>
+      <editable-only-at-install>true</editable-only-at-install>
+    </value-attributes>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <property>
     <name>hbase_regionserver_xmn_max</name>
-    <value>4000</value>
+    <value>512</value>
     <description>
 Sets the upper bound on HBase RegionServers' young generation size.
 This value is used in case the young generation size (-Xmn) calculated based on the max heapsize (hbase_regionserver_heapsize)
@@ -32,8 +55,59 @@ and the -Xmn ratio (hbase_regionserver_xmn_ratio) exceeds this value.
     <value-attributes>
       <unit>MB</unit>
     </value-attributes>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <property>
+    <name>hbase_regionserver_xmn_ratio</name>
+    <value>0.2</value>
+    <display-name>RegionServers -Xmn in -Xmx ratio</display-name>
+    <description>Percentage of max heap size (-Xmx) which used for young generation heap (-Xmn).</description>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <property>
+    <name>hbase_user</name>
+    <display-name>HBase User</display-name>
+    <value>hbase</value>
+    <property-type>USER</property-type>
+    <description>HBase User Name.</description>
+    <value-attributes>
+      <type>user</type>
+      <overridable>false</overridable>
+    </value-attributes>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <property>
+    <name>hbase_max_direct_memory_size</name>
+    <value/>
+    <display-name>HBase off-heap MaxDirectMemorySize</display-name>
+    <description>If not empty, adds '-XX:MaxDirectMemorySize={{hbase_max_direct_memory_size}}m' to HBASE_REGIONSERVER_OPTS.</description>
+    <value-attributes>
+      <empty-value-valid>true</empty-value-valid>
+    </value-attributes>
     <on-ambari-upgrade add="false"/>
   </property>
+  <property>
+    <name>phoenix_sql_enabled</name>
+    <value>false</value>
+    <description>Enable Phoenix SQL</description>
+    <display-name>Enable Phoenix</display-name>
+    <value-attributes>
+      <type>value-list</type>
+      <entries>
+        <entry>
+          <value>true</value>
+          <label>Enabled</label>
+        </entry>
+        <entry>
+          <value>false</value>
+          <label>Disabled</label>
+        </entry>
+      </entries>
+      <selection-cardinality>1</selection-cardinality>
+    </value-attributes>
+    <on-ambari-upgrade add="true"/>
+  </property>
+  <!-- hbase-env.sh -->
   <property>
     <name>content</name>
     <display-name>hbase-env template</display-name>
@@ -48,7 +122,7 @@ export JAVA_HOME={{java64_home}}
 export HBASE_CONF_DIR=${HBASE_CONF_DIR:-{{hbase_conf_dir}}}
 
 # Extra Java CLASSPATH elements. Optional.
-export HBASE_CLASSPATH=${HBASE_CLASSPATH}:{{stack_root}}/current/ext/hbase/*
+export HBASE_CLASSPATH=${HBASE_CLASSPATH}
 
 
 # The maximum amount of heap to use, in MB. Default is 1000.
@@ -97,19 +171,14 @@ export HBASE_PID_DIR={{pid_dir}}
 # Tell HBase whether it should manage it's own instance of Zookeeper or not.
 export HBASE_MANAGES_ZK=false
 
-{% if java_version &lt; 8 %}
-JDK_DEPENDED_OPTS="-XX:PermSize=128m -XX:MaxPermSize=128m"
-{% endif %}
-
 {% if security_enabled %}
 export HBASE_OPTS="$HBASE_OPTS -XX:+UseConcMarkSweepGC -XX:ErrorFile={{log_dir}}/hs_err_pid%p.log -Djava.security.auth.login.config={{client_jaas_config_file}} -Djava.io.tmpdir={{java_io_tmpdir}}"
-export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Xmx{{master_heapsize}} -Djava.security.auth.login.config={{master_jaas_config_file}} -Djavax.security.auth.useSubjectCredsOnly=false $JDK_DEPENDED_OPTS"
-export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Xmn{{regionserver_xmn_size}} -XX:CMSInitiatingOccupancyFraction={{regionserver_cms_initiating_occupancy_fraction}} -XX:+UseCMSInitiatingOccupancyOnly -Xms{{regionserver_heapsize}} -Xmx{{regionserver_heapsize}} -Djava.security.auth.login.config={{regionserver_jaas_config_file}} -Djavax.security.auth.useSubjectCredsOnly=false $JDK_DEPENDED_OPTS"
-export PHOENIX_QUERYSERVER_OPTS="$PHOENIX_QUERYSERVER_OPTS -Djava.security.auth.login.config={{queryserver_jaas_config_file}}"
+export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Xmx{{master_heapsize}} -Djava.security.auth.login.config={{master_jaas_config_file}}"
+export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Xmn{{regionserver_xmn_size}} -XX:CMSInitiatingOccupancyFraction={{regionserver_cms_initiating_occupancy_fraction}} -XX:+UseCMSInitiatingOccupancyOnly -Xms{{regionserver_heapsize}} -Xmx{{regionserver_heapsize}} -Djava.security.auth.login.config={{regionserver_jaas_config_file}}"
 {% else %}
 export HBASE_OPTS="$HBASE_OPTS -XX:+UseConcMarkSweepGC -XX:ErrorFile={{log_dir}}/hs_err_pid%p.log -Djava.io.tmpdir={{java_io_tmpdir}}"
-export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Xmx{{master_heapsize}} $JDK_DEPENDED_OPTS"
-export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Xmn{{regionserver_xmn_size}} -XX:CMSInitiatingOccupancyFraction={{regionserver_cms_initiating_occupancy_fraction}} -XX:+UseCMSInitiatingOccupancyOnly -Xms{{regionserver_heapsize}} -Xmx{{regionserver_heapsize}} $JDK_DEPENDED_OPTS"
+export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS -Xmx{{master_heapsize}}"
+export HBASE_REGIONSERVER_OPTS="$HBASE_REGIONSERVER_OPTS -Xmn{{regionserver_xmn_size}} -XX:CMSInitiatingOccupancyFraction={{regionserver_cms_initiating_occupancy_fraction}} -XX:+UseCMSInitiatingOccupancyOnly -Xms{{regionserver_heapsize}} -Xmx{{regionserver_heapsize}}"
 {% endif %}
 
 # HBase off-heap MaxDirectMemorySize
@@ -119,6 +188,6 @@ export HBASE_MASTER_OPTS="$HBASE_MASTER_OPTS {% if hbase_max_direct_memory_size 
     <value-attributes>
       <type>content</type>
     </value-attributes>
-    <on-ambari-upgrade add="false"/>
+    <on-ambari-upgrade add="true"/>
   </property>
 </configuration>
