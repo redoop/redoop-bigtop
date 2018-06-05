@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,101 +20,46 @@
 -->
 <configuration>
   <property>
-    <name>xasecure.audit.is.enabled</name>
-    <value>true</value>
-    <description>Is Audit enabled?</description>
+    <name>xasecure.audit.destination.db</name>
+    <deleted>true</deleted>
     <on-ambari-upgrade add="false"/>
   </property>
   <property>
-    <name>xasecure.audit.destination.hdfs</name>
-    <value>true</value>
-    <display-name>Audit to HDFS</display-name>
-    <description>Is Audit to HDFS enabled?</description>
-    <value-attributes>
-      <type>boolean</type>
-    </value-attributes>
-    <depends-on>
-      <property>
-        <type>ranger-env</type>
-        <name>xasecure.audit.destination.hdfs</name>
-      </property>
-    </depends-on>
+    <name>xasecure.audit.destination.db.jdbc.url</name>
+    <deleted>true</deleted>
     <on-ambari-upgrade add="false"/>
   </property>
   <property>
-    <name>xasecure.audit.destination.hdfs.dir</name>
-    <value>hdfs://NAMENODE_HOSTNAME:8020/ranger/audit</value>
-    <description>HDFS folder to write audit to, make sure the service user has requried permissions</description>
-    <depends-on>
-      <property>
-        <type>ranger-env</type>
-        <name>xasecure.audit.destination.hdfs.dir</name>
-      </property>
-    </depends-on>
+    <name>xasecure.audit.destination.db.user</name>
+    <deleted>true</deleted>
     <on-ambari-upgrade add="false"/>
   </property>
   <property>
-    <name>xasecure.audit.destination.hdfs.batch.filespool.dir</name>
-    <value>/var/log/hbase/audit/hdfs/spool</value>
-    <description>/var/log/hbase/audit/hdfs/spool</description>
+    <name>xasecure.audit.destination.db.password</name>
+    <deleted>true</deleted>
     <on-ambari-upgrade add="false"/>
   </property>
   <property>
-    <name>xasecure.audit.destination.solr</name>
-    <value>false</value>
-    <display-name>Audit to SOLR</display-name>
-    <description>Is Solr audit enabled?</description>
-    <value-attributes>
-      <type>boolean</type>
-    </value-attributes>
-    <depends-on>
-      <property>
-        <type>ranger-env</type>
-        <name>xasecure.audit.destination.solr</name>
-      </property>
-    </depends-on>
+    <name>xasecure.audit.destination.db.jdbc.driver</name>
+    <deleted>true</deleted>
     <on-ambari-upgrade add="false"/>
   </property>
   <property>
-    <name>xasecure.audit.destination.solr.urls</name>
-    <value/>
-    <description>Solr URL</description>
+    <name>xasecure.audit.credential.provider.file</name>
+    <deleted>true</deleted>
+    <on-ambari-upgrade add="false"/>
+  </property>
+  <property>
+    <name>xasecure.audit.destination.db.batch.filespool.dir</name>
+    <deleted>true</deleted>
+    <on-ambari-upgrade add="false"/>
+  </property>
+  <property>
+    <name>ranger.plugin.hbase.ambari.cluster.name</name>
+    <value>{{cluster_name}}</value>
+    <description>Capture cluster name from where Ranger hbase plugin is enabled.</description>
     <value-attributes>
       <empty-value-valid>true</empty-value-valid>
-    </value-attributes>
-    <depends-on>
-      <property>
-        <type>ranger-admin-site</type>
-        <name>ranger.audit.solr.urls</name>
-      </property>
-    </depends-on>
-    <on-ambari-upgrade add="false"/>
-  </property>
-  <property>
-    <name>xasecure.audit.destination.solr.zookeepers</name>
-    <value>NONE</value>
-    <description>Solr Zookeeper string</description>
-    <depends-on>
-      <property>
-        <type>ranger-admin-site</type>
-        <name>ranger.audit.solr.zookeepers</name>
-      </property>
-    </depends-on>
-    <on-ambari-upgrade add="false"/>
-  </property>
-  <property>
-    <name>xasecure.audit.destination.solr.batch.filespool.dir</name>
-    <value>/var/log/hbase/audit/solr/spool</value>
-    <description>/var/log/hbase/audit/solr/spool</description>
-    <on-ambari-upgrade add="false"/>
-  </property>
-  <property>
-    <name>xasecure.audit.provider.summary.enabled</name>
-    <value>true</value>
-    <display-name>Audit provider summary enabled</display-name>
-    <description>Enable Summary audit?</description>
-    <value-attributes>
-      <type>boolean</type>
     </value-attributes>
     <on-ambari-upgrade add="false"/>
   </property>
