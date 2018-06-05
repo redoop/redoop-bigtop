@@ -352,7 +352,7 @@ bigtop {
     }
     'spark1' {
       name    = 'spark1'
-      pkg     = 'spark1'
+      pkg     = 'spark'
       relNotes = 'Apache Spark'
       version { base = '1.6.2'; pkg = base; release = 1 }
       tarball { destination = "spark-${version.base}.tar.gz"
