@@ -17,10 +17,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.ambari</groupId>
-  <artifactId>crh-BI-mpack</artifactId>
+  <artifactId>crs-mpack</artifactId>
   <packaging>pom</packaging>
   <version>1.0.0.0-SNAPSHOT</version>
-  <name>CRH Business Intelligence Management Pack</name>
+  <name>Redoop Data Scientist Management Pack</name>
   <url>http://ambari.apache.org/</url>
   <properties>
     <minAmbariVersion>2.5.0.0</minAmbariVersion>
@@ -86,7 +86,7 @@
         <configuration>
           <tarLongFileMode>gnu</tarLongFileMode>
           <descriptors>
-            <descriptor>src/main/assemblies/crh-BI-mpack.xml</descriptor>
+            <descriptor>src/main/assemblies/crs-mpack.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
