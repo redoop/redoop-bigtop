@@ -61,10 +61,10 @@ cp -ra $RPM_SOURCE_DIR/selector/* ${RPM_BUILD_ROOT}/usr/bin/
 # Redoop CRH Management Packs
 install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
 %__cp -ra crh-DW-mpack/target/crh-DW-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
-%__cp -ra crh-BI-mpack/target/crh-BI-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-Spark-mpack/target/crh-Spark-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-Security-mpack/target/crh-Security-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-TS-mpack/target/crh-TS-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crs-mpack/target/crs-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 
 
 %package -n %{distro_select}
@@ -84,15 +84,6 @@ AutoProv: no
 AutoReqProv: no
 %description crh-DW
 Redoop Ambari CRH Data Warehouse Mpack
-
-%package crh-BI
-Summary: CRH Business Intelligence Mpack
-Group: Development/Libraries
-Requires: ambari-server
-AutoProv: no
-AutoReqProv: no
-%description crh-BI
-Redoop Ambari CRH Business Intelligence Mpack
 
 %package crh-Spark
 Summary: CRH Spark Mpack
@@ -121,6 +112,15 @@ AutoReqProv: no
 %description crh-TS
 Redoop Ambari CRH Time Series Mpack
 
+%package crs
+Summary: Data Scientist Mpack
+Group: Development/Libraries
+Requires: ambari-server
+AutoProv: no
+AutoReqProv: no
+%description crs
+Redoop Ambari Data Scientist Mpack
+
 
 %files -n %{distro_select}
 %attr(755,root,root) /usr/bin/%{distro_select}
@@ -138,7 +138,7 @@ rm -rf /var/lib/ambari-server/resources/mpacks/cache/%1-mpack-1.0.0.0-SNAPSHOT.t
 rm -rf /var/lib/ambari-server/resources/mpacks/%1-mpack-1.0.0.0-SNAPSHOT
 
 %service_macro crh-DW
-%service_macro crh-BI
 %service_macro crh-Spark
 %service_macro crh-Security
 %service_macro crh-TS
+%service_macro crs

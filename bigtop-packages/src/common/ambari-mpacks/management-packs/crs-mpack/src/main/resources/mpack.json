@@ -1,10 +1,10 @@
 {
   "type" : "full-release",
-  "name" : "crh-BI-mpack",
+  "name" : "crs-mpack",
   "version": "${project.version}",
   "hash": "${buildNumber}",
   "branch": "${scmBranch}",
-  "description" : "CRH Business Intelligence Management Pack",
+  "description" : "Redoop Data Scientist Management Pack",
   "prerequisites": {
     "min-ambari-version" : "${minAmbariVersion}",
     "max-ambari-version" : "${maxAmbariVersion}"
