@@ -133,7 +133,6 @@ Redoop Ambari CRH Time Series Mpack
 %attr(644,root,root) /var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz \
 %post %1 \
 ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz --verbose \
-ambari-server restart \
 %postun %1 \
 rm -rf /var/lib/ambari-server/resources/mpacks/cache/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz \
 rm -rf /var/lib/ambari-server/resources/mpacks/%1-mpack-1.0.0.0-SNAPSHOT
