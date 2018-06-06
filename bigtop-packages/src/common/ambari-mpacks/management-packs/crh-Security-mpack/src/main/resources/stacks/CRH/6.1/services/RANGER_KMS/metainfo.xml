@@ -22,11 +22,8 @@
   <schemaVersion>2.0</schemaVersion>
   <services>
     <service>
-      <name>RANGER</name>
-      <displayName>Ranger</displayName>
-      <comment>Comprehensive security for Hadoop</comment>
-      <extends>common-services/RANGER/0.6.0</extends>
-      <version>0.6.0</version>
+      <name>RANGER_KMS</name>
+      <version>1.0.0</version>
     </service>
   </services>
 </metainfo>

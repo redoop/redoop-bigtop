@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -18,15 +18,16 @@
  * limitations under the License.
  */
 -->
-<metainfo>
-  <schemaVersion>2.0</schemaVersion>
-  <services>
-    <service>
-      <name>RANGER</name>
-      <displayName>Ranger</displayName>
-      <comment>Comprehensive security for Hadoop</comment>
-      <extends>common-services/RANGER/0.6.0</extends>
-      <version>0.6.0</version>
-    </service>
-  </services>
-</metainfo>
+<configuration>
+
+  <property>
+    <name>ranger.plugin.kms.ambari.cluster.name</name>
+    <value>{{cluster_name}}</value>
+    <description>Capture cluster name from where Ranger kms plugin is enabled.</description>
+    <value-attributes>
+      <empty-value-valid>true</empty-value-valid>
+    </value-attributes>
+    <on-ambari-upgrade add="false"/>
+  </property>
+
+</configuration>
