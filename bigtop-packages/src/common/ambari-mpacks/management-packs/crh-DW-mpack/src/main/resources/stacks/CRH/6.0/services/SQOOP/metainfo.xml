@@ -22,9 +22,6 @@
       <name>SQOOP</name>
       <extends>common-services/SQOOP/1.4.4.2.0</extends>
       <version>1.4.6</version>
-      <configuration-dependencies>
-        <config-type>application-properties</config-type>
-      </configuration-dependencies>
       <osSpecifics>
         <osSpecific>
           <osFamily>redhat7</osFamily>
@@ -35,6 +32,10 @@
           </packages>
         </osSpecific>
       </osSpecifics>
+
+      <configuration-dependencies>
+        <config-type>application-properties</config-type>
+      </configuration-dependencies>
     </service>
   </services>
 </metainfo>
