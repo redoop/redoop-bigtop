@@ -1,16 +1,34 @@
+diff -uNr ambari/ambari-metrics/ambari-metrics-timelineservice/pom.xml ambari-cp/ambari-metrics/ambari-metrics-timelineservice/pom.xml
+--- ambari/ambari-metrics/ambari-metrics-timelineservice/pom.xml	2017-12-13 04:14:08.000000000 +0800
++++ ambari-cp/ambari-metrics/ambari-metrics-timelineservice/pom.xml	2018-06-07 17:58:09.243056883 +0800
+@@ -34,9 +34,9 @@
+     <!-- Needed for generating FindBugs warnings using parent pom -->
+     <!--<yarn.basedir>${project.parent.parent.basedir}</yarn.basedir>-->
+     <protobuf.version>2.5.0</protobuf.version>
+-    <hadoop.version>2.7.1.2.3.4.0-3347</hadoop.version>
+-    <phoenix.version>4.4.0.2.3.4.0-3347</phoenix.version>
+-    <hbase.version>1.1.2.2.3.4.0-3347</hbase.version>
++    <hadoop.version>2.7.3.2.6.4.0-91</hadoop.version>
++    <phoenix.version>4.7.0.2.6.4.0-91</phoenix.version>
++    <hbase.version>1.1.2.2.6.4.0-91</hbase.version>
+   </properties>
+ 
+   <build>
 diff -uNr ambari/ambari-metrics/pom.xml ambari-cp/ambari-metrics/pom.xml
---- ambari/ambari-metrics/pom.xml	2018-03-13 09:08:12.816018496 +0800
-+++ ambari-cp/ambari-metrics/pom.xml	2018-03-13 09:11:58.049472120 +0800
-@@ -39,17 +39,17 @@
+--- ambari/ambari-metrics/pom.xml	2017-12-13 04:14:08.000000000 +0800
++++ ambari-cp/ambari-metrics/pom.xml	2018-06-07 17:58:09.265057489 +0800
+@@ -39,18 +39,18 @@
      <python.ver>python &gt;= 2.6</python.ver>
      <deb.python.ver>python (&gt;= 2.6)</deb.python.ver>
      <!--TODO change to HDP URL-->
 -    <hbase.tar>http://private-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.3.4.0-3347/tars/hbase-1.1.2.2.3.4.0-3347.tar.gz</hbase.tar>
-+    <hbase.tar>http://compile.redoop.org/redoop/ambari/2.6.1/default/hbase-1.1.2.2.3.4.0-3347.tar.gz</hbase.tar>
-     <hbase.folder>hbase-1.1.2.2.3.4.0-3347</hbase.folder>
+-    <hbase.folder>hbase-1.1.2.2.3.4.0-3347</hbase.folder>
 -    <hadoop.tar>http://private-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.3.4.0-3347/tars/hadoop-2.7.1.2.3.4.0-3347.tar.gz</hadoop.tar>
-+    <hadoop.tar>http://compile.redoop.org/redoop/ambari/2.6.1/default/hadoop-2.7.1.2.3.4.0-3347.tar.gz</hadoop.tar>
-     <hadoop.folder>hadoop-2.7.1.2.3.4.0-3347</hadoop.folder>
+-    <hadoop.folder>hadoop-2.7.1.2.3.4.0-3347</hadoop.folder>
++    <hbase.tar>http://compile.redoop.org/redoop/ambari/2.6.4/default/hbase-1.1.2.2.6.4.0-91.tar.gz</hbase.tar>
++    <hbase.folder>hbase-1.1.2.2.6.4.0-91</hbase.folder>
++    <hadoop.tar>http://compile.redoop.org/redoop/ambari/2.6.4/default/hadoop-2.7.3.2.6.4.0-91.tar.gz</hadoop.tar>
++    <hadoop.folder>hadoop-2.7.3.2.6.4.0-91</hadoop.folder>
      <hbase.winpkg.zip>https://msibuilds.blob.core.windows.net/hdp/2.x/2.2.4.2/2/hbase-0.98.4.2.2.4.2-0002-hadoop2.winpkg.zip</hbase.winpkg.zip>
      <hbase.winpkg.folder>hbase-0.98.4.2.2.4.2-0002-hadoop2</hbase.winpkg.folder>
      <hadoop.winpkg.zip>https://msibuilds.blob.core.windows.net/hdp/2.x/2.2.4.2/2/hadoop-2.6.0.2.2.4.2-0002.winpkg.zip</hadoop.winpkg.zip>
@@ -18,8 +36,10 @@ diff -uNr ambari/ambari-metrics/pom.xml ambari-cp/ambari-metrics/pom.xml
      <grafana.folder>grafana-2.6.0</grafana.folder>
 -    <grafana.tar>https://grafanarel.s3.amazonaws.com/builds/grafana-2.6.0.linux-x64.tar.gz</grafana.tar>
 -    <phoenix.tar>http://private-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.3.4.0-3347/tars/phoenix-4.4.0.2.3.4.0-3347.tar.gz</phoenix.tar>
-+    <grafana.tar>http://compile.redoop.org/redoop/ambari/2.6.1/default/grafana-2.6.0.linux-x64.tar.gz</grafana.tar>
-+    <phoenix.tar>http://compile.redoop.org/redoop/ambari/2.6.1/default/phoenix-4.4.0.2.3.4.0-3347.tar.gz</phoenix.tar>
-     <phoenix.folder>phoenix-4.4.0.2.3.4.0-3347</phoenix.folder>
+-    <phoenix.folder>phoenix-4.4.0.2.3.4.0-3347</phoenix.folder>
++    <grafana.tar>http://compile.redoop.org/redoop/ambari/2.6.4/default/grafana-2.6.0.linux-x64.tar.gz</grafana.tar>
++    <phoenix.tar>http://compile.redoop.org/redoop/ambari/2.6.4/default/phoenix-4.7.0.2.6.4.0-91.tar.gz</phoenix.tar>
++    <phoenix.folder>phoenix-4.7.0.2.6.4.0-91</phoenix.folder>
      <resmonitor.install.dir>
        /usr/lib/python2.6/site-packages/resource_monitoring
+     </resmonitor.install.dir>
