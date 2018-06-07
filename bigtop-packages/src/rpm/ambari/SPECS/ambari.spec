@@ -46,7 +46,7 @@ Source4: stacks
 Source5: custom-style
 Source6: licenseutils
 
-# Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
+Patch0: patch0-METRICS-TAR-DOWNLOADROOT.diff
 Patch1: patch1-REDOOP-AMBARI-LICENSE.diff
 
 # FIXME
@@ -59,7 +59,7 @@ Ambari
 %prep
 %setup -n apache-%{ambari_name}-%{ambari_base_version}-src
 # Apply patch
-# %patch0 -p1
+%patch0 -p1
 %patch1 -p1
 
 
