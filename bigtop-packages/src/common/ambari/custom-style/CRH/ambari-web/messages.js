@@ -3126,7 +3126,7 @@ Em.I18n.translations = {
   'menu.item.dashboard':'仪表盘',
   'menu.item.services':'服务',
   'menu.item.hosts':'主机',
-  'menu.item.admin':'Admin',
+  'menu.item.admin':'管理员',
   'menu.item.alerts': '警告',
   'menu.item.views':'<i class="icon-th"></i>',
   'menu.item.views.noViews':'没有视图',
