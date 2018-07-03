@@ -53,7 +53,7 @@ Source4: install_zeppelin.sh
 Source5: zeppelin-env.sh
 Source6: zeppelin.svc
 Requires: bigtop-utils >= 0.7, hadoop%{crh_version_as_name}-client
-Requires: ambari-mpacks%{crh_version_as_name}-crh-BI
+Requires: ambari-mpacks%{crh_version_as_name}-crs
 Requires(preun): /sbin/service
 AutoReq: no
 
