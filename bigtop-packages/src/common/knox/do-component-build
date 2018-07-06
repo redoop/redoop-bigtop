@@ -22,7 +22,7 @@ set -e
 
 mvn -q -B -e versions:set -DnewVersion=${knox_jar_version} -DgenerateBackupPoms=false
 
-mvn ${BUILD_KNOX_OPTS} install "$@"
+mvn ${BUILD_KNOX_OPTS} -DskipTests -DskipTest install "$@"
 
 
 mkdir build
