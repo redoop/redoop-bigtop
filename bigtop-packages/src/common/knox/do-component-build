@@ -20,9 +20,8 @@ set -e
 . `dirname $0`/bigtop.bom
 
 
-mvn -q -B -e versions:set -DnewVersion=${knox_jar_version} -DgenerateBackupPoms=false
-
-mvn ${BUILD_KNOX_OPTS} -DskipTests -DskipTest package "$@"
+# no maven
+# use binary archive
 
 
 mkdir build
