@@ -16,37 +16,15 @@
 
 set -e
 
-echo "-------------- Knox-do-component-build-started -----------"
-base_path=`pwd`
-#build_support_dir=`echo ${base_path%bigtop*}`
-#tar_output_folder="${build_support_dir}crh-output"
-#replace_file_path="${build_support_dir}SubstitutionFiles/knox.sh"
-#crh_comp_vars=${build_support_dir}HDP_COMPONENT_VARIABLES.sh
-#source ${crh_comp_vars}
 
 . `dirname $0`/bigtop.bom
-# modifying the properties prior to build
-#source ${replace_file_path}
 
 
-#$MAVEN_HOME/bin/mvn -q -B -e versions:set -DnewVersion=${knox_jar_version} -DgenerateBackupPoms=false
+mvn -q -B -e versions:set -DnewVersion=${knox_jar_version} -DgenerateBackupPoms=false
 
-#set +x
+mvn ${BUILD_KNOX_OPTS} "$@"
 
-echo "Generating git diffs of the source tress"
-#git diff  > ${tar_output_folder}/knox-source.patch
 
-#set -x
-#$MAVEN_HOME/bin/mvn ${BUILD_KNOX_OPTS} "$@"
-#export MAVEN_OPTS="-Xmx1500m -Xms1500m -XX:MaxPermSize=256m" 
-#mvn clean install -DskipTests "$@" 
-#mvn clean package -Pdist -DskipTests
-#set +x
-
-echo;echo
-#Copying the knox binary tarball to the hdp-output folder
 mkdir build
-#echo "${base_path}/target/${knox_jar_version}/${knox_name}*-${knox_jar_version}.tar.gz ${tar_output_folder}/"
-#cp ${base_path}/target/${knox_jar_version}/${knox_name}*-${knox_jar_version}.tar.gz ${tar_output_folder}/
+
 tar -C build --strip-components=1 -xzf target/${knox_jar_version}/${knox_name}*-${knox_jar_version}.tar.gz
-echo "-------------- Knox-do-component-build-completed --------------"

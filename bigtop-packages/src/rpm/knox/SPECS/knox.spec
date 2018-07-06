@@ -84,8 +84,7 @@ Source0: %{component_name}-%{knox_base_version}.tar.gz
 Source1: do-component-build
 Source2: install_knox.sh
 BuildArch: noarch
-Requires: ranger%{crh_version_as_name}-knox-plugin, %{distroselect} >= %{crh_version_with_bn}
-
+Requires: ranger%{crh_version_as_name}-knox-plugin
 ##############################
 %description 
 ##############################
