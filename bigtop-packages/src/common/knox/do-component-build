@@ -24,6 +24,3 @@ set -e
 # use binary archive
 
 
-mkdir build
-
-tar -C build --strip-components=1 -xzf target/${knox_jar_version}/${knox_name}*-${knox_jar_version}.tar.gz
