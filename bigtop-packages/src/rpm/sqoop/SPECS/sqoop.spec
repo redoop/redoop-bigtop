@@ -77,8 +77,8 @@ Sqoop allows easy imports and exports of data sets between databases and the Had
 Summary: Shared metadata repository for Sqoop.
 URL: http://sqoop.apache.org/
 Group: System/Daemons
-Provides: sqoop-metastore
-Requires: sqoop = %{version}-%{release} 
+Provides: %{name}-metastore
+Requires: %{name} = %{version}-%{release} 
 
 %if  %{?suse_version:1}0
 # Required for init scripts
