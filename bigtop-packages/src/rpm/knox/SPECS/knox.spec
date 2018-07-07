@@ -84,8 +84,7 @@ Source0: %{component_name}-%{knox_base_version}.tar.gz
 Source1: do-component-build
 Source2: install_knox.sh
 BuildArch: noarch
-Requires: ranger%{crh_version_as_name}-knox-plugin, %{distroselect} >= %{crh_version_with_bn}
-
+Requires: ranger%{crh_version_as_name}-knox-plugin
 ##############################
 %description 
 ##############################
@@ -101,7 +100,7 @@ Knox is an authenticating REST API gateway that provides perimeter security for 
 ##############################
 %build
 ##############################
-env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} KNOX_VERSION=%{version} knox_jar_version=%{knox_base_version} knox_name=%{component_name} bash %{SOURCE1}
+# env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} KNOX_VERSION=%{version} knox_jar_version=%{knox_base_version} knox_name=%{component_name} bash %{SOURCE1}
 
 
 ##############################
@@ -109,7 +108,7 @@ env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} KNOX_VERSION=%{version
 ##############################
 %__rm -rf $RPM_BUILD_ROOT
 env CRH_DIR=%{crh_dir} CRH_VERSION=%{crh_version_with_bn} sh -x  %{SOURCE2} \
-        --build-dir=build \
+        --build-dir=./ \
         --crh-dir=%{crh_dir} \
         --prefix=$RPM_BUILD_ROOT
  
