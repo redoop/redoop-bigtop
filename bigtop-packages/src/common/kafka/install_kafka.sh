@@ -132,6 +132,9 @@ rm -rf ${PREFIX}/${LIB_DIR}/libs/kafka_*javadoc*
 rm -rf ${PREFIX}/${LIB_DIR}/libs/kafka_*scaladoc*
 rm -rf ${PREFIX}/${LIB_DIR}/bin/windows
 
+# add kafka start script to bin
+cp $SOURCE_DIR/kafka $PREFIX/$LIB_DIR/bin/
+
 chmod 755 $PREFIX/$LIB_DIR/bin/*
 
 # Exposing a few scripts by placing them under /usr/bin
