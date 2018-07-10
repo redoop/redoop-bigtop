@@ -146,8 +146,8 @@ ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAP
 %preun %1 \
 ambari-server uninstall-mpack --mpack-name=%1-mpack \
 %postun %1 \
-rm -rf /var/lib/ambari-server/resources/mpacks/cache/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz
-rm -rf /var/lib/ambari-server/data/tmp/%1-mpack-1.0.0.0-SNAPSHOT
+rm -rf /var/lib/ambari-server/resources/mpacks/cache/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz \
+rm -rf /var/lib/ambari-server/data/tmp/%1-mpack-1.0.0.0-SNAPSHOT \
 rm -rf /var/lib/ambari-server/data/tmp/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz
 
 %service_macro crh-DW
