@@ -144,8 +144,8 @@ Redoop Ambari Data Flow Mpack
 %post %1 \
 ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz --verbose \
 %postun %1 \
-rm -rf /var/lib/ambari-server/resources/mpacks/cache/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz \
-rm -rf /var/lib/ambari-server/resources/mpacks/%1-mpack-1.0.0.0-SNAPSHOT
+ambari-server uninstall-mpack --mpack-name=%1-mpack \
+rm -rf /var/lib/ambari-server/resources/mpacks/cache/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz
 
 %service_macro crh-DW
 %service_macro crh-Spark
