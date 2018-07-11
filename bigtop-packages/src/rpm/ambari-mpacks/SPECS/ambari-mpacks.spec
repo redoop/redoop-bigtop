@@ -65,6 +65,7 @@ install -d -m 0755 $RPM_BUILD_ROOT/var/lib/ambari-mpacks/
 %__cp -ra crh-Security-mpack/target/crh-Security-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crh-TS-mpack/target/crh-TS-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 %__cp -ra crs-mpack/target/crs-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
+%__cp -ra crf-mpack/target/crf-mpack-*.tar.gz ${RPM_BUILD_ROOT}/var/lib/ambari-mpacks/
 
 
 %package -n %{distro_select}
@@ -121,6 +122,15 @@ AutoReqProv: no
 %description crs
 Redoop Ambari Data Scientist Mpack
 
+%package crf
+Summary: Data Flow Mpack
+Group: Development/Libraries
+Requires: ambari-server
+AutoProv: no
+AutoReqProv: no
+%description crf
+Redoop Ambari Data Flow Mpack
+
 
 %files -n %{distro_select}
 %attr(755,root,root) /usr/bin/%{distro_select}
@@ -133,12 +143,16 @@ Redoop Ambari Data Scientist Mpack
 %attr(644,root,root) /var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz \
 %post %1 \
 ambari-server install-mpack --mpack=/var/lib/ambari-mpacks/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz --verbose \
+%preun %1 \
+ambari-server uninstall-mpack --mpack-name=%1-mpack \
 %postun %1 \
 rm -rf /var/lib/ambari-server/resources/mpacks/cache/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz \
-rm -rf /var/lib/ambari-server/resources/mpacks/%1-mpack-1.0.0.0-SNAPSHOT
+rm -rf /var/lib/ambari-server/data/tmp/%1-mpack-1.0.0.0-SNAPSHOT.tar.gz \
+rm -rf /var/lib/ambari-server/data/tmp/%1-mpack-1.0.0.0-SNAPSHOT
 
 %service_macro crh-DW
 %service_macro crh-Spark
 %service_macro crh-Security
 %service_macro crh-TS
 %service_macro crs
+%service_macro crf

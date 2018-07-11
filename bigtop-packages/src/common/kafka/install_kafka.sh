@@ -132,6 +132,9 @@ rm -rf ${PREFIX}/${LIB_DIR}/libs/kafka_*javadoc*
 rm -rf ${PREFIX}/${LIB_DIR}/libs/kafka_*scaladoc*
 rm -rf ${PREFIX}/${LIB_DIR}/bin/windows
 
+# add kafka start script to bin
+cp $SOURCE_DIR/kafka $PREFIX/$LIB_DIR/bin/
+
 chmod 755 $PREFIX/$LIB_DIR/bin/*
 
 # Exposing a few scripts by placing them under /usr/bin
@@ -152,7 +155,7 @@ done
 
 # Copy in the configuration files
 install -d -m 0755 $PREFIX/$CONF_DIR
-cp -a ${BUILD_DIR}/config/{tools-log4j.properties,server.properties,log4j.properties} $PREFIX/$CONF_DIR/
+cp -a ${BUILD_DIR}/config/* $PREFIX/$CONF_DIR/
 # BIGTOP-1886
 sed -i -e "s|=log-cleaner.log|=$\{kafka.logs.dir\}/log-cleaner.log|" $PREFIX/$CONF_DIR/log4j.properties
 ln -s ${ETC_KAFKA_DIR}/conf $PREFIX/$LIB_DIR/config

@@ -28,6 +28,7 @@
     <module>crh-Security-mpack</module>
     <module>crh-TS-mpack</module>
     <module>crs-mpack</module>
+    <module>crf-mpack</module>
   </modules>
   <build>
     <pluginManagement>
@@ -100,6 +101,7 @@
         <module>crh-Security-mpack</module>
         <module>crh-TS-mpack</module>
         <module>crs-mpack</module>
+        <module>crf-mpack</module>
       </modules>
     </profile>
   </profiles>
