@@ -118,6 +118,11 @@ cp -r $BUILD_DIR/bin $PREFIX/$LIB_DIR/
 chmod 755 $PREFIX/$BIN_DIR/*.py
 chmod 755 $PREFIX/$BIN_DIR/*.sh
 
+# Remove hbase-site.xml
+rm -rf $PREFIX/$BIN_DIR/hbase-site.xml
+# Link HBASE_HOME/conf/hbase-site.xml to PHOENIX_HOME/bin/hbase-site.xml
+ln -s $CRH_DIR/hbase/conf/hbase-site.xml $PREFIX/$BIN_DIR/hbase-site.xml
+
 # Remove sources jar
 rm $PREFIX/$LIB_DIR/phoenix-*-sources.jar
 
