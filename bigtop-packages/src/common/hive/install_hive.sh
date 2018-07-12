@@ -197,6 +197,11 @@ install -d -m 1777 $PREFIX/var/lib/hive/metastore/
 # We need to remove the .war files. No longer supported.
 rm -f ${HIVE_DIR}/lib/hive-hwi*.war
 
+
+# Link phoenix-hive.jar to hive lib
+ln -s ${CRH_DIR}/phoenix/phoenix-hive.jar ${HIVE_DIR}/lib/phoenix-hive.jar
+
+
 # Remove some source which gets installed
 rm -rf ${HIVE_DIR}/lib/php/ext
 
