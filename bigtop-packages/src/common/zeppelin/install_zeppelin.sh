@@ -135,3 +135,9 @@ chmod 755 $PREFIX/$LIB_DIR/bin/*
 rm -f $PREFIX/$CONF_DIR/*.cmd.*
 cp -a ${SOURCE_DIR}/zeppelin-env.sh $PREFIX/$CONF_DIR
 ln -s /etc/zeppelin/conf $PREFIX/$LIB_DIR/conf
+
+
+# Link Phoenix jdbc (phoenix-client.jar) to Zeppelin interpreter
+ln -s $CRH_DIR/phoenix/phoenix-client.jar $PREFIX/$LIB_DIR/interpreter/jdbc
+
+
