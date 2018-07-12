@@ -116,7 +116,7 @@ Redoop Ambari CRH Time Series Mpack
 %package crs
 Summary: Data Scientist Mpack
 Group: Development/Libraries
-Requires: ambari-server
+Requires: ambari-server, %{name}-crh-Spark
 AutoProv: no
 AutoReqProv: no
 %description crs
