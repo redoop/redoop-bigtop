@@ -94,7 +94,7 @@ Requires: redhat-lsb
 Bundles the init script for kafka server.
 
 %prep
-%setup -n %{kafka_name}-%{kafka_base_version}-src
+%setup -n %{kafka_name}-%{kafka_base_version}
 
 %build
 bash $RPM_SOURCE_DIR/do-component-build
