@@ -19,8 +19,8 @@
   <schemaVersion>2.0</schemaVersion>
   <services>
     <service>
-      <name>KAFKA</name>
-      <version>0.10.2.2</version>
+      <name>FLUME</name>
+      <extends>common-services/FLUME/1.4.0.2.0</extends>
     </service>
   </services>
 </metainfo>
