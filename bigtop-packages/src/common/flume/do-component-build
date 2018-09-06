@@ -22,6 +22,9 @@ export MAVEN_OPTS="-Xmx1536m -Xms256m -XX:MaxPermSize=256m"
 
 sed -i -e \
 's#<artifactId>asynchbase</artifactId>#<artifactId>asynchbase</artifactId>\n<exclusions>\n<exclusion>\n<groupId>org.apache.zookeeper</groupId>\n<artifactId>zookeeper</artifactId>\n</exclusion>\n</exclusions>#' flume-ng-sinks/flume-ng-hbase-sink/pom.xml
+
+# update kafka scala version
+sed -i -e \
 's#<artifactId>kafka_2.10</artifactId>#<artifactId>kafka_2.11</artifactId>#' flume-ng-sources/flume-kafka-source/pom.xml
 
 # The following is weird, but true: yes *hadoop*.profile is hbase-98
