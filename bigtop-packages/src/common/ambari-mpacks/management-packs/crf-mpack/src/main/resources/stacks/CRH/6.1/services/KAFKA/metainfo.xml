@@ -20,7 +20,7 @@
   <services>
     <service>
       <name>KAFKA</name>
-      <version>0.10.2.2</version>
+      <version>0.10.1.1</version>
     </service>
   </services>
 </metainfo>
