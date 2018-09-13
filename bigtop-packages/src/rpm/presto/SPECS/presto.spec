@@ -21,6 +21,9 @@
 %define vlb_presto /var/lib/presto
 
 
+%define __jar_repack 0
+
+
 %define presto_folder %{presto_name}-server-%{presto_base_version}
 
 %if  %{?suse_version:1}0
@@ -96,7 +99,6 @@ env CRH_DIR=%{crh_dir} sh %{SOURCE2} \
           --build-dir=$PWD \
           --prefix=$RPM_BUILD_ROOT \
 	  --doc-dir=%{doc_presto}
-%__install -d -m 0755 $RPM_BUILD_ROOT/%{initd_dir}/
 
 
 %__install -d -m 0755 $RPM_BUILD_ROOT/usr/bin
