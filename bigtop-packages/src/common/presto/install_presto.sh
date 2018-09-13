@@ -100,8 +100,8 @@ install -d -m 0755 ${PREFIX}/${DATA_DIR}
 
 cp -rf ${BUILD_DIR}/* ${PREFIX}/${LIB_DIR}/
 
-chmod +x ${PREFIX}/${LIB_DIR}/bin/presto-cli-*-executable.jar
-ln -s $CRH_DIR/presto/bin/presto-cli-*-executable.jar ${PREFIX}/${LIB_DIR}/bin/presto
+mv ${PREFIX}/${LIB_DIR}/bin/presto-cli-*-executable.jar ${PREFIX}/${LIB_DIR}/bin/presto
+chmod +x ${PREFIX}/${LIB_DIR}/bin/presto
 
 
 wrapper=$PREFIX/usr/bin/presto
