@@ -17,6 +17,7 @@
 %define etc_presto /etc/presto/conf
 %define bin_presto %{_bindir}
 %define lib_presto %{crh_dir}/presto
+%define presto_data /var/presto/data
 %define vlb_presto /var/lib/presto
 
 
@@ -120,3 +121,5 @@ fi
 %defattr(644,root,root,755)
 %{lib_presto}
 %{etc_presto}
+
+%dir %{presto_data}
