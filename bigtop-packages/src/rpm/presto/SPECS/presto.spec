@@ -63,7 +63,6 @@ Summary:  presto is an open source distributed SQL query engine for running inte
 URL: https://prestodb.io/
 Group: Development/Libraries
 Buildroot: %{_topdir}/INSTALL/%{presto_name}-%{version}
-BuildArch: noarch
 License: ASL 2.0
 Source0: %{presto_folder}.tar.gz
 Source1: do-component-build
