@@ -121,5 +121,6 @@ fi
 %defattr(644,root,root,755)
 %{lib_presto}
 %{etc_presto}
+%{bin_presto}/presto
 
 %dir %{presto_data}
