@@ -120,8 +120,12 @@ fi
 
 %files 
 %defattr(644,root,root,755)
-%{lib_presto}
 %{etc_presto}
-%{bin_presto}/presto
+%{lib_presto}
+%attr(755,root,root) %{lib_presto}/bin/launcher
+%attr(755,root,root) %{lib_presto}/bin/launcher.properties
+%attr(755,root,root) %{lib_presto}/bin/launcher.py
+%attr(755,root,root) %{lib_presto}/bin/presto
+%attr(755,root,root) %{bin_presto}/presto
 
 %dir %{presto_data}
