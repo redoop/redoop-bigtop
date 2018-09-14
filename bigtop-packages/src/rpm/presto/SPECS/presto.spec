@@ -18,6 +18,7 @@
 %define lib_presto %{crh_dir}/presto
 %define presto_data /var/presto/data
 %define vlb_presto /var/lib/presto
+%define bin_presto %{_bindir}
 
 
 %define __jar_repack 0
