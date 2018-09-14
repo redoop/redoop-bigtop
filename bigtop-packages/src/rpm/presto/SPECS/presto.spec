@@ -81,15 +81,6 @@ Requires: sh-utils
 presto is an open source distributed SQL query engine for running interactive analytic queries against data sources of all sizes ranging from gigabytes to petabytes. 
 
 
-%package client
-Summary: Presto client
-Group: System/Daemons
-Requires: %{name} = %{version}-%{release}
-
-%description client
-Installation of this package will provide you with presto for presto-cli.
-
-
 %prep
 %setup -n %{presto_folder}
 
@@ -132,9 +123,3 @@ fi
 %{etc_presto}
 
 %dir %{presto_data}
-
-%exclude %{lib_presto}/bin/presto
-
-
-% files client
-%{lib_presto}/bin/presto
