@@ -117,5 +117,5 @@ chmod 755 $wrapper
 install -d -m 0755 $PREFIX/$ETC_DIR/conf
 
 
-ln -s /etc/presto/conf $PREFIX/$LIB_DIR/etc
+ln -s /etc/presto/conf $PREFIX/$LIB_DIR/conf
 
