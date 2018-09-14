@@ -89,7 +89,8 @@ leaves = {
            "spark2-client" : "spark2",
            "spark2-client" : "spark2",
            "spark2-thriftserver" : "spark2",
-           "spark2-historyserver" : "spark2"
+           "spark2-historyserver" : "spark2",
+           "presto" : "presto"
 }
 
 # Define the aliases and the list of leaves they correspond to
