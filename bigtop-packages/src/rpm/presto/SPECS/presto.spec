@@ -15,7 +15,6 @@
 %define crh_dir /usr/%{crh_tag}/%{crh_version_with_bn}
 %define presto_name presto
 %define etc_presto /etc/presto/conf
-%define bin_presto %{_bindir}
 %define lib_presto %{crh_dir}/presto
 %define presto_data /var/presto/data
 %define vlb_presto /var/lib/presto
@@ -82,6 +81,15 @@ Requires: sh-utils
 presto is an open source distributed SQL query engine for running interactive analytic queries against data sources of all sizes ranging from gigabytes to petabytes. 
 
 
+%package client
+Summary: Presto client
+Group: System/Daemons
+Requires: %{name} = %{version}-%{release}
+
+%description client
+Installation of this package will provide you with presto for presto-cli.
+
+
 %prep
 %setup -n %{presto_folder}
 
@@ -121,7 +129,12 @@ fi
 %files 
 %defattr(644,root,root,755)
 %{lib_presto}
-%{bin_presto}
 %{etc_presto}
 
 %dir %{presto_data}
+
+%exclude %{lib_presto}/bin/presto
+
+
+% files client
+%{lib_presto}/bin/presto
