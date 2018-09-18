@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+       http://www.apache.org/licenses/LICENSE-2.0
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<configuration>
+  <property>
+    <name>node-scheduler.include-coordinator</name>
+    <value>false</value>
+    <description>
+      Allow scheduling work on the coordinator. For larger clusters, processing
+      work on the coordinator can impact query performance because the machine’s
+      resources are not available for the critical task of scheduling, managing
+      and monitoring query execution.
+    </description>
+    <value-attributes>
+      <type>value-list</type>
+      <entries>
+        <entry>
+          <value>true</value>
+          <label>Enabled</label>
+        </entry>
+        <entry>
+          <value>false</value>
+          <label>Disabled</label>
+        </entry>
+      </entries>
+      <selection-cardinality>1</selection-cardinality>
+    </value-attributes>
+    <on-ambari-upgrade add="true"/>
+  </property>
+
+  <property>
+    <name>http-server.http.port</name>
+    <value>8787</value>
+    <description>
+      Specifies the port for the HTTP server. Presto uses HTTP for all
+      communication, internal and external
+    </description>
+    <on-ambari-upgrade add="true"/>
+  </property>
+
+  <property require-input="true">
+    <name>discovery.uri</name>
+    <value></value>
+    <description>
+      The URI to the Discovery server. Because we have enabled the embedded version of Discovery in 
+      the Presto coordinator, this should be the URI of the Presto coordinator. Replace http://example.net:8787 
+      to match the host and port of the Presto coordinator. This URI must not end in a slash.
+    </description>
+    <on-ambari-upgrade add="true"/>
+  </property>
+
+  <property>
+    <name>query.max-memory</name>
+    <value>50GB</value>
+    <description>
+      The maximum amount of distributed memory that a query may use.
+    </description>
+    <value-attributes>
+      <type>int</type>
+      <minimum>0</minimum>
+      <maximum>300</maximum>
+      <increment-step>2</increment-step>
+      <unit>GB</unit>
+      <overridable>false</overridable>
+    </value-attributes>
+    <on-ambari-upgrade add="true"/>
+  </property>
+
+  <property>
+    <name>query.max-memory-per-node</name>
+    <value>1GB</value>
+    <description>
+      The maximum amount of memory that a query may use on any one machine.
+    </description>
+    <value-attributes>
+      <type>int</type>
+      <minimum>0</minimum>
+      <maximum>100</maximum>
+      <increment-step>1</increment-step>
+      <unit>GB</unit>
+      <overridable>false</overridable>
+    </value-attributes>
+    <on-ambari-upgrade add="true"/>
+  </property>
+
+  <property>
+    <name>query.max-total-memory-per-node</name>
+    <value>2GB</value>
+    <description>
+      The maximum amount of user and system memory that a query may use on any one machine, where 
+      system memory is the memory used during execution by readers, writers, and network buffers, etc.
+    </description>
+    <value-attributes>
+      <type>int</type>
+      <minimum>0</minimum>
+      <maximum>100</maximum>
+      <increment-step>1</increment-step>
+      <unit>GB</unit>
+      <overridable>false</overridable>
+    </value-attributes>
+    <on-ambari-upgrade add="true"/>
+  </property>
+</configuration>

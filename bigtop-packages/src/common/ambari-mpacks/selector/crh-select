@@ -89,7 +89,8 @@ leaves = {
            "spark2-client" : "spark2",
            "spark2-client" : "spark2",
            "spark2-thriftserver" : "spark2",
-           "spark2-historyserver" : "spark2"
+           "spark2-historyserver" : "spark2",
+           "presto" : "presto"
 }
 
 # Define the aliases and the list of leaves they correspond to
@@ -134,7 +135,8 @@ locked_contexts = {
                     ("shc", "shc"),
                     ("spark_llap", "spark_llap"),
                     ("spark2-client", "spark2"),
-                    ("spark-client", "spark")]
+                    ("spark-client", "spark"),
+                    ("presto", "presto")]
 }
 
 command_symlinks = {
