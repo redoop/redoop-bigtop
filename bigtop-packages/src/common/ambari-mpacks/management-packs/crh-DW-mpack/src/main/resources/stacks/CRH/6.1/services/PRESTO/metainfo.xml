@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<metainfo>
+  <schemaVersion>2.0</schemaVersion>
+  <services>
+    <service>
+      <name>PRESTO</name>
+      <displayName>Presto</displayName>
+      <comment>An open source distributed SQL query engine for running interactive analytic queries against data sources of all sizes ranging from gigabytes to petabytes.</comment>
+      <version>0.210</version>
+      <components>
+        <component>
+          <name>COORDINATOR</name>
+          <displayName>Presto Coordinator</displayName>
+          <category>MASTER</category>
+          <cardinality>1</cardinality>
+          <commandScript>
+            <script>scripts/coordinator.py</script>
+            <scriptType>PYTHON</scriptType>
+            <timeout>1200</timeout>
+          </commandScript>
+        </component>
+        <component>
+          <name>WORKER</name>
+          <displayName>Presto Worker</displayName>
+          <category>SLAVE</category>
+          <cardinality>0+</cardinality>
+          <commandScript>
+            <script>scripts/worker.py</script>
+            <scriptType>PYTHON</scriptType>
+            <timeout>1200</timeout>
+          </commandScript>
+        </component>
+      </components>
+
+      <osSpecifics>
+        <osSpecific>
+          <osFamily>redhat7</osFamily>
+          <packages>
+            <package>
+              <name>presto_${stack_version}</name>
+            </package>
+          </packages>
+        </osSpecific>
+      </osSpecifics>
+
+      <configuration-dependencies>
+        <config-type>log-properties</config-type>
+        <config-type>presto-env</config-type>
+        <config-type>node-properties</config-type>
+        <config-type>coordinator-properties</config-type>
+        <config-type>worker-properties</config-type>
+        <config-type>jvm-config</config-type>
+      </configuration-dependencies>
+
+    </service>
+  </services>
+</metainfo>
