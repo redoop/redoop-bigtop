@@ -128,4 +128,4 @@ fi
 %attr(755,root,root) %{lib_presto}/bin/presto
 %attr(755,root,root) %{bin_presto}/presto
 
-%dir %{presto_data}
+%attr(755,presto,presto) %{presto_data}
