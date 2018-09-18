@@ -92,10 +92,9 @@ LIB_DIR=${LIB_DIR:-$CRH_DIR/presto}
 BIN_DIR=${BIN_DIR:-$CRH_DIR/presto/bin}
 CONF_DIST_DIR=/etc/presto/conf/
 ETC_DIR=${ETC_DIR:-/etc/presto}
-DATA_DIR=/var/presto/data
+
 
 install -d -m 0755 ${PREFIX}/${LIB_DIR}
-install -d -m 0755 ${PREFIX}/${DATA_DIR}
 
 
 cp -rf ${BUILD_DIR}/* ${PREFIX}/${LIB_DIR}/

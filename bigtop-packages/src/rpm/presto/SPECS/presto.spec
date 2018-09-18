@@ -16,7 +16,6 @@
 %define presto_name presto
 %define etc_presto /etc/presto/conf
 %define lib_presto %{crh_dir}/presto
-%define presto_data /var/presto
 %define vlb_presto /var/lib/presto
 %define bin_presto %{_bindir}
 
@@ -110,8 +109,6 @@ getent passwd presto >/dev/null || useradd -c "presto" -s /sbin/nologin -g prest
 
 
 %post
-chown -R presto:presto %{presto_data}
-
 %{alternatives_cmd} --install %{etc_presto} %{presto_name}-conf %{etc_presto}.empty 30
 
 %preun
@@ -130,4 +127,3 @@ fi
 %attr(755,root,root) %{lib_presto}/bin/presto
 %attr(755,root,root) %{bin_presto}/presto
 
-%dir %{presto_data}
