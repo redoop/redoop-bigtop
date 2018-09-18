@@ -135,7 +135,8 @@ locked_contexts = {
                     ("shc", "shc"),
                     ("spark_llap", "spark_llap"),
                     ("spark2-client", "spark2"),
-                    ("spark-client", "spark")]
+                    ("spark-client", "spark"),
+                    ("presto", "presto")]
 }
 
 command_symlinks = {
