@@ -68,6 +68,10 @@
         <config-type>jvm-config</config-type>
       </configuration-dependencies>
 
+      <requiredServices>
+        <service>HIVE</service>
+      </requiredServices>
+
     </service>
   </services>
 </metainfo>
