@@ -1,0 +1,71 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# we'll just use the build from the tarball.
+	bash debian/do-component-build -Divy.home=${HOME}/.ivy2
+
+override_dh_auto_install:
+	env CRH_DIR=${crh_dir} sh -x debian/install_datafu.sh \
+	  --build-dir=datafu-pig/build/libs \
+	  --prefix=debian/tmp
+	  
+	# Rename file to add CRH version as name, first define file list
+deb_file=
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/datafu.dirs ] || mv debian/datafu.dirs debian/datafu${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/datafu.install ] || mv debian/datafu.install debian/datafu${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/datafu.lintian-overrides ] || mv debian/datafu.lintian-overrides debian/datafu${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/datafu.manpages ] || mv debian/datafu.manpages debian/datafu${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/datafu.postinst ] || mv debian/datafu.postinst debian/datafu${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/datafu.preinst ] || mv debian/datafu.preinst debian/datafu${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/datafu.prerm ] || mv debian/datafu.prerm debian/datafu${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/datafu-$$file.dirs ] || mv debian/datafu-$$file.dirs debian/datafu${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/datafu-$$file.install ] || mv debian/datafu-$$file.install debian/datafu${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/datafu-$$file.lintian-overrides ] || mv debian/datafu-$$file.lintian-overrides debian/datafu${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/datafu-$$file.manpages ] || mv debian/datafu-$$file.manpages debian/datafu${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/datafu-$$file.postinst ] || mv debian/datafu-$$file.postinst debian/datafu${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/datafu-$$file.preinst ] || mv debian/datafu-$$file.preinst debian/datafu${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/datafu-$$file.prerm ] || mv debian/datafu-$$file.prerm debian/datafu${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install
+	   

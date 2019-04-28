@@ -1,0 +1,66 @@
+#!/bin/bash
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -ex
+
+. `dirname ${0}`/bigtop.bom
+
+cat <<__EOT__ >> ivy/libraries.properties
+
+hbase95.version=$HBASE_VERSION
+hive.version=$HIVE_VERSION
+zookeeper.version=$ZOOKEEPER_VERSION
+hadoop-common.version=$HADOOP_VERSION
+hadoop-hdfs.version=$HADOOP_VERSION
+hadoop-mapreduce.version=$HADOOP_VERSION
+__EOT__
+
+# use .m2/repository/apache-forrest as store for apache forrest depency download store
+# since -O and -N cannot be used together, work around this issue
+( mkdir -p $HOME/.m2/repository/apache-forrest ;
+  cd $HOME/.m2/repository/apache-forrest  ;
+  /usr/bin/wget -N https://archive.apache.org/dist/forrest/0.9/apache-forrest-0.9.tar.gz
+  echo "ea58a078e3861d4dfc8bf3296a53a5f8  apache-forrest-0.9.tar.gz" >apache-forrest-0.9.tar.md5
+  if ! md5sum  -c --quiet apache-forrest-0.9.tar.md5 ; then
+    exit 1
+  fi
+)
+tar xf  $HOME/.m2/repository/apache-forrest/apache-forrest-0.9.tar.gz
+export FORREST_HOME=`pwd`/apache-forrest-0.9
+
+BUILD_OPTS="-Djavac.version=${JDK_VERSION} -Dforrest.home=${FORREST_HOME} -Dversion=${PIG_VERSION} -Dhadoopversion=23"
+
+# FIXME: there's a weird synchronization issue between ivy and Maven caches wrt. jetty
+# If we don't do the following the build fails with (note zip instead of jar):
+# [ivy:resolve]                ::::::::::::::::::::::::::::::::::::::::::::::
+# [ivy:resolve]                ::              FAILED DOWNLOADS            ::
+# [ivy:resolve]                :: ^ see resolution messages for details  ^ ::
+# [ivy:resolve]                ::::::::::::::::::::::::::::::::::::::::::::::
+# [ivy:resolve]                :: org.mortbay.jetty#jetty;6.1.26!jetty.zip
+# [ivy:resolve]                ::::::::::::::::::::::::::::::::::::::::::::::
+for h in ${HOME} `mvn help:system | grep '^user.home=' | cut -f2 -d=` ; do
+  rm -rf ${h}/.ivy2/cache/*jetty ${h}/.m2/repository/org/mortbay ${h}/.m2/repository/org/eclipse/jetty
+done
+
+
+echo "forrest.maxmemory=256m" >> src/docs/forrest.properties
+
+export ANT_OPTS="-Xmx4096m"
+ant $BUILD_OPTS clean published pigunit-jar smoketests-jar javadoc "$@"
+for build_file in contrib/piggybank/java/build.xml ; do
+  ant $BUILD_OPTS -buildfile $build_file clean jar "$@"
+done
+ant $BUILD_OPTS tar "$@"

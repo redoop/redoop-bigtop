@@ -1,0 +1,83 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+build_version=${FLUME_VERSION}
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# No easy way to disable the default RAT run which fails the build because of some fails in the debian/ directory
+	rm -rf bigtop-empty
+	mkdir -p bigtop-empty
+	# I could not find a way to add debian/ to RAT exclude list through cmd line
+	# or to unbind rat:check goal
+	# So I am redirecting its attention with a decoy
+	env FLUME_VERSION=$(build_version) \
+		sh debian/do-component-build -Drat.basedir=$${PWD}/bigtop-empty -Dmaven.repo.local=${HOME}/.m2/repository
+
+override_dh_auto_install:
+	env CRH_DIR=${crh_dir} sh -x debian/install_flume.sh \
+	  --build-dir=$${PWD} \
+	  --prefix=debian/flume${CRH_VERSION_AS_NAME}
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/flume-agent.init
+	install -d -m 0755 debian/flume${CRH_VERSION_AS_NAME}-agent/etc/default
+	install -d -m 0755 debian/flume${CRH_VERSION_AS_NAME}-agent/etc/init.d
+	cp debian/flume-agent.default debian/flume${CRH_VERSION_AS_NAME}-agent/etc/default/flume-agent
+	cp debian/flume-agent.init debian/flume${CRH_VERSION_AS_NAME}-agent/etc/init.d/flume-agent
+	
+	# Rename file to add CRH version as name, first define file list
+deb_file=agent
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/flume.dirs ] || mv debian/flume.dirs debian/flume${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/flume.install ] || mv debian/flume.install debian/flume${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/flume.lintian-overrides ] || mv debian/flume.lintian-overrides debian/flume${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/flume.manpages ] || mv debian/flume.manpages debian/flume${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/flume.postinst ] || mv debian/flume.postinst debian/flume${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/flume.preinst ] || mv debian/flume.preinst debian/flume${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/flume.prerm ] || mv debian/flume.prerm debian/flume${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/flume-$$file.dirs ] || mv debian/flume-$$file.dirs debian/flume${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/flume-$$file.install ] || mv debian/flume-$$file.install debian/flume${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/flume-$$file.lintian-overrides ] || mv debian/flume-$$file.lintian-overrides debian/flume${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/flume-$$file.manpages ] || mv debian/flume-$$file.manpages debian/flume${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/flume-$$file.postinst ] || mv debian/flume-$$file.postinst debian/flume${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/flume-$$file.preinst ] || mv debian/flume-$$file.preinst debian/flume${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/flume-$$file.prerm ] || mv debian/flume-$$file.prerm debian/flume${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install
+

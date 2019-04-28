@@ -1,0 +1,9 @@
+etc/hive
+usr/bin/hive
+usr/bin/beeline
+usr/bin/hiveserver2
+{CRH_DIR}/hive/bin
+{CRH_DIR}/hive/conf
+{CRH_DIR}/hive/scripts
+usr/share/man/man1/hive.1.gz
+usr/share/doc/hive

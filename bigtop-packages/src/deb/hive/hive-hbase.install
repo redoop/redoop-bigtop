@@ -1,0 +1,2 @@
+${crh_dir}/hive/lib/hbase-*.jar
+${crh_dir}/hive/lib/hive-hbase-handler*.jar

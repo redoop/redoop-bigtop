@@ -1,0 +1,13 @@
+reset: false
+bundle_deploy: false
+sources:
+  - 'ppa:juju/stable'
+packages:
+  - amulet
+  - python3-yaml
+# exclude tests that are unrelated to bigtop.
+excludes:
+  - ganglia
+  - ganglia-node
+  - rsyslog
+  - rsyslog-forwarder-ha

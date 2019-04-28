@@ -1,0 +1,4 @@
+/etc/hadoop/conf.empty/
+${crh_dir}/hadoop
+/usr/bin
+/usr/share/doc/hadoop

@@ -1,0 +1,3 @@
+/etc/hadoop-httpfs
+${crh_dir}/hadoop-httpfs
+/var/log/hadoop-httpfs

@@ -1,0 +1,67 @@
+#!/usr/bin/make -f
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# -*- makefile -*-
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+%:
+	dh $@
+override_dh_auto_build:
+	bash debian/do-component-build
+svcs=spark-master spark-worker spark-history-server spark-thriftserver
+$(svcs): debian/init.d.tmpl
+	bash $< debian/$@.svc deb debian/$@.init
+	touch $@
+override_dh_auto_install: $(svcs)
+	env CRH_DIR=${crh_dir} bash -x debian/install_spark.sh \
+	--build-dir=`pwd` \
+	--doc-dir=/usr/share/doc/spark \
+	--source-dir=debian \
+	--prefix=debian/tmp
+	# Rename file to add CRH version as name, first define file list
+deb_file=master worker python history-server thriftserver datanucleus external yarn-shuffle
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/spark.dirs ] || mv debian/spark.dirs debian/spark2${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/spark.install ] || mv debian/spark.install debian/spark2${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/spark.lintian-overrides ] || mv debian/spark.lintian-overrides debian/spark2${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/spark.manpages ] || mv debian/spark.manpages debian/spark2${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/spark.postinst ] || mv debian/spark.postinst debian/spark2${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/spark.preinst ] || mv debian/spark.preinst debian/spark2${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/spark.prerm ] || mv debian/spark.prerm debian/spark2${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/spark-$$file.dirs ] || mv debian/spark-$$file.dirs debian/spark2${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/spark-$$file.install ] || mv debian/spark-$$file.install debian/spark2${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/spark-$$file.lintian-overrides ] || mv debian/spark-$$file.lintian-overrides debian/spark2${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/spark-$$file.manpages ] || mv debian/spark-$$file.manpages debian/spark2${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/spark-$$file.postinst ] || mv debian/spark-$$file.postinst debian/spark2${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/spark-$$file.preinst ] || mv debian/spark-$$file.preinst debian/spark2${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/spark-$$file.prerm ] || mv debian/spark-$$file.prerm debian/spark2${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	dh_install
+	# BIGTOP-2588 drop datanucleus jars from spark-core
+	rm -Rf debian/spark-core/${crh_dir}/spark2/jars/datanucleus*

@@ -1,0 +1,4 @@
+${crh_dir}/hbase
+/usr/bin/hbase
+/etc/hbase
+/etc/security/limits.d/hbase.nofiles.conf

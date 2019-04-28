@@ -1,0 +1,6 @@
+/etc/hadoop/conf.empty/
+${crh_dir}/hadoop/libexec
+${crh_dir}/hadoop-hdfs
+/usr/bin
+/var/lib/hadoop-hdfs/cache
+/var/log/hadoop-hdfs

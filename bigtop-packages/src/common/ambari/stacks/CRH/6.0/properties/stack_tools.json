@@ -1,0 +1,14 @@
+{
+  "CRH": {
+    "stack_selector": [
+      "crh-select",
+      "/usr/bin/crh-select",
+      "crh-select"
+    ],
+    "conf_selector": [
+      "conf-select",
+      "/usr/bin/conf-select",
+      "conf-select"
+    ]
+  }
+}
