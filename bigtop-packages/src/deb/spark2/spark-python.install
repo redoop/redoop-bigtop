@@ -1,0 +1,4 @@
+/usr/bin/pyspark
+${crh_dir}/spark2/bin/pyspark
+${crh_dir}/spark2/python
+

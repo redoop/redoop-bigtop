@@ -1,0 +1,84 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# -*- makefile -*-
+SHELL=/bin/bash
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+tez_pkg_name=tez
+tez_home=${crh_dir}/tez
+lib_tez=${crh_dir}/tez/lib
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	env tez_name=${tez_pkg_name} tez_base_version=${TEZ_VERSION} bash debian/do-component-build -Dmaven.repo.local=${HOME}/.m2/repository
+
+
+override_dh_auto_install:
+	cp debian/tez.1 .
+	cp debian/tez-site.xml .
+	env CRH_DIR=${crh_dir} bash -x debian/install_tez.sh \
+		--build-dir=build \
+		--doc-dir=usr/share/doc/${tez_pkg_name}-doc \
+		--prefix=debian/tmp
+	ln -sf ${crh_dir}/hadoop/hadoop-annotations.jar debian/tmp/${lib_tez}/hadoop-annotations.jar
+	ln -sf ${crh_dir}/hadoop/hadoop-auth.jar debian/tmp/${lib_tez}/hadoop-auth.jar
+	ln -sf ${crh_dir}/hadoop-mapreduce/hadoop-mapreduce-client-common.jar debian/tmp/${lib_tez}/hadoop-mapreduce-client-common.jar
+	ln -sf ${crh_dir}/hadoop-mapreduce/hadoop-mapreduce-client-core.jar debian/tmp/${lib_tez}/hhadoop-mapreduce-client-core.jar
+	ln -sf ${crh_dir}/hadoop-yarn/hadoop-yarn-server-web-proxy.jar debian/tmp/${lib_tez}/hadoop-yarn-server-web-proxy.jar
+	
+	# Rename file to add CRH version as name, first define file list
+deb_file=
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/tez.dirs ] || mv debian/tez.dirs debian/tez${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/tez.install ] || mv debian/tez.install debian/tez${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/tez.lintian-overrides ] || mv debian/tez.lintian-overrides debian/tez${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/tez.manpages ] || mv debian/tez.manpages debian/tez${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/tez.postinst ] || mv debian/tez.postinst debian/tez${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/tez.preinst ] || mv debian/tez.preinst debian/tez${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/tez.prerm ] || mv debian/tez.prerm debian/tez${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/tez-$$file.dirs ] || mv debian/tez-$$file.dirs debian/tez${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/tez-$$file.install ] || mv debian/tez-$$file.install debian/tez${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/tez-$$file.lintian-overrides ] || mv debian/tez-$$file.lintian-overrides debian/tez${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/tez-$$file.manpages ] || mv debian/tez-$$file.manpages debian/tez${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/tez-$$file.postinst ] || mv debian/tez-$$file.postinst debian/tez${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/tez-$$file.preinst ] || mv debian/tez-$$file.preinst debian/tez${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/tez-$$file.prerm ] || mv debian/tez-$$file.prerm debian/tez${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install
+	   

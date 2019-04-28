@@ -1,0 +1,5 @@
+/etc/default/hadoop-httpfs
+/etc/hadoop-httpfs
+${crh_dir}/hadoop/libexec/httpfs-config.sh
+${crh_dir}/hadoop-httpfs
+/var/lib/hadoop-httpfs

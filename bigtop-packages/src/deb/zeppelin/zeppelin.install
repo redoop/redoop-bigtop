@@ -1,0 +1,7 @@
+/etc/zeppelin
+${crh_dir}/zeppelin
+/var/lib/zeppelin
+/var/run/zeppelin
+/var/log/zeppelin
+/var/run/zeppelin/webapps
+/usr/share/doc/zeppelin

@@ -1,0 +1,74 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	env FULL_VERSION=${KAFKA_BASE_VERSION} bash debian/do-component-build
+
+override_dh_auto_install:
+	env FULL_VERSION=${KAFKA_BASE_VERSION} CRH_DIR=${crh_dir} \
+	bash -x debian/install_kafka.sh \
+	  --build-dir=./ \
+	  --source-dir=debian \
+	  --prefix=debian/kafka${CRH_VERSION_AS_NAME}
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/kafka-server.svc
+	mkdir -p debian/kafka${CRH_VERSION_AS_NAME}-server/etc/init.d/
+	bash debian/init.d.tmpl debian/kafka-server.svc deb debian/kafka${CRH_VERSION_AS_NAME}-server/etc/init.d/kafka-server
+	
+	# Rename file to add CRH version as name, first define file list
+deb_file=server
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/kafka.dirs ] || mv debian/kafka.dirs debian/kafka${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/kafka.install ] || mv debian/kafka.install debian/kafka${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/kafka.lintian-overrides ] || mv debian/kafka.lintian-overrides debian/kafka${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/kafka.manpages ] || mv debian/kafka.manpages debian/kafka${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/kafka.postinst ] || mv debian/kafka.postinst debian/kafka${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/kafka.preinst ] || mv debian/kafka.preinst debian/kafka${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/kafka.prerm ] || mv debian/kafka.prerm debian/kafka${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/kafka-$$file.dirs ] || mv debian/kafka-$$file.dirs debian/kafka${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/kafka-$$file.install ] || mv debian/kafka-$$file.install debian/kafka${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/kafka-$$file.lintian-overrides ] || mv debian/kafka-$$file.lintian-overrides debian/kafka${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/kafka-$$file.manpages ] || mv debian/kafka-$$file.manpages debian/kafka${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/kafka-$$file.postinst ] || mv debian/kafka-$$file.postinst debian/kafka${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/kafka-$$file.preinst ] || mv debian/kafka-$$file.preinst debian/kafka${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/kafka-$$file.prerm ] || mv debian/kafka-$$file.prerm debian/kafka${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install

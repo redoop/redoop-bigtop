@@ -1,0 +1,9 @@
+/var/log/hive2
+/var/run/hive2
+/var/lib/hive2
+/etc/hive2/conf.dist
+${crh_dir}/hive2/bin
+${crh_dir}/hive2/conf
+${crh_dir}/hive2/lib
+${crh_dir}/hive2/metastore
+${crh_dir}/hive2/scripts

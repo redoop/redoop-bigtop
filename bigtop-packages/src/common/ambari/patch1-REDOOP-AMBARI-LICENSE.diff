@@ -1,0 +1,134 @@
+diff -uNr apache-ambari-2.6.1-src/ambari-server/pom.xml apache-ambari-2.6.1-srcp/ambari-server/pom.xml
+--- apache-ambari-2.6.1-src/ambari-server/pom.xml	2017-12-13 04:14:08.000000000 +0800
++++ apache-ambari-2.6.1-srcp/ambari-server/pom.xml	2018-03-20 09:47:47.496261633 +0800
+@@ -454,6 +454,20 @@
+                 </source>
+               </sources>
+             </mapping>
++
++            <!-- Redoop License file -->
++            <mapping>
++              <directory>/etc</directory>
++              <username>root</username>
++              <groupname>root</groupname>
++              <directoryIncluded>false</directoryIncluded> <!-- avoid managi
++ng /etc/init.d -->              <sources>
++                <source>
++                  <location>${basedir}/../license</location>
++                </source>
++              </sources>
++            </mapping>
++
+             <mapping>
+               <directory>/usr/sbin</directory>
+               <username>root</username>
+diff -uNr apache-ambari-2.6.1-src/ambari-server/src/main/java/org/apache/ambari/server/bootstrap/BootStrapImpl.java apache-ambari-2.6.1-srcp/ambari-server/src/main/java/org/apache/ambari/server/bootstrap/BootStrapImpl.java
+--- apache-ambari-2.6.1-src/ambari-server/src/main/java/org/apache/ambari/server/bootstrap/BootStrapImpl.java	2017-12-13 04:14:08.000000000 +0800
++++ apache-ambari-2.6.1-srcp/ambari-server/src/main/java/org/apache/ambari/server/bootstrap/BootStrapImpl.java	2018-03-20 09:45:23.896590911 +0800
+@@ -34,8 +34,16 @@
+ import com.google.inject.Singleton;
+ import org.apache.ambari.server.controller.AmbariServer;
+ 
++import org.apache.ambari.server.license.HandleLicenseInfo;
++import org.apache.ambari.server.license.HandleLicenseInfoImpl;
++import org.apache.ambari.server.orm.dao.HostDAO;
++
+ @Singleton
+ public class BootStrapImpl {
++
++  @Inject
++  HostDAO hostDAO;
++
+   public static final String DEV_VERSION = "${ambariVersion}";
+   private File bootStrapDir;
+   private String bootScript;
+@@ -104,6 +112,13 @@
+ 
+   public  synchronized BSResponse runBootStrap(SshHostInfo info) {
+     BSResponse response = new BSResponse();
++
++    /**
++     * set有效主机列表
++     */
++    HandleLicenseInfo handleLicenseInfo = new HandleLicenseInfoImpl();
++    info.setHosts(handleLicenseInfo.getvalidHostsList(hostDAO, info));
++
+     /* Run some checks for ssh host */
+     LOG.info("BootStrapping hosts " + info.hostListAsString());
+     if (bsRunner != null) {
+diff -uNr apache-ambari-2.6.1-src/ambari-server/src/main/java/org/apache/ambari/server/controller/AmbariServer.java apache-ambari-2.6.1-srcp/ambari-server/src/main/java/org/apache/ambari/server/controller/AmbariServer.java
+--- apache-ambari-2.6.1-src/ambari-server/src/main/java/org/apache/ambari/server/controller/AmbariServer.java	2017-12-13 04:14:08.000000000 +0800
++++ apache-ambari-2.6.1-srcp/ambari-server/src/main/java/org/apache/ambari/server/controller/AmbariServer.java	2018-03-20 09:41:33.497701410 +0800
+@@ -165,6 +165,12 @@
+ import com.google.inject.persist.Transactional;
+ import com.sun.jersey.spi.container.servlet.ServletContainer;
+ 
++import org.apache.ambari.server.orm.dao.ControllerDAO;
++import org.apache.ambari.server.license.HandleLicenseInfo;
++import org.apache.ambari.server.license.HandleLicenseInfoImpl;
++import org.apache.ambari.server.license.LicenseInfo;
++import org.apache.ambari.server.license.LicenseTimer;
++
+ @Singleton
+ public class AmbariServer {
+   public static final String VIEWS_URL_PATTERN = "/api/v1/views/*";
+@@ -1065,7 +1071,28 @@
+       KerberosChecker.checkJaasConfiguration();
+       ViewRegistry.initInstance(server.viewRegistry);
+       ComponentSSLConfiguration.instance().init(server.configs);
+-      server.run();
++      /**
++       * 判断license文件中的Mac地址与本机Mac地址是否匹配，如果不匹配，则停止server，否则继续
++       */
++      HandleLicenseInfo handleLicenseInfo = new HandleLicenseInfoImpl();
++      ControllerDAO controllerDAO = injector.getInstance(ControllerDAO.class);
++      if (LicenseInfo.getInstance().getMacAddress().equals("xwd")) {
++        server.run();
++      } else {
++        if (!handleLicenseInfo.verifyMacAddress()) {
++          LOG.error("===== The mac address for license does not match lcoal mac address, license is invalid =====");
++        } else {
++          if (handleLicenseInfo.isNewLicense(controllerDAO)) {
++            handleLicenseInfo.initCurrentLicense(controllerDAO);
++          }
++            LicenseTimer.timer(controllerDAO);
++            server.run();
++          if (handleLicenseInfo.isExpire()) {
++            LOG.error("============================ License was Expire ============================");
++            LOG.error("============ Ambari Server will stop after 5 minutes of started ============");
++          }
++        }
++      }
+     } catch (Throwable t) {
+       // Writing to system console is needed because loggers may not get flushed on exit and diagnostic information
+       // may get lost.
+diff -uNr apache-ambari-2.6.1-src/ambari-server/src/main/resources/Ambari-DDL-Postgres-CREATE.sql apache-ambari-2.6.1-srcp/ambari-server/src/main/resources/Ambari-DDL-Postgres-CREATE.sql
+--- apache-ambari-2.6.1-src/ambari-server/src/main/resources/Ambari-DDL-Postgres-CREATE.sql	2017-12-13 04:14:09.000000000 +0800
++++ apache-ambari-2.6.1-srcp/ambari-server/src/main/resources/Ambari-DDL-Postgres-CREATE.sql	2018-03-20 09:30:20.782540273 +0800
+@@ -84,6 +84,15 @@
+   CONSTRAINT UQ_config_type_tag UNIQUE (cluster_id, type_name, version_tag),
+   CONSTRAINT UQ_config_type_version UNIQUE (cluster_id, type_name, version));
+ 
++CREATE TABLE controller (
++  controller_id VARCHAR(255) NOT NULL,
++  vaild_time VARCHAR(255) NOT NULL,
++  mac_address VARCHAR(255) NOT NULL,
++  reg_date VARCHAR(255) NOT NULL,
++  remain_time VARCHAR(255) NOT NULL,
++  permission_hosts VARCHAR(255)  NOT NULL,
++  CONSTRAINT PK_controller PRIMARY KEY (controller_id));
++
+ CREATE TABLE serviceconfig (
+   service_config_id BIGINT NOT NULL,
+   cluster_id BIGINT NOT NULL,
+diff -uNr apache-ambari-2.6.1-src/ambari-server/src/main/resources/META-INF/persistence.xml apache-ambari-2.6.1-srcp/ambari-server/src/main/resources/META-INF/persistence.xml
+--- apache-ambari-2.6.1-src/ambari-server/src/main/resources/META-INF/persistence.xml	2017-12-13 04:14:09.000000000 +0800
++++ apache-ambari-2.6.1-srcp/ambari-server/src/main/resources/META-INF/persistence.xml	2018-03-20 09:31:51.293844875 +0800
+@@ -97,6 +97,7 @@
+     <class>org.apache.ambari.server.orm.entities.KerberosDescriptorEntity</class>
+     <class>org.apache.ambari.server.orm.entities.RemoteAmbariClusterEntity</class>
+     <class>org.apache.ambari.server.orm.entities.RemoteAmbariClusterServiceEntity</class>
++    <class>org.apache.ambari.server.orm.entities.ControllerEntity</class>
+ 
+     <properties>
+       <property name="eclipselink.cache.size.default" value="10000" />

@@ -1,0 +1,130 @@
+#!/usr/bin/make -f
+
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+%:
+	dh $@
+
+hadoop_version=${HADOOP_BASE_VERSION}
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+
+ifeq (${DEB_BUILD_ARCH},amd64)
+  native_dir=Linux-amd64-64
+endif
+ifeq (${DEB_BUILD_ARCH},i386)
+  native_dir=Linux-i386-32
+endif
+
+
+override_dh_auto_build:
+	env HADOOP_VERSION=${hadoop_version} HADOOP_ARCH=${native_dir} \
+        bash debian/do-component-build -Divy.home=${HOME}/.ivy2
+
+hadoop_svcs=hdfs-namenode hdfs-secondarynamenode hdfs-datanode hdfs-zkfc hdfs-journalnode \
+            yarn-resourcemanager yarn-nodemanager yarn-proxyserver yarn-timelineserver\
+            mapreduce-historyserver httpfs
+
+$(hadoop_svcs): debian/init.d.tmpl
+	bash $< debian/hadoop-$@.svc deb debian/hadoop-$@.init
+	cp debian/$(firstword $(subst -, ,$@)).default debian/tmp/etc/default/hadoop-$@
+	echo /etc/default/hadoop-$@ >> debian/hadoop-$@.install
+	# FIXME: workaround for BIGTOP-105
+	[ -f debian/hadoop-$@.postinst ] || cp debian/hadoop.daemon.postinst.tpl debian/hadoop-$@.postinst
+	sed -i -e "s|@HADOOP_DAEMON@|$@|" debian/hadoop-$@.postinst
+
+override_dh_auto_install:
+	env CRH_DIR=${crh_dir} CRH_VERSION=${CRH_VERSION_WITH_BN} HADOOP_VERSION=${hadoop_version} \
+	bash debian/install_hadoop.sh \
+	  --prefix=${PWD}/debian/tmp \
+	  --distro-dir=debian \
+	  --build-dir=${PWD}/build \
+	  --httpfs-dir=debian/tmp/${crh_dir}/hadoop-httpfs \
+	  --httpfs-etc-dir=debian/tmp/etc/hadoop-httpfs \
+	  --system-lib-dir=debian/tmp/usr/lib/ \
+	  --system-libexec-dir=debian/tmp/${crh_dir}/hadoop/libexec/ \
+	  --system-include-dir=debian/tmp/usr/include \
+	  --doc-dir=debian/tmp/usr/share/doc/hadoop-doc \
+	  --man-dir=debian/tmp/usr/share/man \
+	  --example-dir=debian/tmp/usr/share/doc/hadoop/examples \
+	  --native-build-string=${native_dir} \
+	  --installed-lib-dir=${crh_dir}/hadoop
+	# Forcing Zookeeper dependency to be on the packaged jar
+	ln -sf ${crh_dir}/zookeeper/zookeeper.jar debian/tmp/${crh_dir}/hadoop/lib/zookeeper*.jar
+	# Workaround for BIGTOP-583
+	rm -f debian/tmp/${crh_dir}/hadoop-*/lib/slf4j-log4j12-*.jar
+	# FIXME: BIGTOP-463
+	mkdir -p debian/tmp/etc/default
+	echo 'export JSVC_HOME=/usr/lib/bigtop-utils' >> debian/hadoop.default
+	cp debian/hadoop.default debian/tmp/etc/default/hadoop
+	# Refactored from install-arch
+	cp debian/hadoop-fuse.default debian/tmp/etc/default/hadoop-fuse
+	mkdir -p debian/tmp/etc/security/limits.d
+	cp debian/hdfs.conf debian/yarn.conf debian/mapreduce.conf debian/tmp/etc/security/limits.d
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hadoop.postinst
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hadoop-yarn.postinst
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/hadoop-httpfs.svc
+	mv debian/libhdfs0-dev.install debian/libhdfs0${CRH_VERSION_AS_NAME}-dev.install
+	mv debian/libhdfs0.install debian/libhdfs0${CRH_VERSION_AS_NAME}.install
+	mv debian/libhdfs0.dirs debian/libhdfs0${CRH_VERSION_AS_NAME}.dirs
+	
+# Rename file to add CRH version as name, first define file list
+deb_file=hdfs yarn mapreduce hdfs-fuse doc conf-pseudo mapreduce-historyserver yarn-nodemanager \
+         yarn-resourcemanager yarn-proxyserver yarn-timelineserver hdfs-namenode hdfs-secondarynamenode \
+         hdfs-zkfc hdfs-journalnode hdfs-datanode httpfs client
+
+override_dh_install: $(hadoop_svcs)
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/hadoop.dirs ] || mv debian/hadoop.dirs debian/hadoop${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/hadoop.install ] || mv debian/hadoop.install debian/hadoop${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/hadoop.lintian-overrides ] || mv debian/hadoop.lintian-overrides debian/hadoop${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/hadoop.manpages ] || mv debian/hadoop.manpages debian/hadoop${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/hadoop.postinst ] || mv debian/hadoop.postinst debian/hadoop${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/hadoop.preinst ] || mv debian/hadoop.preinst debian/hadoop${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/hadoop.prerm ] || mv debian/hadoop.prerm debian/hadoop${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/hadoop-$$file.dirs ] || mv debian/hadoop-$$file.dirs debian/hadoop${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/hadoop-$$file.install ] || mv debian/hadoop-$$file.install debian/hadoop${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/hadoop-$$file.lintian-overrides ] || mv debian/hadoop-$$file.lintian-overrides debian/hadoop${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/hadoop-$$file.manpages ] || mv debian/hadoop-$$file.manpages debian/hadoop${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/hadoop-$$file.postinst ] || mv debian/hadoop-$$file.postinst debian/hadoop${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/hadoop-$$file.preinst ] || mv debian/hadoop-$$file.preinst debian/hadoop${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/hadoop-$$file.prerm ] || mv debian/hadoop-$$file.prerm debian/hadoop${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install
+	# Drop misc fuse_dfs directories
+	rm -Rf debian/hadoop/${crh_dir}/hadoop/bin/fuse_dfs 
+	rm -Rf debian/hadoop/${crh_dir}/hadoop/contrib/fuse-dfs
+	rm -Rf debian/hadoop/${crh_dir}/hadoop/hdfs/contrib/fuse-dfs
+	cp debian/tmp/${crh_dir}/hadoop/mapreduce.tar.gz debian/hadoop${CRH_VERSION_AS_NAME}/${crh_dir}/hadoop

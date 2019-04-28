@@ -1,0 +1,2 @@
+${crh_dir}/spark2/yarn/spark-*-yarn-shuffle.jar
+${crh_dir}/spark2/yarn/lib/spark-yarn-shuffle.jar

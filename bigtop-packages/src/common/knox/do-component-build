@@ -1,0 +1,52 @@
+#!/bin/sh
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -e
+
+echo "-------------- Knox-do-component-build-started -----------"
+base_path=`pwd`
+#build_support_dir=`echo ${base_path%bigtop*}`
+#tar_output_folder="${build_support_dir}crh-output"
+#replace_file_path="${build_support_dir}SubstitutionFiles/knox.sh"
+#crh_comp_vars=${build_support_dir}HDP_COMPONENT_VARIABLES.sh
+#source ${crh_comp_vars}
+
+. `dirname $0`/bigtop.bom
+# modifying the properties prior to build
+#source ${replace_file_path}
+
+
+#$MAVEN_HOME/bin/mvn -q -B -e versions:set -DnewVersion=${knox_jar_version} -DgenerateBackupPoms=false
+
+#set +x
+
+echo "Generating git diffs of the source tress"
+#git diff  > ${tar_output_folder}/knox-source.patch
+
+#set -x
+#$MAVEN_HOME/bin/mvn ${BUILD_KNOX_OPTS} "$@"
+#export MAVEN_OPTS="-Xmx1500m -Xms1500m -XX:MaxPermSize=256m" 
+#mvn clean install -DskipTests "$@" 
+#mvn clean package -Pdist -DskipTests
+#set +x
+
+echo;echo
+#Copying the knox binary tarball to the hdp-output folder
+mkdir build
+#echo "${base_path}/target/${knox_jar_version}/${knox_name}*-${knox_jar_version}.tar.gz ${tar_output_folder}/"
+#cp ${base_path}/target/${knox_jar_version}/${knox_name}*-${knox_jar_version}.tar.gz ${tar_output_folder}/
+tar -C build --strip-components=1 -xzf target/${knox_jar_version}/${knox_name}*-${knox_jar_version}.tar.gz
+echo "-------------- Knox-do-component-build-completed --------------"

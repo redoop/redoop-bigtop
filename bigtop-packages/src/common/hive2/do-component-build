@@ -1,0 +1,38 @@
+#!/bin/bash
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -ex
+
+. `dirname ${0}`/bigtop.bom
+
+HIVE_MAVEN_OPTS=" -Dhbase.version=$HBASE_VERSION \
+-Dzookeeper.version=$ZOOKEEPER_VERSION \
+-Dhadoop.mr.rev=23 \
+-Dhadoop.security.version=$HADOOP_VERSION \
+-Dhadoop-23.version=$HADOOP_VERSION \
+-Dhbase.hadoop2.version=$HBASE_VERSION \
+-Dmvn.hadoop.profile=hadoop23 \
+-DskipTests \
+-Dhbase.version.with.hadoop.version=$HBASE_VERSION-hadoop2 \
+-Dtez.version=${TEZ_HIVE2_VERSION} \
+-Dspark.version=${SPARK_VERSION}
+"
+
+export MAVEN_OPTS="-Xmx1500m -Xms1500m -XX:MaxPermSize=256m"
+mvn ${HIVE_MAVEN_OPTS} clean package -Pdist "$@"
+
+mkdir -p build/dist
+tar -C build/dist --strip-components=1 -xzf packaging/target/apache-hive-${HIVE2_VERSION}-bin.tar.gz
