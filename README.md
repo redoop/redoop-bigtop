@@ -1,3 +1,8 @@
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=redoop/redoop-bigtop&type=Date)](https://star-history.com/#redoop/redoop-bigtop&Date)
+
+
 Licensed to the Apache Software Foundation (ASF) under one or more
 contributor license agreements. See the NOTICE file distributed with
 this work for additional information regarding copyright ownership.
