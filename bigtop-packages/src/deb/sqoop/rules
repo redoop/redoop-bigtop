@@ -1,0 +1,79 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	bash debian/do-component-build
+
+override_dh_auto_install:
+	env CRH_DIR=${crh_dir} CRH_VERSION=${CRH_VERSION_AS_NAME} \
+	bash -x debian/install_sqoop.sh \
+	  --build-dir=build/sqoop-* \
+	  --doc-dir=usr/share/doc/sqoop \
+	  --conf-dir=/etc/sqoop/conf.dist \
+	  --prefix=debian/sqoop${CRH_VERSION_AS_NAME} \
+	  --extra-dir=debian/
+	  
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/sqoop-metastore.sh.suse
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/sqoop-metastore.sh
+	cp debian/sqoop-metastore.sh debian/sqoop-metastore.init
+	mkdir -p debian/sqoop${CRH_VERSION_AS_NAME}-metastore/etc/init.d
+	cp debian/sqoop-metastore.init debian/sqoop${CRH_VERSION_AS_NAME}-metastore/etc/init.d/sqoop-metastore
+	
+# Rename file to add CRH version as name, first define file list
+deb_file=metastore
+
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/sqoop.dirs ] || mv debian/sqoop.dirs debian/sqoop${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/sqoop.install ] || mv debian/sqoop.install debian/sqoop${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/sqoop.lintian-overrides ] || mv debian/sqoop.lintian-overrides debian/sqoop${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/sqoop.manpages ] || mv debian/sqoop.manpages debian/sqoop${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/sqoop.postinst ] || mv debian/sqoop.postinst debian/sqoop${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/sqoop.preinst ] || mv debian/sqoop.preinst debian/sqoop${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/sqoop.prerm ] || mv debian/sqoop.prerm debian/sqoop${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/sqoop-$$file.dirs ] || mv debian/sqoop-$$file.dirs debian/sqoop${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/sqoop-$$file.install ] || mv debian/sqoop-$$file.install debian/sqoop${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/sqoop-$$file.lintian-overrides ] || mv debian/sqoop-$$file.lintian-overrides debian/sqoop${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/sqoop-$$file.manpages ] || mv debian/sqoop-$$file.manpages debian/sqoop${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/sqoop-$$file.postinst ] || mv debian/sqoop-$$file.postinst debian/sqoop${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/sqoop-$$file.preinst ] || mv debian/sqoop-$$file.preinst debian/sqoop${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/sqoop-$$file.prerm ] || mv debian/sqoop-$$file.prerm debian/sqoop${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install

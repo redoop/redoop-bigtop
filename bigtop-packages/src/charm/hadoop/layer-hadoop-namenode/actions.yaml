@@ -1,0 +1,2 @@
+smoke-test:
+    description: Run a simple HDFS smoke test.

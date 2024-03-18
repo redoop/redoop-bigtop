@@ -1,0 +1,2 @@
+${crh_dir}/spark/lib/datanucleus-*.jar
+${crh_dir}/hadoop-yarn/lib/datanucleus-*.jar

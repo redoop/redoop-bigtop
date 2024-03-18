@@ -1,0 +1,233 @@
+
+#top-nav .navbar.navbar-static-top .navbar-inner {
+  background: #2d2d3c;
+  padding: 0 80px 0 0;
+  max-height: 60px;
+}
+#top-nav .navbar.navbar-static-top .logo,
+#top-nav .navbar.navbar-static-top .brand {
+  margin-top: 10px;
+}
+#top-nav .navbar.navbar-static-top .brand.cluster-name .icon-caret-left {
+  color: #5b5b6d;
+}
+#top-nav .navbar.navbar-static-top .brand.cluster-name .label.alerts-none-count {
+  background: #f2322a;
+}
+#top-nav .navbar.navbar-static-top .top-nav-menu.nav li a {
+  padding: 20px 15px;
+}
+#top-nav .navbar.navbar-static-top .top-nav-menu.nav .active > a {
+  background: #16161f;
+  color: #fff;
+}
+#top-nav .navbar.navbar-static-top .top-nav-menu.nav .top-nav-dropdown-menu {
+  border: 1px solid #2d2d3c;
+}
+#top-nav #span-bg-operation-count {
+  background: #5b5b6d;
+}
+#top-nav .top-nav-user {
+  margin-top: 15px;
+}
+#top-nav .btn-group .btn {
+  background: #5b5b6d;
+  color: #fff;
+}
+#top-nav .btn-group .caret {
+  border-top: 4px solid #fff;
+}
+#main .main-container {
+  width: 100%;
+}
+#main .services-menu.well.service-menu-width {
+  position: relative;
+  width: 250px;
+  margin: -20px 0 0 -20px;
+  padding-bottom: 200px !important;
+}
+#main .nav-tabs {
+  border-bottom: none;
+}
+#main .nav-tabs li a {
+  border: none;
+}
+#main .nav-tabs li a:hover {
+  background: none;
+}
+#main .nav-tabs > .active > a,
+#main .nav-tabs > .active >a:hover {
+  background: #727c9a;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 10px;
+  min-width: 65px;
+  text-align: center;
+}
+#content,
+.service-content {
+  padding: 20px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.services-menu {
+  width: 250px;
+  background: #79afda;
+}
+.services-menu .nav-list >li >a {
+  color: #fff;
+  text-shadow: none;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+}
+.services-menu .nav-list >li >a:hover {
+  color: #fff;
+  background: #5893c2;
+  border-bottom: 1px solid #41759f;
+}
+.services-menu .nav-list > .active > a {
+  color: #fff;
+  background: #5893c2;
+  border-bottom: 1px solid #41759f;
+}
+.services-menu .nav-list .health-status-LIVE,
+.services-menu .nav-list .icon-laptop {
+  color: #198311;
+}
+.services-menu .btn {
+  background: #5893c2;
+  color: #fff;
+  text-shadow: none;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+.services-menu .btn .caret {
+  border-top-color: #fff;
+}
+.services-menu .btn-group.open .btn.dropdown-toggle {
+  background: #5893c2;
+  box-shadow: none;
+}
+.services-menu .dropdown-menu {
+  background: #5893c2;
+  width: 82%;
+}
+.services-menu .dropdown-menu a {
+  color: #fff;
+}
+.services-menu .dropdown-menu a:hover {
+  background: #41759f;
+  color: #fff;
+}
+.services-menu .divider {
+  border: none;
+  background: #74a1db;
+}
+@media (min-width: 1200px) {
+  .services-menu .nav-list li .health-status-LIVE,
+  .services-menu .nav-list li .health-status-STARTING,
+  .services-menu .nav-list li .health-status-DEAD-RED,
+  .services-menu .nav-list li .health-status-STOPPING,
+  .services-menu .nav-list li .health-status-DEAD-YELLOW {
+    margin-left: 16px;
+  }
+  .services-menu .nav-list li .icon-laptop {
+    margin-left: 10px;
+  }
+}
+.alert-info {
+  background: #727c9a;
+  color: #fff;
+}
+.nav-pills >li >a {
+  color: #000;
+}
+.nav-pills > .active > a,
+.nav-pills > .active > a:hover {
+  background: #ebebeb;
+  color: #000;
+}
+.summary-width {
+  margin-right: -20px;
+  max-width: calc(100vw - 300px);
+}
+#config_history .table thead {
+  background: #dbe8ed;
+}
+#config_history .advanced-header-table .sorting {
+  background: url("../img/arrow.png") no-repeat right 50%;
+}
+#config_history .services-menu {
+  background: #f4f8fa;
+}
+#config_history .label-info {
+  background: #6cbc5e;
+}
+#config_history .label-success {
+  background: #41759f;
+}
+#config_history .page-bar {
+  background: none;
+  border: none;
+}
+#config_history .table-striped tbody tr:nth-child(odd) td,
+#config_history .table-striped tbody tr:nth-child(odd) th {
+  background: #fff;
+}
+.service-metrics-block #add-widget-action-box {
+  border-color: #c1ced8;
+  background: #f8fafb;
+}
+.service-metrics-block #add-widget-action-box .icon-plus {
+  color: #c1ced8;
+}
+.thumbnail {
+  border: 1px solid #c1ced8;
+}
+.table th,
+.table td {
+  border-color: #c1ced8;
+}
+.table-striped tbody td,
+.table-striped tbody th {
+  border-color: #c1ced8;
+}
+.table-striped tbody tr:nth-child(odd) td,
+.table-striped tbody tr:nth-child(odd) th {
+  background: #f5f9fb;
+}
+.box {
+  border-color: #c1ced8;
+}
+.box .box-header,
+.box .box-footer {
+  background: #e9f1f4;
+  border-color: #c1ced8;
+}
+.rack {
+  border-color: #c1ced8;
+}
+.rack .rackHeader {
+  background: #e9f1f4;
+  border-color: #c1ced8;
+}
+#hosts .table th {
+  background: #e9f1f4;
+  border-color: #c1ced8;
+}
+#hosts .table td {
+  border-color: #c1ced8;
+}
+.tab-content.service-config-tab-content .enhanced-config-tab-content .section-layout-container .config-section-table .config-section {
+  border-color: #c1ced8;
+}
+#combo_search_box .VS-search .VS-search-box {
+  border-color: #c1ced8;
+}
+.page-bar {
+  border-color: #c1ced8;
+}
+#i18n-18 {
+  color: #333;
+}

@@ -1,0 +1,12 @@
+diff -uNr apache-tez-0.9.1-src/tez-ui/pom.xml apache-tez-0.9.1-srcp/tez-ui/pom.xml
+--- apache-tez-0.9.1-src/tez-ui/pom.xml	2017-12-13 08:11:51.000000000 +0800
++++ apache-tez-0.9.1-srcp/tez-ui/pom.xml	2018-04-10 16:36:04.260777431 +0800
+@@ -144,7 +144,7 @@
+             <phase>generate-resources</phase>
+             <id>bower install</id>
+             <configuration>
+-              <arguments>install</arguments>
++              <arguments>install --allow-root</arguments>
+             </configuration>
+             <goals>
+               <goal>bower</goal>

@@ -1,0 +1,108 @@
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.ambari.contrib.mpacks</groupId>
+  <artifactId>ambari-contrib-mpacks</artifactId>
+  <packaging>pom</packaging>
+  <version>2.0.0.0-SNAPSHOT</version>
+  <name>Ambari Contrib Management Packs</name>
+  <modules>
+    <module>crh-DW-mpack</module>
+    <module>crh-Spark-mpack</module>
+    <module>crh-Security-mpack</module>
+    <module>crh-TS-mpack</module>
+    <module>crs-mpack</module>
+    <module>crf-mpack</module>
+  </modules>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <version>0.11</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!--GIT files-->
+            <exclude>.git/</exclude>
+            <exclude>**/.gitignore</exclude>
+            <exclude>**/.gitattributes</exclude>
+            <!--gitignore content-->
+            <exclude>.idea/</exclude>
+            <exclude>pass.txt</exclude>
+            <exclude>.DS_Store</exclude>
+            <exclude>.iml/</exclude>
+            <exclude>.classpath</exclude>
+            <exclude>.project</exclude>
+            <exclude>.settings</exclude>
+            <exclude>**/target/**</exclude>
+            <exclude>**/.gitkeep</exclude>
+            <exclude>**/.bowerrc</exclude>
+            <exclude>**/.editorconfig</exclude>
+            <exclude>**/.jshintrc</exclude>
+            <exclude>**/.tmp/**</exclude>
+            <exclude>**/tmp/**</exclude>
+            <exclude>**/*.json</exclude>
+            <exclude>**/*.svg</exclude>
+            <exclude>**/vendor/**</exclude>
+            <exclude>**/bin</exclude>
+            <exclude>**/node_modules/**</exclude>
+            <exclude>**/vendor/**</exclude>
+            <exclude>**/public/**</exclude>
+            <exclude>**/dist/**</exclude>
+            <exclude>**/bower_components/**</exclude>
+            <exclude>**/bower/**</exclude>
+            <exclude>**/node/**</exclude>
+            <exclude>**/runner.js</exclude>
+            <exclude>**/assets/javascripts/**</exclude>
+            <exclude>**/assets/stylesheets/**</exclude>
+            <exclude>**/assets/static/javascripts/**</exclude>
+            <exclude>**/assets/static/stylesheets/**</exclude>
+            <exclude>storm/src/main/resources/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <modules>
+        <module>crh-DW-mpack</module>
+        <module>crh-Spark-mpack</module>
+        <module>crh-Security-mpack</module>
+        <module>crh-TS-mpack</module>
+        <module>crs-mpack</module>
+        <module>crf-mpack</module>
+      </modules>
+    </profile>
+  </profiles>
+</project>

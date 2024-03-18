@@ -1,0 +1,9 @@
+/etc/hive-hcatalog
+/usr/bin/hcat
+/usr/share/man/man1/hive-hcatalog.1.gz
+${crh_dir}/hive-hcatalog/bin
+${crh_dir}/hive-hcatalog/etc/hcatalog
+${crh_dir}/hive-hcatalog/libexec
+${crh_dir}/hive-hcatalog/sbin/hcat*
+${crh_dir}/hive-hcatalog/sbin/update-hcatalog-env.sh
+${crh_dir}/hive-hcatalog/share/hcatalog

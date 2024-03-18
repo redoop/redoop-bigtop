@@ -1,0 +1,74 @@
+#!/bin/sh
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -e
+
+echo "-------------- Slider-do-component-build-started -----------"
+base_path=`pwd`
+build_support_dir=`echo ${base_path%bigtop*}`
+tar_output_folder="${build_support_dir}crh-output"
+replace_file_path="${build_support_dir}SubstitutionFiles/slider.sh"
+app_packages_file_path="${build_support_dir}SubstitutionFiles/slider-app-variables.sh"
+crh_comp_vars=${build_support_dir}CRH_COMPONENT_VARIABLES.sh
+source ${crh_comp_vars}
+
+. `dirname $0`/bigtop.bom
+# modifying the properties prior to build
+source ${replace_file_path}
+
+set -x
+$MAVEN_HOME/bin/mvn -q -B -e versions:set -DnewVersion=${slider_jar_version}
+
+set +x
+               (
+               cd  ../  &&
+               echo tar zcf ${tar_output_folder}/slider-${slider_jar_version}.source.tar.gz slider-${slider_rpm_version}
+               tar zcf ${tar_output_folder}/slider-${slider_jar_version}.source.tar.gz slider-${slider_rpm_version}
+               cd -
+               )
+
+echo "Generating git diffs of the source tress"
+git diff  > ${tar_output_folder}/slider-source.patch
+
+set -x
+echo "$BUILD_SLIDER_OPTS"
+$MAVEN_HOME/bin/mvn ${BUILD_SLIDER_OPTS} "$@"
+set +x
+
+echo;echo
+#Copying the slider binary tarball to the crh-output folder
+mkdir build
+echo "${base_path}/${slider_name}-assemby/target/${slider_name}-${slider_jar_version}-all.tar.gz ${tar_output_folder}/"
+cp ${base_path}/${slider_name}-assembly/target/${slider_name}-${slider_jar_version}*.tar.gz ${tar_output_folder}/
+tar -C build --strip-components=1 -xzf ${slider_name}-assembly/target/${slider_name}-${slider_jar_version}-all.tar.gz
+source ${app_packages_file_path}
+
+mkdir -p ${BIGTOP_LOCATION}/output/slider-app-packages
+                 for i in accumulo hbase storm ;do
+                     pushd ${base_path}/app-packages/$i
+                          [[ ! -d ${BIGTOP_LOCATION}/output/slider-app-packages/$i ]] && mkdir -p ${BIGTOP_LOCATION}/output/slider-app-packages/$i
+                          k=`grep "parent" pom.xml -A3 | awk -F "[><]" '/version/ {print $3}'` ; sed -i "s/$k/${slider_jar_version}/" pom.xml
+                          cmd=$(eval echo \${slider_build_opts_$i})
+                          cmd_full="${cmd} -Dpkg.src=${tar_output_folder}"
+                          echo $cmd_full ; eval $cmd_full ; zipfile=`find -name ${slider_name}-${i}-app-package-*.zip` ; cp $zipfile ${BIGTOP_LOCATION}/output/slider-app-packages/$i/
+                          #writing urls to pkg_list.txt file
+                          echo "${i}_pkg_url=${bucketurl}/${REPO_LOCATION}/slider-app-packages/${i}/`basename ${zipfile}`" >> ${BIGTOP_LOCATION}/output/slider-app-packages/pkg-list.txt
+                          echo "${i}_pkg_url=${private_repo_url}/${REPO_LOCATION}/slider-app-packages/${i}/`basename ${zipfile}`" >> ${BIGTOP_LOCATION}/output/slider-app-packages/pkg-list_private.txt
+                          echo "${i}_pkg_url=${public_repo_url}/${REPO_LOCATION}/slider-app-packages/${i}/`basename ${zipfile}`" >> ${BIGTOP_LOCATION}/output/slider-app-packages/pkg-list_public.txt
+                          echo "${i}_pkg_url=${bucketurl}/${REPO_LOCATION_BUILD_NUMBER}/slider-app-packages/${i}/`basename ${zipfile}`" >> ${BIGTOP_LOCATION}/output/slider-app-packages/pkg-list_bn.txt
+                     popd
+                 done
+echo "-------------- Slider-do-component-build-completed --------------"

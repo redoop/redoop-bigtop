@@ -1,0 +1,93 @@
+#!/usr/bin/make -f
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+phoenix_pkg_name=phoenix
+zookeeper_home=${crh_dir}/zookeeper
+hadoop_home=${crh_dir}/hadoop
+hadoop_mapreduce_home=${crh_dir}/hadoop-mapreduce
+hadoop_hdfs_home=${crh_dir}/hadoop-hdfs
+hadoop_yarn_home=${crh_dir}/hadoop-yarn
+hbase_home=${crh_dir}/hbase
+crh_dir=/usr/${CRH_TAG}/${CRH_VERSION_WITH_BN}
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# we'll just use the build from the tarball.
+	mkdir -p debian/tmp/bigtop-empty
+	bash debian/do-component-build -Dmaven.repo.local=${HOME}/.m2/repository
+
+.PHONY: queryserver
+	bash debian/init.d.tmpl debian/${phoenix_pkg_name}-queryserver.svc deb debian/${phoenix_pkg_name}-queryserver.init
+	
+override_dh_auto_install: queryserver
+	mkdir -p debian/${phoenix_pkg_name}${CRH_VERSION_AS_NAME}/etc/default/
+	mkdir -p debian/${phoenix_pkg_name}${CRH_VERSION_AS_NAME}-queryserver/etc/default/
+	cp debian/phoenix.default debian/${phoenix_pkg_name}${CRH_VERSION_AS_NAME}/etc/default/${phoenix_pkg_name}
+	cp debian/phoenix-queryserver.default debian/${phoenix_pkg_name}${CRH_VERSION_AS_NAME}/etc/default/${phoenix_pkg_name}-queryserver
+	cp debian/phoenix-queryserver.default debian/${phoenix_pkg_name}${CRH_VERSION_AS_NAME}-queryserver/etc/default/${phoenix_pkg_name}-queryserver
+	env CRH_DIR=${crh_dir} bash -x debian/install_phoenix.sh \
+	  --build-dir=$${PWD}/build     \
+	  --prefix=debian/tmp
+	
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/phoenix-queryserver.svc
+	sed -i -e "s,{CRH_DIR},${crh_dir}," debian/phoenix.default
+	sed -i -e "s,{CRH_DIR},${crh_dir},g" debian/phoenix.postinst
+	sed -i -e "s,{PHOENIX_BASE_VERSION},${PHOENIX_BASE_VERSION}," debian/phoenix.postinst
+	  
+	# Rename file to add CRH version as name, first define file list
+deb_file=queryserver
+override_dh_install:
+	# Rename file to add CRH version as name, second traverse deb_file list and rename everyone
+	# dirs
+	[ ! -f debian/phoenix.dirs ] || mv debian/phoenix.dirs debian/phoenix${CRH_VERSION_AS_NAME}.dirs
+	# install
+	[ ! -f debian/phoenix.install ] || mv debian/phoenix.install debian/phoenix${CRH_VERSION_AS_NAME}.install
+	# lintian-overrides
+	[ ! -f debian/phoenix.lintian-overrides ] || mv debian/phoenix.lintian-overrides debian/phoenix${CRH_VERSION_AS_NAME}.lintian-overrides
+	# manpages
+	[ ! -f debian/phoenix.manpages ] || mv debian/phoenix.manpages debian/phoenix${CRH_VERSION_AS_NAME}.manpages
+	# postinst
+	[ ! -f debian/phoenix.postinst ] || mv debian/phoenix.postinst debian/phoenix${CRH_VERSION_AS_NAME}.postinst
+	# preinst
+	[ ! -f debian/phoenix.preinst ] || mv debian/phoenix.preinst debian/phoenix${CRH_VERSION_AS_NAME}.preinst
+	# prerm
+	[ ! -f debian/phoenix.prerm ] || mv debian/phoenix.prerm debian/phoenix${CRH_VERSION_AS_NAME}.prerm
+	# other files like above
+	for file in $(deb_file); \
+	do \
+		[ ! -f debian/phoenix-$$file.dirs ] || mv debian/phoenix-$$file.dirs debian/phoenix${CRH_VERSION_AS_NAME}-$$file.dirs; \
+		[ ! -f debian/phoenix-$$file.install ] || mv debian/phoenix-$$file.install debian/phoenix${CRH_VERSION_AS_NAME}-$$file.install; \
+		[ ! -f debian/phoenix-$$file.lintian-overrides ] || mv debian/phoenix-$$file.lintian-overrides debian/phoenix${CRH_VERSION_AS_NAME}-$$file.lintian-overrides; \
+		[ ! -f debian/phoenix-$$file.manpages ] || mv debian/phoenix-$$file.manpages debian/phoenix${CRH_VERSION_AS_NAME}-$$file.manpages; \
+		[ ! -f debian/phoenix-$$file.postinst ] || mv debian/phoenix-$$file.postinst debian/phoenix${CRH_VERSION_AS_NAME}-$$file.postinst; \
+		[ ! -f debian/phoenix-$$file.preinst ] || mv debian/phoenix-$$file.preinst debian/phoenix${CRH_VERSION_AS_NAME}-$$file.preinst; \
+		[ ! -f debian/phoenix-$$file.prerm ] || mv debian/phoenix-$$file.prerm debian/phoenix${CRH_VERSION_AS_NAME}-$$file.prerm; \
+	done
+	
+	dh_install

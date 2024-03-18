@@ -1,0 +1,3 @@
+/etc/default/hadoop-fuse
+/usr/bin/hadoop-fuse-dfs
+${crh_dir}/hadoop/bin/fuse_dfs

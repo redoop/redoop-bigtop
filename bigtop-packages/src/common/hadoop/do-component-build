@@ -1,0 +1,95 @@
+#!/bin/bash
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -ex
+######################################################################
+# BIGTOP-2288 Please remove this patch when maven repository is updated
+# with version of leveldbjni-all library that is not x86 specific
+if [ $HOSTTYPE = "powerpc64le" ] ; then
+        #download the POWER version of leveldb
+        git clone git://github.com/ibmsoe/leveldb.git
+        git clone https://github.com/ibmsoe/leveldbjni.git
+        export SNAPPY_HOME=/usr/lib
+        export LEVELDB_HOME=`cd leveldb; pwd`
+        export LEVELDBJNI_HOME=`cd leveldbjni; pwd`
+        export LIBRARY_PATH=${SNAPPY_HOME}
+        cd ${LEVELDB_HOME}
+        export C_INCLUDE_PATH=${LIBRARY_PATH}
+        export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
+        git apply ../leveldbjni/leveldb.patch
+        make libleveldb.a
+        #Now use maven to build and update the local maven repository with ppc version of
+        #leveldbjni.
+        cd ${LEVELDBJNI_HOME}
+        mvn clean install -DskipTests -P download -Plinux64,all
+        cd ..
+        #cleanup
+        rm -rf ${LEVELDBJNI_HOME}
+        rm -rf ${LEVELDB_HOME}
+elif [[ $HOSTTYPE = "aarch64" || $HOSTTYPE = "mips64el" ]] ; then
+        #download the ARM64 version of leveldb
+        git clone https://github.com/Xingwd/leveldb.git
+        git clone https://github.com/Xingwd/leveldbjni.git
+        export SNAPPY_HOME=/usr/lib64
+        export LEVELDB_HOME=`cd leveldb; pwd`
+        export LEVELDBJNI_HOME=`cd leveldbjni; pwd`
+        cd ${LEVELDB_HOME}
+        export LIBRARY_PATH=${SNAPPY_HOME}
+        export C_INCLUDE_PATH=${LIBRARY_PATH}
+        export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
+        git apply ../leveldbjni/leveldb.patch
+        make
+        cp out-static/libleveldb.a .
+        #Now use maven to build and update the local maven repository with aarch64/mips64el version of
+        #leveldbjni.
+        cd ${LEVELDBJNI_HOME}
+        mvn clean install -DskipTests -P download -Plinux64,all
+        cd ..
+        #cleanup
+        rm -rf ${LEVELDBJNI_HOME}
+        rm -rf ${LEVELDB_HOME}
+fi
+## BIGTOP-2288
+
+. `dirname $0`/bigtop.bom
+
+if [ -z "$BUNDLE_SNAPPY" ] ; then
+  [ -f /usr/lib/libsnappy.so ] && BUNDLE_SNAPPY="-Dsnappy.prefix=x -Dbundle.snappy=true -Dsnappy.lib=/usr/lib"
+  [ -f /usr/lib64/libsnappy.so ] && BUNDLE_SNAPPY="-Dsnappy.prefix=x -Dbundle.snappy=true -Dsnappy.lib=/usr/lib64"
+  [ -f /usr/lib/${HOSTTYPE}-linux-gnu/libsnappy.so ] && BUNDLE_SNAPPY="-Dsnappy.prefix=x -Dbundle.snappy=true -Dsnappy.lib=/usr/lib/${HOSTTYPE}-linux-gnu"
+fi
+
+mkdir build
+mkdir build/src
+
+# Build artifacts
+MAVEN_OPTS="-Dzookeeper.version=$ZOOKEEPER_VERSION"
+MAVEN_OPTS="$MAVEN_OPTS -DskipTests -DskipTest -DskipITs"
+mvn $ANT_OPTS $BUNDLE_SNAPPY -Pdist -Pnative -Psrc -Dtar ${MAVEN_OPTS} -Dtomcat.version=${BIGTOP_TOMCAT_VERSION} -Dtomcat.download.url="http://compile.redoop.org/redoop/archive/dist/tomcat/tomcat-6/v${BIGTOP_TOMCAT_VERSION}/bin/apache-tomcat-${BIGTOP_TOMCAT_VERSION}.tar.gz" install "$@"
+mvn site site:stage ${MAVEN_OPTS} $@
+
+(cd build ; tar --strip-components=1 -xzvf  ../hadoop-dist/target/hadoop-${HADOOP_VERSION}.tar.gz)
+(cd build/src ; tar --strip-components=1 -xzvf  ../../hadoop-dist/target/hadoop-${HADOOP_VERSION}-src.tar.gz)
+
+# Copy generated docs
+mkdir -p build/share
+cp -r target/staging/hadoop-project build/share/doc
+
+# Create a manifest for hadoop client package
+(cd hadoop-client/target/hadoop-client-*/share/hadoop/client/lib ; ls) > build/hadoop-client.list
+
+# Copy fuse output to the build directory
+cp hadoop-hdfs-project/hadoop-hdfs/target/native/main/native/fuse-dfs/fuse_dfs build/bin/
